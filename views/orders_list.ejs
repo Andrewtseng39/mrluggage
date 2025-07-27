@@ -722,8 +722,57 @@
           </tbody>
         </table>
       </div>
+<!-- 手機版卡片 -->
+<div class="mobile-cards">
+  <% if (orders.length > 0) { %>
+    <% orders.forEach(order => { %>
+      <div class="order-card">
+        <div class="card-header">
+          <span class="card-order-no">#<%= order.order_no %></span>
+          <span class="card-status">
+            <% if (order.signed_at) { %>
+              <span class="status-badge status-completed">已完成</span>
+            <% } else { %>
+              <span class="status-badge status-pending">未完成</span>
+            <% } %>
+          </span>
+        </div>
+        <div class="card-info">
+          <div class="card-info-item">
+            <span class="card-info-label">姓名</span>
+            <span class="card-info-value"><%= order.name %></span>
+          </div>
+          <div class="card-info-item">
+            <span class="card-info-label">電話</span>
+            <span class="card-info-value"><%= order.phone %></span>
+          </div>
+          <div class="card-info-item">
+            <span class="card-info-label">金額</span>
+            <span class="card-info-value">NT$ <%= order.amount %></span>
+          </div>
+          <div class="card-info-item">
+            <span class="card-info-label">部門</span>
+            <span class="card-info-value"><%= order.dept_name || '未指定' %></span>
+          </div>
+          <div class="card-info-item">
+            <span class="card-info-label">建立時間</span>
+            <span class="card-info-value"><%= order.created_at %></span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <a href="/orders/<%= order.id %>" class="card-view-btn">查看</a>
+          <a href="/orders/<%= order.id %>/print" class="card-print-btn"><i class="fas fa-print"></i> 列印</a>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div class="no-data">
+      <i class="fas fa-inbox"></i>
+      <h3>沒有找到訂單</h3>
+      <p>嘗試調整搜尋條件，或新增第一筆訂單</p>
     </div>
-  </div>
+  <% } %>
+</div>
 
   <script>
     // 你的原本 JS 不變

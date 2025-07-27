@@ -17,6 +17,51 @@
       min-height: 100vh;
       display: flex;
     }
+    
+    /* 手機版選單按鈕 */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: rgba(234, 85, 20, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .menu-toggle:hover {
+      background: rgba(234, 85, 20, 1);
+      transform: scale(1.1);
+    }
+    
+    /* 覆蓋層 */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    
     .sidebar {
       width: 280px;
       background: rgba(255, 255, 255, 0.95);
@@ -31,7 +76,9 @@
       display: flex;
       flex-direction: column;
       transition: transform 0.3s ease;
+      z-index: 1000;
     }
+    
     .sidebar-header {
       padding: 30px 25px;
       background: linear-gradient(135deg, #EA5514, #ff7043);
@@ -40,6 +87,7 @@
       position: relative;
       overflow: hidden;
     }
+    
     .sidebar-header::before {
       content: '';
       position: absolute;
@@ -50,10 +98,12 @@
       background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
       animation: shimmer 3s ease-in-out infinite;
     }
+    
     @keyframes shimmer {
       0%, 100% { transform: rotate(0deg); }
       50% { transform: rotate(180deg); }
     }
+    
     .sidebar-header h2 {
       font-size: 1.8em;
       font-weight: 700;
@@ -61,17 +111,43 @@
       position: relative;
       z-index: 1;
     }
+    
     .sidebar-header .subtitle {
       font-size: 0.9em;
       opacity: 0.9;
       position: relative;
       z-index: 1;
     }
+    
+    /* 關閉按鈕 */
+    .sidebar-close {
+      display: none;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 1.1em;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+    
     .sidebar-nav {
       flex: 1;
       padding: 20px 0;
       overflow-y: auto;
     }
+    
     .sidebar-nav a {
       color: #4a5568;
       text-decoration: none;
@@ -82,24 +158,29 @@
       border-left: 3px solid transparent;
       position: relative;
     }
+    
     .sidebar-nav a:hover {
       background: linear-gradient(90deg, rgba(234, 85, 20, 0.1), transparent);
       color: #EA5514;
       border-left-color: #EA5514;
       transform: translateX(5px);
     }
+    
     .sidebar-nav a i {
       width: 20px;
       margin-right: 15px;
       font-size: 1.1em;
     }
+    
     .content {
       margin-left: 280px;
       padding: 30px;
       flex: 1;
       background: transparent;
       min-height: 100vh;
+      transition: margin-left 0.3s ease;
     }
+    
     .top-bar {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
@@ -109,6 +190,7 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.18);
     }
+    
     .top-bar h1 {
       color: #2d3748;
       font-size: 2.2em;
@@ -119,16 +201,19 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+    
     .welcome-text {
       color: #718096;
       font-size: 1.1em;
     }
+    
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 25px;
       margin-bottom: 30px;
     }
+    
     .stat-card {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
@@ -141,10 +226,12 @@
       overflow: hidden;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+    
     .stat-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     }
+    
     .stat-card::before {
       content: '';
       position: absolute;
@@ -154,9 +241,11 @@
       height: 4px;
       background: var(--card-color);
     }
+    
     .stat-card.orange { --card-color: linear-gradient(135deg, #EA5514, #ff7043); }
     .stat-card.green { --card-color: linear-gradient(135deg, #48bb78, #68d391); }
     .stat-card.blue { --card-color: linear-gradient(135deg, #4299e1, #63b3ed); }
+    
     .stat-icon {
       width: 60px;
       height: 60px;
@@ -168,20 +257,24 @@
       font-size: 1.5em;
       color: white;
     }
+    
     .stat-card.orange .stat-icon { background: linear-gradient(135deg, #EA5514, #ff7043); }
     .stat-card.green .stat-icon { background: linear-gradient(135deg, #48bb78, #68d391); }
     .stat-card.blue .stat-icon { background: linear-gradient(135deg, #4299e1, #63b3ed); }
+    
     .stat-number {
       font-size: 2.5em;
       font-weight: 700;
       color: #2d3748;
       margin-bottom: 8px;
     }
+    
     .stat-label {
       color: #718096;
       font-size: 1.1em;
       font-weight: 500;
     }
+    
     .overdue-section {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
@@ -190,6 +283,7 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.18);
     }
+    
     .section-header {
       display: flex;
       align-items: center;
@@ -197,22 +291,27 @@
       padding-bottom: 15px;
       border-bottom: 2px solid #f7fafc;
     }
+    
     .section-header i {
       color: #e53e3e;
       font-size: 1.3em;
       margin-right: 12px;
     }
+    
     .section-header h2 {
       color: #2d3748;
       font-size: 1.5em;
       font-weight: 600;
     }
+    
     .table-container {
       overflow-x: auto;
       border-radius: 12px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
+    
     table { width: 100%; border-collapse: collapse; background: white; }
+    
     th {
       background: linear-gradient(135deg, #EA5514, #ff7043);
       color: white;
@@ -222,16 +321,20 @@
       font-size: 0.95em;
       letter-spacing: 0.5px;
     }
+    
     td {
       padding: 16px 15px;
       border-bottom: 1px solid #e2e8f0;
       color: #4a5568;
     }
+    
     .overdue-row {
       background: rgba(254, 178, 178, 0.1);
       animation: pulse 2s ease-in-out infinite;
     }
+    
     .overdue-row:hover { background: rgba(254, 178, 178, 0.2); }
+    
     @keyframes pulse {
       0%, 100% {
         background-color: rgba(254, 178, 178, 0.1);
@@ -242,16 +345,19 @@
         box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
       }
     }
+    
     .no-data {
       text-align: center;
       padding: 50px 20px;
       color: #718096;
     }
+    
     .no-data i {
       font-size: 3em;
       color: #48bb78;
       margin-bottom: 15px;
     }
+    
     .fee-badge {
       background: linear-gradient(135deg, #e53e3e, #fc8181);
       color: white;
@@ -260,38 +366,119 @@
       font-size: 0.9em;
       font-weight: 600;
     }
+    
+    /* 手機版樣式 */
     @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); z-index: 1000; }
-      .content { margin-left: 0; padding: 20px; }
-      .stats-grid { grid-template-columns: 1fr; gap: 15px; }
-      .stat-card { padding: 20px; }
-      .top-bar h1 { font-size: 1.8em; }
+      .menu-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .sidebar-close {
+        display: block;
+      }
+      
+      .content {
+        margin-left: 0;
+        padding: 80px 20px 20px 20px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .stat-card {
+        padding: 20px;
+      }
+      
+      .top-bar {
+        padding: 20px;
+      }
+      
+      .top-bar h1 {
+        font-size: 1.8em;
+      }
+      
+      .overdue-section {
+        padding: 20px;
+      }
+      
+      /* 手機版表格優化 */
+      th, td {
+        padding: 12px 8px;
+        font-size: 0.9em;
+      }
+      
+      .fee-badge {
+        font-size: 0.8em;
+        padding: 4px 8px;
+      }
+    }
+    
+    /* 極小螢幕優化 */
+    @media (max-width: 480px) {
+      .sidebar {
+        width: 100vw;
+      }
+      
+      .content {
+        padding: 80px 15px 15px 15px;
+      }
+      
+      .stat-number {
+        font-size: 2em;
+      }
+      
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2em;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- 手機版選單按鈕 -->
+  <button class="menu-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- 覆蓋層 -->
+  <div class="overlay" onclick="closeSidebar()"></div>
+
   <!-- 側邊選單 -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
+      <button class="sidebar-close" onclick="closeSidebar()">
+        <i class="fas fa-times"></i>
+      </button>
       <h2><i class="fas fa-suitcase-rolling"></i> Mr. Luggage</h2>
       <div class="subtitle">行李寄存管理系統</div>
     </div>
     <nav class="sidebar-nav">
-  <a href="/dashboard"><i class="fas fa-tachometer-alt"></i> 儀表板</a>
-  <a href="/orders"><i class="fas fa-clipboard-list"></i> 訂單列表</a>
-  <a href="/inventory/logs"><i class="fas fa-history"></i> 盤點紀錄</a>
-  <a href="/inventory/missing"><i class="fas fa-exclamation-triangle"></i> 未盤點清單</a>
-  <a href="/inventory/scan"><i class="fas fa-barcode"></i> 行李盤點</a>
-  <% if (user && user.isAdmin) { %>
-    <a href="/departments"><i class="fas fa-building"></i> 部門管理</a>
-    <a href="/staff"><i class="fas fa-users-cog"></i> 員工管理</a>
-    <a href="/orders/export/csv"><i class="fas fa-file-csv"></i> 匯出訂單 CSV</a>
-    <a href="/backup/download"><i class="fas fa-download"></i> 下載備份</a>
-  <% } %>
-  <a href="/logout" style="margin-top: auto; border-top: 1px solid #e2e8f0;">
-    <i class="fas fa-sign-out-alt"></i> 登出
-  </a>
-</nav>
+      <a href="/dashboard" onclick="closeSidebar()"><i class="fas fa-tachometer-alt"></i> 儀表板</a>
+      <a href="/orders" onclick="closeSidebar()"><i class="fas fa-clipboard-list"></i> 訂單列表</a>
+      <a href="/inventory/logs" onclick="closeSidebar()"><i class="fas fa-history"></i> 盤點紀錄</a>
+      <a href="/inventory/missing" onclick="closeSidebar()"><i class="fas fa-exclamation-triangle"></i> 未盤點清單</a>
+      <a href="/inventory/scan" onclick="closeSidebar()"><i class="fas fa-barcode"></i> 行李盤點</a>
+      <% if (user && user.isAdmin) { %>
+        <a href="/departments" onclick="closeSidebar()"><i class="fas fa-building"></i> 部門管理</a>
+        <a href="/staff" onclick="closeSidebar()"><i class="fas fa-users-cog"></i> 員工管理</a>
+        <a href="/orders/export/csv" onclick="closeSidebar()"><i class="fas fa-file-csv"></i> 匯出訂單 CSV</a>
+        <a href="/backup/download" onclick="closeSidebar()"><i class="fas fa-download"></i> 下載備份</a>
+      <% } %>
+      <a href="/logout" style="margin-top: auto; border-top: 1px solid #e2e8f0;" onclick="closeSidebar()">
+        <i class="fas fa-sign-out-alt"></i> 登出
+      </a>
+    </nav>
   </div>
 
   <!-- 主內容 -->
@@ -362,5 +549,45 @@
       <% } %>
     </div>
   </div>
+
+  <script>
+    // 側邊選單控制函數
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.querySelector('.overlay');
+      
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+    
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.querySelector('.overlay');
+      
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+    
+    // 點擊選單項目後自動關閉選單（手機版）
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll('.sidebar-nav a').forEach(link => {
+        link.addEventListener('click', closeSidebar);
+      });
+    }
+    
+    // 監聽螢幕大小變化
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        closeSidebar();
+      }
+    });
+    
+    // ESC 鍵關閉選單
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeSidebar();
+      }
+    });
+  </script>
 </body>
 </html>

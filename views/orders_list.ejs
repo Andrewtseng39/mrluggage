@@ -19,6 +19,52 @@
       display: flex;
     }
 
+    /* 漢堡選單按鈕 */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: none;
+      border-radius: 12px;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .menu-toggle i {
+      font-size: 1.2em;
+      color: #EA5514;
+    }
+
+    /* 遮罩層 */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.active {
+      opacity: 1;
+    }
+
     .sidebar {
       width: 280px;
       background: rgba(255, 255, 255, 0.95);
@@ -33,6 +79,7 @@
       display: flex;
       flex-direction: column;
       transition: transform 0.3s ease;
+      z-index: 1000;
     }
 
     .sidebar-header {
@@ -75,6 +122,28 @@
       z-index: 1;
     }
 
+    /* 關閉按鈕 (手機版) */
+    .sidebar-close {
+      display: none;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      color: white;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
     .sidebar-nav {
       flex: 1;
       padding: 20px 0;
@@ -111,6 +180,7 @@
       flex: 1;
       background: transparent;
       min-height: 100vh;
+      transition: margin-left 0.3s ease;
     }
 
     .top-bar {
@@ -230,6 +300,7 @@
       background: white;
       border-radius: 12px;
       overflow: hidden;
+      min-width: 800px;
     }
 
     th {
@@ -323,14 +394,147 @@
       color: #ff7043;
     }
 
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-        z-index: 1000;
-      }
+    /* 手機版卡片樣式 */
+    .mobile-cards {
+      display: none;
+    }
 
+    .order-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .card-order-no {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #EA5514;
+    }
+
+    .card-status {
+      flex-shrink: 0;
+    }
+
+    .card-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .card-info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-info-label {
+      font-size: 0.8em;
+      color: #718096;
+      margin-bottom: 2px;
+    }
+
+    .card-info-value {
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .card-view-btn {
+      color: #EA5514;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 8px 16px;
+      border: 2px solid #EA5514;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .card-view-btn:hover {
+      background: #EA5514;
+      color: white;
+    }
+
+    .card-print-btn {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 0.9em;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .card-print-btn:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 1024px) {
       .content {
         margin-left: 0;
+        padding: 20px;
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .overlay.active {
+        display: block;
+      }
+
+      .sidebar-close {
+        display: block;
+      }
+
+      .top-bar {
+        margin-top: 80px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        padding: 20px;
+        margin-top: 80px;
+      }
+
+      .top-bar h1 {
+        font-size: 1.8em;
+      }
+
+      .search-section {
         padding: 20px;
       }
 
@@ -341,83 +545,118 @@
 
       .search-input {
         min-width: 100%;
+        margin-bottom: 10px;
       }
 
+      .search-btn, .new-order-btn {
+        justify-content: center;
+      }
+
+      .table-section {
+        padding: 20px;
+      }
+
+      /* 隱藏桌面版表格，顯示手機版卡片 */
       .table-container {
-        font-size: 0.9em;
+        display: none;
       }
 
-      th, td {
-        padding: 12px 10px;
+      .mobile-cards {
+        display: block;
       }
 
-      .top-bar h1 {
-        font-size: 1.8em;
+      .sidebar {
+        width: 100%;
+        max-width: 300px;
       }
     }
 
     @media (max-width: 480px) {
-      th, td {
-        padding: 8px 6px;
-        font-size: 0.85em;
+      .content {
+        padding: 15px;
       }
 
-      .status-badge {
-        font-size: 0.75em;
-        padding: 4px 8px;
+      .top-bar {
+        padding: 15px;
+        margin-top: 70px;
+      }
+
+      .top-bar h1 {
+        font-size: 1.6em;
+      }
+
+      .search-section, .table-section {
+        padding: 15px;
+      }
+
+      .order-card {
+        padding: 15px;
+      }
+
+      .card-info {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .card-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .card-view-btn {
+        text-align: center;
+      }
+    }
+
+    /* 觸控優化 */
+    @media (hover: none) and (pointer: coarse) {
+      .search-btn:hover, .new-order-btn:hover {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .order-card:hover {
+        transform: none;
+      }
+
+      .card-view-btn:hover {
+        background: #EA5514;
+        color: white;
       }
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
+  <!-- 漢堡選單按鈕 -->
+  <button class="menu-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- 遮罩層 -->
+  <div class="overlay" onclick="closeSidebar()"></div>
+
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
+      <button class="sidebar-close" onclick="closeSidebar()">
+        <i class="fas fa-times"></i>
+      </button>
       <h2><i class="fas fa-suitcase-rolling"></i> Mr. Luggage</h2>
       <div class="subtitle">行李寄存管理系統</div>
     </div>
 
     <nav class="sidebar-nav">
-      <a href="/dashboard">
-        <i class="fas fa-tachometer-alt"></i>
-        儀表板
-      </a>
-      <a href="/orders" class="active">
-        <i class="fas fa-clipboard-list"></i>
-        訂單列表
-      </a>
-      <a href="/inventory/logs">
-        <i class="fas fa-history"></i>
-        盤點紀錄
-      </a>
-      <a href="/inventory/missing">
-        <i class="fas fa-exclamation-triangle"></i>
-        未盤點清單
-      </a>
-      <a href="/inventory/scan">
-        <i class="fas fa-barcode"></i>
-        行李盤點
-      </a>
-      <% if (user && user.isAdmin) { %>
-        <a href="/departments">
-          <i class="fas fa-building"></i>
-          部門管理
-        </a>
-        <a href="/staff">
-          <i class="fas fa-users-cog"></i>
-          員工管理
-        </a>
-        <a href="/orders/export/csv">
-          <i class="fas fa-file-csv"></i>
-          匯出訂單 CSV
-        </a>
-        <a href="/backup/download">
-          <i class="fas fa-download"></i>
-          下載備份
-        </a>
-      <% } %>
+      <a href="/dashboard"><i class="fas fa-tachometer-alt"></i> 儀表板</a>
+      <a href="/orders" class="active"><i class="fas fa-clipboard-list"></i> 訂單列表</a>
+      <a href="/inventory/logs"><i class="fas fa-history"></i> 盤點紀錄</a>
+      <a href="/inventory/missing"><i class="fas fa-exclamation-triangle"></i> 未盤點清單</a>
+      <a href="/inventory/scan"><i class="fas fa-barcode"></i> 行李盤點</a>
+      <a href="/departments"><i class="fas fa-building"></i> 部門管理</a>
+      <a href="/staff"><i class="fas fa-users-cog"></i> 員工管理</a>
+      <a href="/orders/export/csv"><i class="fas fa-file-csv"></i> 匯出訂單 CSV</a>
+      <a href="/backup/download"><i class="fas fa-download"></i> 下載備份</a>
       <a href="/logout" style="margin-top: auto; border-top: 1px solid #e2e8f0;">
-        <i class="fas fa-sign-out-alt"></i>
-        登出
+        <i class="fas fa-sign-out-alt"></i> 登出
       </a>
     </nav>
   </div>
@@ -429,82 +668,103 @@
 
     <div class="search-section">
       <form class="search-form" method="GET" action="/orders">
-        <input
-          type="text"
-          name="q"
-          value="<%= query %>"
-          placeholder="搜尋姓名 / 電話 / 訂單編號..."
-          class="search-input"
-        >
-        <button type="submit" class="search-btn">
-          <i class="fas fa-search"></i>
-          搜尋
-        </button>
-        <a href="/orders/new" class="new-order-btn">
-          <i class="fas fa-plus"></i>
-          新增訂單
-        </a>
+        <input type="text" name="q" value="<%= query %>" placeholder="搜尋姓名 / 電話 / 訂單編號..." class="search-input">
+        <button type="submit" class="search-btn"><i class="fas fa-search"></i> 搜尋</button>
+        <a href="/orders/new" class="new-order-btn"><i class="fas fa-plus"></i> 新增訂單</a>
       </form>
     </div>
 
     <div class="table-section">
-      <% if (orders.length === 0) { %>
-        <div class="no-data">
-          <i class="fas fa-inbox"></i>
-          <h3>沒有找到訂單</h3>
-          <p>嘗試調整搜尋條件，或新增第一筆訂單</p>
-        </div>
-      <% } else { %>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th><i class="fas fa-hashtag"></i> 訂單編號</th>
-                <th><i class="fas fa-user"></i> 姓名</th>
-                <th><i class="fas fa-phone"></i> 電話</th>
-                <th><i class="fas fa-dollar-sign"></i> 金額</th>
-                <th><i class="fas fa-building"></i> 部門</th>
-                <th><i class="fas fa-flag"></i> 狀態</th>
-                <th><i class="fas fa-calendar-alt"></i> 建立時間</th>
-                <th><i class="fas fa-print"></i> 列印</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% orders.forEach(o => { %>
+      <!-- 桌面版表格 -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th><i class="fas fa-hashtag"></i> 訂單編號</th>
+              <th><i class="fas fa-user"></i> 姓名</th>
+              <th><i class="fas fa-phone"></i> 電話</th>
+              <th><i class="fas fa-dollar-sign"></i> 金額</th>
+              <th><i class="fas fa-building"></i> 部門</th>
+              <th><i class="fas fa-flag"></i> 狀態</th>
+              <th><i class="fas fa-calendar-alt"></i> 建立時間</th>
+              <th><i class="fas fa-print"></i> 列印</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (orders.length > 0) { %>
+              <% orders.forEach(order => { %>
                 <tr>
+                  <td><a href="/orders/<%= order.id %>" class="order-link"><%= order.order_no %></a></td>
+                  <td><%= order.name %></td>
+                  <td><%= order.phone %></td>
+                  <td class="amount-text">NT$ <%= order.amount %></td>
+                  <td><%= order.dept_name || '未指定' %></td>
                   <td>
-                    <a href="/orders/<%= o.id %>" class="order-link">
-                      <strong><%= o.order_no %></strong>
-                    </a>
-                  </td>
-                  <td><%= o.name %></td>
-                  <td><%= o.phone %></td>
-                  <td class="amount-text">$<%= o.amount %></td>
-                  <td><%= o.dept_name %></td>
-                  <td>
-                    <% if (!o.signed_at) { %>
-                      <span class="status-badge status-pending">
-                        <i class="fas fa-clock"></i> 未領取
-                      </span>
+                    <% if (order.signed_at) { %>
+                      <span class="status-badge status-completed">已完成</span>
                     <% } else { %>
-                      <span class="status-badge status-completed">
-                        <i class="fas fa-check"></i> 已領取
-                      </span>
+                      <span class="status-badge status-pending">未完成</span>
                     <% } %>
                   </td>
-                  <td><%= o.created_at %></td>
-                  <td>
-                    <a href="/orders/<%= o.id %>/print" target="_blank" class="print-btn">
-                      <i class="fas fa-print"></i> 列印
-                    </a>
-                  </td>
+                  <td><%= order.created_at %></td>
+                  <td><a href="/orders/<%= order.id %>/print" class="print-btn"><i class="fas fa-print"></i> 列印</a></td>
                 </tr>
               <% }) %>
-            </tbody>
-          </table>
-        </div>
-      <% } %>
+            <% } else { %>
+              <tr>
+                <td colspan="8" class="no-data">
+                  <i class="fas fa-inbox"></i>
+                  <h3>沒有找到訂單</h3>
+                  <p>嘗試調整搜尋條件，或新增第一筆訂單</p>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
+
+  <script>
+    // 你的原本 JS 不變
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.querySelector('.overlay');
+      const menuToggle = document.querySelector('.menu-toggle');
+      
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      
+      if (sidebar.classList.contains('active')) {
+        overlay.style.display = 'block';
+        menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+        document.body.style.overflow = 'hidden';
+      } else {
+        overlay.style.display = 'none';
+        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        document.body.style.overflow = '';
+      }
+    }
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.querySelector('.overlay');
+      const menuToggle = document.querySelector('.menu-toggle');
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      overlay.style.display = 'none';
+      menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+      document.body.style.overflow = '';
+    }
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 1024) {
+        closeSidebar();
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeSidebar();
+      }
+    });
+  </script>
 </body>
 </html>

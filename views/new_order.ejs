@@ -123,6 +123,7 @@
             margin-bottom: 25px;
             border-left: 4px solid #ff5252;
             animation: shake 0.5s ease-in-out;
+            display: block;
         }
 
         @keyframes shake {
@@ -359,28 +360,6 @@
             opacity: 0.8;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .container {
-                border-radius: 15px;
-            }
-            
-            .form-content {
-                padding: 25px;
-            }
-            
-            .row {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-        }
-
         .loading {
             display: none;
             text-align: center;
@@ -401,6 +380,35 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 15px;
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-content {
+                padding: 25px 20px;
+            }
+            
+            .row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -413,7 +421,8 @@
         <div class="form-content">
             <a href="/orders" class="back-link">返回訂單列表</a>
             
-            <% if (error) { %>
+            <!-- 錯誤訊息 -->
+            <% if (typeof error !== 'undefined' && error) { %>
                 <div class="error">⚠️ <%= error %></div>
             <% } %>
 
@@ -474,20 +483,24 @@
                         <div class="form-group">
                             <label for="checkin_at" class="required">寄存時間</label>
                             <div class="datetime-input">
-                                <input type="datetime-local" id="checkin_at" name="checkin_at" required value="<%= defaultCheckin %>" onchange="calculatePrice()">
+                                <input type="datetime-local" id="checkin_at" name="checkin_at" 
+                                       value="<%= typeof defaultCheckin !== 'undefined' ? defaultCheckin : '' %>" 
+                                       required onchange="calculatePrice()">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="checkout_at" class="required">取件時間</label>
                             <div class="datetime-input">
-                                <input type="datetime-local" id="checkout_at" name="checkout_at" required value="<%= defaultCheckout %>" onchange="calculatePrice()">
+                                <input type="datetime-local" id="checkout_at" name="checkout_at" 
+                                       value="<%= typeof defaultCheckout !== 'undefined' ? defaultCheckout : '' %>" 
+                                       required onchange="calculatePrice()">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 價格顯示 -->
-                <div class="price-display" id="priceDisplay">
+                <div class="price-display" id="priceDisplay" style="display: none;">
                     <div>預估總金額: <span id="totalPrice">NT$ 0</span></div>
                     <div class="price-breakdown" id="priceBreakdown">請選擇行李數量和時間</div>
                 </div>
@@ -507,21 +520,21 @@
         const PRICE_BIG = 200;
         const PRICE_SMALL = 150;
 
-        // 設定預設時間（如果後端沒有提供）
+        // 設定預設時間（如果 EJS 沒有提供預設值）
         function setDefaultTimes() {
             const checkinInput = document.getElementById('checkin_at');
             const checkoutInput = document.getElementById('checkout_at');
             
             if (!checkinInput.value) {
                 const now = new Date();
-                const checkinTime = new Date(now.getTime() + 60 * 60 * 1000); // 1小時後
-                checkinInput.value = checkinTime.toISOString().slice(0, 16);
+                const taiwanNow = new Date(now.getTime() + (8 * 60 * 60 * 1000)); // 台灣時間
+                checkinInput.value = taiwanNow.toISOString().slice(0, 16);
             }
             
             if (!checkoutInput.value) {
                 const now = new Date();
-                const checkoutTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24小時後
-                checkoutInput.value = checkoutTime.toISOString().slice(0, 16);
+                const taiwanTomorrow = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (24 * 60 * 60 * 1000)); // 台灣明天
+                checkoutInput.value = taiwanTomorrow.toISOString().slice(0, 16);
             }
         }
 
@@ -598,18 +611,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             setDefaultTimes();
             calculatePrice();
-            
-            // 為所有輸入框添加動畫效果
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'scale(1.02)';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'scale(1)';
-                });
-            });
         });
     </script>
 </body>

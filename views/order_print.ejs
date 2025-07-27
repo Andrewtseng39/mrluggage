@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>列印訂單 - <%= order.order_no %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @page {
+      size: 74mm 105mm; /* A7 尺寸 */
+      margin: 0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Microsoft JhengHei', 'Arial', sans-serif;
+      font-size: 13px;
+      margin: 0;
+      background: #fff;
+      color: #000;
+      text-align: center;
+    }
+
+    .ticket {
+      width: 74mm;
+      height: 103mm; /* 縮小高度 */
+      padding: 1.5mm; /* 減少 padding */
+      border: 2px solid #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+
+    /* 標題區域 */
+    .header {
+      border-bottom: 2px solid #000;
+      padding-bottom: 1mm;
+      margin-bottom: 1.5mm;
+    }
+
+    .company-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .service-type {
+      font-size: 10px;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    /* 訂單資訊 */
+    .order-no {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 1.5mm 0;
+      padding: 1.5mm 0;
+      border: 2px solid #000;
+    }
+
+    .info-row {
+      font-size: 13px;
+      margin: 0.5mm 0;
+    }
+
+    /* 時間資訊 */
+    .time-info {
+      border: 1px solid #000;
+      padding: 1.5mm;
+      font-size: 13px;
+      margin: 1.5mm 0;
+    }
+
+    .time-title {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 0.8mm;
+      border-bottom: 1px dotted #000;
+      padding-bottom: 0.8mm;
+    }
+
+    .time-row {
+      margin: 0.5mm 0;
+    }
+
+    /* QR 區域 */
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5mm 0;
+    }
+
+    .qr-code {
+      width: 22mm;
+      height: 22mm;
+      border: 1px solid #000;
+      margin-bottom: 1mm;
+    }
+
+    .qr-label {
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    /* 底部資訊 */
+    .footer {
+      border-top: 2px solid #000;
+      padding-top: 1mm;
+    }
+
+    .item-counter {
+      font-size: 13px;
+      font-weight: bold;
+      padding: 0.8mm;
+      border: 1px solid #000;
+    }
+
+    /* 列印控制按鈕 */
+    .print-controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: #fff;
+      padding: 10px;
+      border: 2px solid #000;
+      border-radius: 5px;
+    }
+
+    .print-btn {
+      padding: 8px 16px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      margin: 0 3px;
+      font-family: inherit;
+    }
+
+    @media print {
+      .print-controls { display: none !important; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 列印控制 -->
+  <div class="print-controls">
+    <button class="print-btn" onclick="window.print()">🖨️ 列印全部</button>
+    <button class="print-btn" onclick="printSingle()">📄 單張預覽</button>
+    <button class="print-btn" onclick="window.close()">❌ 關閉</button>
+  </div>
+
+  <% luggages.forEach(function(luggage, index) { %>
+    <div class="ticket">
+      <!-- 標題 -->
+      <div class="header">
+        <h1 class="company-name">MR. LUGGAGE</h1>
+        <p class="service-type">Luggage Storage Service</p>
+      </div>
+
+      <div class="order-no"><%= order.order_no %></div>
+      <div class="info-row">姓名：<%= order.name %></div>
+      <div class="info-row">電話：<%= order.phone %></div>
+
+      <div class="time-info">
+        <div class="time-title">寄存時間</div>
+        <div class="time-row">寄存：<%= new Date(order.checkin_at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></div>
+        <div class="time-row">取件：<%= new Date(order.checkout_at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></div>
+      </div>
+
+<div class="qr-section">
+  <% if (luggage.qrDataUrl) { %>
+    <img src="<%= luggage.qrDataUrl %>" alt="QR Code" class="qr-code">
+    <div class="qr-label">掃描取件</div>
+  <% } else { %>
+    <div class="qr-code" style="display:flex;align-items:center;justify-content:center;background:#f0f0f0;font-size:10px;">QR Code<br>載入中</div>
+  <% } %>
+</div>
+
+      <div class="footer">
+        <div class="item-counter">第 <%= index + 1 %> 件，共 <%= luggages.length %> 件</div>
+      </div>
+    </div>
+  <% }); %>
+
+  <script>
+    function printSingle() {
+      const tickets = document.querySelectorAll('.ticket');
+      if (tickets.length > 0) {
+        tickets.forEach((ticket, index) => ticket.style.display = index === 0 ? 'flex' : 'none');
+        window.print();
+        tickets.forEach(ticket => ticket.style.display = 'flex');
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && e.key === 'p') { e.preventDefault(); window.print(); }
+      if (e.key === 'Escape') { window.close(); }
+      if (e.key === '1') { printSingle(); }
+    });
+  </script>
+</body>
+</html>

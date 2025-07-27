@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>新增員工</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    
+    .container {
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 25px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+    }
+    
+    .header h1 {
+      color: #2d3748;
+      font-size: 2.2em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .header .icon {
+      font-size: 3em;
+      color: #EA5514;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+    
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #EA5514;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(234, 85, 20, 0.1);
+    }
+    
+    .back-btn:hover {
+      transform: translateX(-5px);
+      background: rgba(234, 85, 20, 0.2);
+      box-shadow: 0 4px 12px rgba(234, 85, 20, 0.3);
+    }
+    
+    .form-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .error-message {
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+      animation: errorShake 0.5s ease-out;
+    }
+    
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-label {
+      display: block;
+      color: #2d3748;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-label i {
+      color: #EA5514;
+      width: 16px;
+      text-align: center;
+    }
+    
+    .form-label .required {
+      color: #e53e3e;
+      font-size: 0.9em;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid rgba(234, 85, 20, 0.2);
+      border-radius: 12px;
+      font-size: 1em;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #EA5514;
+      box-shadow: 0 0 20px rgba(234, 85, 20, 0.2);
+      transform: translateY(-2px);
+      background: white;
+    }
+    
+    .form-input:invalid:not(:placeholder-shown) {
+      border-color: #e53e3e;
+      box-shadow: 0 0 10px rgba(229, 62, 62, 0.2);
+    }
+    
+    .form-input:valid {
+      border-color: #48bb78;
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid rgba(234, 85, 20, 0.2);
+      border-radius: 12px;
+      font-size: 1em;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    
+    .form-select:focus {
+      outline: none;
+      border-color: #EA5514;
+      box-shadow: 0 0 20px rgba(234, 85, 20, 0.2);
+      transform: translateY(-2px);
+      background: white;
+    }
+    
+    .password-strength {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+      display: none;
+    }
+    
+    .strength-weak {
+      background: rgba(229, 62, 62, 0.1);
+      color: #e53e3e;
+      border: 1px solid rgba(229, 62, 62, 0.2);
+    }
+    
+    .strength-medium {
+      background: rgba(243, 156, 18, 0.1);
+      color: #f39c12;
+      border: 1px solid rgba(243, 156, 18, 0.2);
+    }
+    
+    .strength-strong {
+      background: rgba(72, 187, 120, 0.1);
+      color: #48bb78;
+      border: 1px solid rgba(72, 187, 120, 0.2);
+    }
+    
+    .role-info {
+      margin-top: 8px;
+      padding: 10px 15px;
+      background: rgba(234, 85, 20, 0.05);
+      border-radius: 8px;
+      border-left: 3px solid #EA5514;
+      font-size: 0.9em;
+      color: #4a5568;
+    }
+    
+    .role-info h4 {
+      color: #EA5514;
+      margin-bottom: 5px;
+      font-size: 0.95em;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-submit {
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      color: white;
+    }
+    
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(234, 85, 20, 0.4);
+    }
+    
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+    
+    /* 載入動畫 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .container > * {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .container > *:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 15px;
+      }
+      
+      .header h1 {
+        font-size: 1.8em;
+      }
+      
+      .form-card {
+        padding: 25px;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .header {
+        padding: 20px;
+      }
+      
+      .form-card {
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 1.5em;
+      }
+      
+      .form-input,
+      .form-select {
+        padding: 12px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 標題區域 -->
+    <div class="header">
+      <div class="icon">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <h1>新增員工</h1>
+      <a href="/staff" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        返回員工列表
+      </a>
+    </div>
+
+    <!-- 表單卡片 -->
+    <div class="form-card">
+      <% if (error) { %>
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <%= error %>
+        </div>
+      <% } %>
+      
+      <form method="POST" action="/staff/new" id="staffForm">
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-user-circle"></i>
+            帳號
+            <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            name="username" 
+            class="form-input" 
+            required 
+            autocomplete="username"
+            placeholder="請輸入登入帳號"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-lock"></i>
+            密碼
+            <span class="required">*</span>
+          </label>
+          <input 
+            type="password" 
+            name="password" 
+            class="form-input" 
+            required 
+            autocomplete="new-password"
+            placeholder="請設定登入密碼"
+            id="passwordInput"
+          >
+          <div class="password-strength" id="passwordStrength"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-id-badge"></i>
+            姓名
+            <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            name="real_name" 
+            class="form-input" 
+            required
+            placeholder="請輸入真實姓名"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-building"></i>
+            部門
+            <span class="required">*</span>
+          </label>
+          <select name="department_id" class="form-select" required>
+            <option value="">請選擇部門</option>
+            <% departments.forEach(d => { %>
+              <option value="<%= d.id %>"><%= d.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-user-shield"></i>
+            權限角色
+            <span class="required">*</span>
+          </label>
+          <select name="role" class="form-select" required id="roleSelect">
+            <option value="">請選擇角色</option>
+            <option value="Staff">Staff - 一般員工</option>
+            <option value="Admin">Admin - 系統管理員</option>
+          </select>
+          <div class="role-info" id="roleInfo" style="display: none;"></div>
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-submit" id="submitBtn">
+            <i class="fas fa-user-plus"></i>
+            新增員工
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // 密碼強度檢測
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordStrength = document.getElementById('passwordStrength');
+    
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      const strength = checkPasswordStrength(password);
+      
+      if (password.length === 0) {
+        passwordStrength.style.display = 'none';
+        return;
+      }
+      
+      passwordStrength.style.display = 'block';
+      passwordStrength.className = 'password-strength ' + strength.class;
+      passwordStrength.innerHTML = `<i class="${strength.icon}"></i> ${strength.text}`;
+    });
+    
+    function checkPasswordStrength(password) {
+      if (password.length < 6) {
+        return {
+          class: 'strength-weak',
+          icon: 'fas fa-times-circle',
+          text: '密碼太短，建議至少6個字元'
+        };
+      }
+      
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+      
+      if (score <= 2) {
+        return {
+          class: 'strength-weak',
+          icon: 'fas fa-exclamation-triangle',
+          text: '密碼強度：弱'
+        };
+      } else if (score <= 3) {
+        return {
+          class: 'strength-medium',
+          icon: 'fas fa-shield-alt',
+          text: '密碼強度：中等'
+        };
+      } else {
+        return {
+          class: 'strength-strong',
+          icon: 'fas fa-check-circle',
+          text: '密碼強度：強'
+        };
+      }
+    }
+    
+    // 角色選擇說明
+    const roleSelect = document.getElementById('roleSelect');
+    const roleInfo = document.getElementById('roleInfo');
+    
+    roleSelect.addEventListener('change', function() {
+      const role = this.value;
+      
+      if (!role) {
+        roleInfo.style.display = 'none';
+        return;
+      }
+      
+      roleInfo.style.display = 'block';
+      
+      if (role === 'Admin') {
+        roleInfo.innerHTML = `
+          <h4><i class="fas fa-crown"></i> 系統管理員權限</h4>
+          <p>可以管理所有功能，包括員工管理、系統設定、資料匯出等</p>
+        `;
+      } else {
+        roleInfo.innerHTML = `
+          <h4><i class="fas fa-user"></i> 一般員工權限</h4>
+          <p>可以處理訂單、行李盤點等日常作業，但無法管理其他員工</p>
+        `;
+      }
+    });
+    
+    // 表單提交處理
+    document.getElementById('staffForm').addEventListener('submit', function(e) {
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 新增中...';
+      submitBtn.disabled = true;
+    });
+    
+    // 表單驗證增強
+    const inputs = document.querySelectorAll('.form-input, .form-select');
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        if (this.hasAttribute('required') && !this.value.trim()) {
+          this.style.borderColor = '#e53e3e';
+        }
+      });
+      
+      input.addEventListener('input', function() {
+        if (this.style.borderColor === 'rgb(229, 62, 62)' && this.value.trim()) {
+          this.style.borderColor = '';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

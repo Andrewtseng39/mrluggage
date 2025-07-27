@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>員工管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    .sidebar {
+      width: 280px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border-right: 1px solid rgba(255, 255, 255, 0.18);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-header {
+      padding: 30px 25px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .sidebar-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+    }
+    
+    .sidebar-header h2 {
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 5px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .sidebar-header .subtitle {
+      font-size: 0.9em;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    
+    .sidebar-nav a {
+      color: #4a5568;
+      text-decoration: none;
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+    
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: linear-gradient(90deg, rgba(234, 85, 20, 0.1), transparent);
+      color: #EA5514;
+      border-left-color: #EA5514;
+      transform: translateX(5px);
+    }
+    
+    .sidebar-nav a i {
+      width: 20px;
+      margin-right: 15px;
+      font-size: 1.1em;
+    }
+    
+    .content {
+      margin-left: 280px;
+      padding: 30px;
+      flex: 1;
+      background: transparent;
+      min-height: 100vh;
+    }
+    
+    .top-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 25px 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .top-bar h1 {
+      color: #2d3748;
+      font-size: 2.2em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .action-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 25px 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .search-form {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 12px 20px;
+      border: 2px solid rgba(234, 85, 20, 0.2);
+      border-radius: 25px;
+      font-size: 1em;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #EA5514;
+      box-shadow: 0 0 20px rgba(234, 85, 20, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .search-btn {
+      padding: 12px 25px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(234, 85, 20, 0.4);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: #EA5514;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: rgba(234, 85, 20, 0.1);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-link:hover {
+      background: rgba(234, 85, 20, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(234, 85, 20, 0.3);
+    }
+    
+    .new-staff-btn {
+      background: linear-gradient(135deg, #48bb78, #68d391);
+      color: white;
+      text-decoration: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .new-staff-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(72, 187, 120, 0.4);
+    }
+    
+    .table-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      overflow: hidden;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    th {
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      color: white;
+      padding: 18px 15px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    
+    td {
+      padding: 16px 15px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4a5568;
+      transition: background-color 0.2s ease;
+    }
+    
+    tr:hover {
+      background: rgba(234, 85, 20, 0.05);
+    }
+    
+    .staff-id {
+      font-weight: 600;
+      color: #2d3748;
+    }
+    
+    .staff-username {
+      font-family: 'Courier New', monospace;
+      background: rgba(234, 85, 20, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    
+    .role-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-align: center;
+      display: inline-block;
+      min-width: 70px;
+    }
+    
+    .role-admin {
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      color: white;
+    }
+    
+    .role-staff {
+      background: linear-gradient(135deg, #4299e1, #63b3ed);
+      color: white;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .edit-btn {
+      color: #48bb78;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 15px;
+      background: rgba(72, 187, 120, 0.1);
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.9em;
+    }
+    
+    .edit-btn:hover {
+      background: rgba(72, 187, 120, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    .delete-btn {
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .delete-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      color: #718096;
+    }
+    
+    .no-data i {
+      font-size: 4em;
+      color: #cbd5e0;
+      margin-bottom: 20px;
+      opacity: 0.7;
+    }
+    
+    .no-data h3 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #4a5568;
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+      
+      .content {
+        margin-left: 0;
+        padding: 20px;
+      }
+      
+      .action-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+      }
+      
+      .search-form {
+        min-width: 100%;
+      }
+      
+      .nav-links {
+        justify-content: center;
+      }
+      
+      .table-container {
+        font-size: 0.9em;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+      }
+      
+      .top-bar h1 {
+        font-size: 1.8em;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      th, td {
+        padding: 8px 6px;
+        font-size: 0.85em;
+      }
+      
+      .role-badge {
+        font-size: 0.75em;
+        padding: 4px 8px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 側邊選單 -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-suitcase-rolling"></i> Mr. Luggage</h2>
+      <div class="subtitle">行李寄存管理系統</div>
+    </div>
+    
+    <nav class="sidebar-nav">
+  <a href="/dashboard"><i class="fas fa-tachometer-alt"></i> 儀表板</a>
+  <a href="/orders"><i class="fas fa-clipboard-list"></i> 訂單列表</a>
+  <a href="/inventory/logs"><i class="fas fa-history"></i> 盤點紀錄</a>
+  <a href="/inventory/missing"><i class="fas fa-exclamation-triangle"></i> 未盤點清單</a>
+  <a href="/inventory/scan"><i class="fas fa-barcode"></i> 行李盤點</a>
+  <% if (user && user.role === 'Admin') { %>
+    <a href="/departments"><i class="fas fa-building"></i> 部門管理</a>
+  <% } %>
+  <a href="/staff" class="active"><i class="fas fa-users-cog"></i> 員工管理</a>
+  <a href="/orders/export/csv"><i class="fas fa-file-csv"></i> 匯出訂單 CSV</a>
+  <a href="/backup/download"><i class="fas fa-download"></i> 下載備份</a>
+  <a href="/logout" style="margin-top: auto; border-top: 1px solid #e2e8f0;"><i class="fas fa-sign-out-alt"></i> 登出</a>
+</nav>
+
+  </div>
+
+  <!-- 主內容 -->
+  <div class="content">
+    <!-- 頂部標題欄 -->
+    <div class="top-bar">
+      <h1><i class="fas fa-users-cog"></i> 員工管理</h1>
+    </div>
+
+    <!-- 操作欄 -->
+    <div class="action-bar">
+      <form class="search-form" method="GET" action="/staff">
+        <input 
+          type="text" 
+          name="q" 
+          placeholder="搜尋帳號 / 姓名 / 部門..." 
+          value="<%= query %>" 
+          class="search-input"
+        >
+        <button type="submit" class="search-btn">
+          <i class="fas fa-search"></i>
+          搜尋
+        </button>
+      </form>
+      
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link">
+          <i class="fas fa-arrow-left"></i>
+          返回儀表板
+        </a>
+        <a href="/staff/new" class="new-staff-btn">
+          <i class="fas fa-user-plus"></i>
+          新增員工
+        </a>
+      </div>
+    </div>
+
+    <!-- 員工表格 -->
+    <div class="table-section">
+      <% if (staff.length === 0) { %>
+        <div class="no-data">
+          <i class="fas fa-users"></i>
+          <h3>沒有找到員工</h3>
+          <p>嘗試調整搜尋條件，或新增第一位員工</p>
+        </div>
+      <% } else { %>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th><i class="fas fa-hashtag"></i> ID</th>
+                <th><i class="fas fa-user-circle"></i> 帳號</th>
+                <th><i class="fas fa-id-badge"></i> 姓名</th>
+                <th><i class="fas fa-building"></i> 部門</th>
+                <th><i class="fas fa-user-shield"></i> 角色</th>
+                <th><i class="fas fa-calendar-alt"></i> 建立時間</th>
+                <th><i class="fas fa-cogs"></i> 操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% staff.forEach(s => { %>
+                <tr>
+                  <td class="staff-id"><%= s.id %></td>
+                  <td><span class="staff-username"><%= s.username %></span></td>
+                  <td><%= s.real_name %></td>
+                  <td><%= s.department_name %></td>
+                  <td>
+                    <span class="role-badge <%= s.role === 'Admin' ? 'role-admin' : 'role-staff' %>">
+                      <% if (s.role === 'Admin') { %>
+                        <i class="fas fa-crown"></i> Admin
+                      <% } else { %>
+                        <i class="fas fa-user"></i> Staff
+                      <% } %>
+                    </span>
+                  </td>
+                  <td><%= s.created_at %></td>
+                  <td>
+                    <div class="action-buttons">
+                      <a href="/staff/<%= s.id %>/edit" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                        編輯
+                      </a>
+                      <form method="POST" action="/staff/<%= s.id %>/delete" style="display: inline;" onsubmit="return confirm('確定刪除員工「<%= s.real_name %>」？此操作無法復原。')">
+                        <button type="submit" class="delete-btn">
+                          <i class="fas fa-trash"></i>
+                          刪除
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    // 刪除確認對話框增強
+    document.querySelectorAll('form[action*="/delete"]').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        const staffName = this.querySelector('button').closest('tr').children[2].textContent;
+        const confirmed = confirm(`⚠️ 確定要刪除員工「${staffName}」嗎？\n\n此操作將永久刪除該員工的所有資料，且無法復原。`);
+        
+        if (confirmed) {
+          const deleteBtn = this.querySelector('.delete-btn');
+          deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 刪除中...';
+          deleteBtn.disabled = true;
+        } else {
+          e.preventDefault();
+        }
+      });
+    });
+
+    // 搜尋表單提交動畫
+    document.querySelector('.search-form').addEventListener('submit', function() {
+      const searchBtn = this.querySelector('.search-btn');
+      searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 搜尋中...';
+      searchBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>

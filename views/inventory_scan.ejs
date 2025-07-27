@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>行李盤點</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* 背景動畫元素 */
+    .bg-decoration {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .floating-icon {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.08);
+      font-size: 3em;
+      animation: float 8s ease-in-out infinite;
+    }
+    
+    .floating-icon:nth-child(1) {
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .floating-icon:nth-child(2) {
+      top: 70%;
+      right: 15%;
+      animation-delay: 3s;
+    }
+    
+    .floating-icon:nth-child(3) {
+      bottom: 25%;
+      left: 20%;
+      animation-delay: 6s;
+    }
+    
+    .floating-icon:nth-child(4) {
+      top: 40%;
+      right: 25%;
+      animation-delay: 2s;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg) scale(1);
+        opacity: 0.08;
+      }
+      50% {
+        transform: translateY(-30px) rotate(10deg) scale(1.1);
+        opacity: 0.15;
+      }
+    }
+    
+    /* 主要容器 */
+    .scan-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 25px;
+      padding: 50px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      position: relative;
+      z-index: 10;
+      animation: slideUp 0.8s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* 頁面標題 */
+    .page-header {
+      margin-bottom: 40px;
+    }
+    
+    .page-title {
+      font-size: 2.5em;
+      font-weight: 700;
+      background: linear-gradient(135deg, #48bb78, #68d391);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .page-subtitle {
+      color: #718096;
+      font-size: 1.2em;
+      font-weight: 500;
+    }
+    
+    /* 返回按鈕 */
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(113, 128, 150, 0.1);
+      color: #718096;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.95em;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(113, 128, 150, 0.2);
+    }
+    
+    .back-btn:hover {
+      background: rgba(113, 128, 150, 0.2);
+      color: #4a5568;
+      transform: translateY(-2px);
+    }
+    
+    /* 掃描圖標區域 */
+    .scan-icon-area {
+      margin: 40px 0;
+      position: relative;
+    }
+    
+    .scan-icon {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #48bb78, #68d391);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      color: white;
+      font-size: 3em;
+      box-shadow: 0 15px 40px rgba(72, 187, 120, 0.3);
+      animation: scanPulse 2s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .scan-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+      animation: shimmer 3s linear infinite;
+    }
+    
+    @keyframes scanPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 15px 40px rgba(72, 187, 120, 0.3);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 20px 50px rgba(72, 187, 120, 0.4);
+      }
+    }
+    
+    @keyframes shimmer {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* 掃描線效果 */
+    .scan-line {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #48bb78, transparent);
+      border-radius: 2px;
+      animation: scanMove 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes scanMove {
+      0%, 100% {
+        width: 80px;
+        opacity: 0.7;
+      }
+      50% {
+        width: 120px;
+        opacity: 1;
+      }
+    }
+    
+    /* 表單區域 */
+    .scan-form {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      padding: 35px;
+      margin: 30px 0;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .form-label {
+      color: #4a5568;
+      font-size: 1.3em;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .scan-input {
+      flex: 1;
+      padding: 18px 20px;
+      border: 3px solid rgba(72, 187, 120, 0.2);
+      border-radius: 15px;
+      font-size: 1.2em;
+      background: white;
+      transition: all 0.3s ease;
+      outline: none;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+    }
+    
+    .scan-input:focus {
+      border-color: #48bb78;
+      box-shadow: 0 0 0 4px rgba(72, 187, 120, 0.1);
+      transform: scale(1.02);
+    }
+    
+    .scan-input::placeholder {
+      color: #a0aec0;
+      font-family: 'Segoe UI', sans-serif;
+      font-weight: 400;
+    }
+    
+    .scan-btn {
+      padding: 18px 30px;
+      background: linear-gradient(135deg, #48bb78, #68d391);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      min-width: 120px;
+      justify-content: center;
+    }
+    
+    .scan-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .scan-btn:hover::before {
+      left: 100%;
+    }
+    
+    .scan-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
+    }
+    
+    .scan-btn:active {
+      transform: translateY(-1px);
+    }
+    
+    /* 訊息顯示 */
+    .message-area {
+      margin-top: 30px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .success-message {
+      background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(104, 211, 145, 0.05));
+      border: 2px solid rgba(72, 187, 120, 0.3);
+      color: #48bb78;
+      padding: 20px 25px;
+      border-radius: 15px;
+      font-size: 1.1em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: messageSlide 0.5s ease-out;
+    }
+    
+    .error-message {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(252, 129, 129, 0.05));
+      border: 2px solid rgba(239, 68, 68, 0.3);
+      color: #e53e3e;
+      padding: 20px 25px;
+      border-radius: 15px;
+      font-size: 1.1em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: messageSlide 0.5s ease-out;
+    }
+    
+    @keyframes messageSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .message-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+    }
+    
+    /* 快捷鍵提示 */
+    .shortcuts {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(113, 128, 150, 0.2);
+    }
+    
+    .shortcuts-title {
+      color: #718096;
+      font-size: 1em;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .shortcut-list {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .shortcut-item {
+      background: rgba(113, 128, 150, 0.1);
+      color: #718096;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .shortcut-key {
+      background: rgba(113, 128, 150, 0.2);
+      color: #4a5568;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      font-size: 0.8em;
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .scan-container {
+        padding: 30px 25px;
+        margin: 20px;
+      }
+      
+      .page-title {
+        font-size: 2em;
+      }
+      
+      .scan-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5em;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      .scan-btn {
+        width: 100%;
+      }
+      
+      .shortcut-list {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .back-btn {
+        position: static;
+        margin-bottom: 20px;
+        align-self: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 背景裝飾 -->
+  <div class="bg-decoration">
+    <i class="fas fa-qrcode floating-icon"></i>
+    <i class="fas fa-barcode floating-icon"></i>
+    <i class="fas fa-camera floating-icon"></i>
+    <i class="fas fa-scanner floating-icon"></i>
+  </div>
+
+  <!-- 主要容器 -->
+  <div class="scan-container">
+    <!-- 返回按鈕 -->
+    <a href="/dashboard" class="back-btn">
+      <i class="fas fa-arrow-left"></i>
+      返回儀表板
+    </a>
+
+    <!-- 頁面標題 -->
+    <div class="page-header">
+      <h1 class="page-title">
+        <i class="fas fa-barcode"></i>
+        行李盤點
+      </h1>
+      <p class="page-subtitle">掃描或輸入行李編號進行盤點作業</p>
+    </div>
+
+    <!-- 掃描圖標區域 -->
+    <div class="scan-icon-area">
+      <div class="scan-icon">
+        <i class="fas fa-qrcode"></i>
+      </div>
+      <div class="scan-line"></div>
+    </div>
+
+    <!-- 掃描表單 -->
+    <div class="scan-form">
+      <div class="form-label">
+        <i class="fas fa-scan"></i>
+        掃描或輸入行李編號
+      </div>
+      
+      <form method="POST" action="/inventory/scan">
+        <div class="input-group">
+          <input 
+            type="text" 
+            name="code" 
+            class="scan-input"
+            placeholder="LUG-2024-001"
+            autofocus
+            autocomplete="off"
+          >
+          <button type="submit" class="scan-btn">
+            <i class="fas fa-search"></i>
+            盤點
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 訊息顯示區域 -->
+    <div class="message-area">
+      <% if (message) { %>
+        <div class="success-message">
+          <div class="message-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <%= message %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- 快捷鍵提示 -->
+    <div class="shortcuts">
+      <div class="shortcuts-title">
+        <i class="fas fa-keyboard"></i>
+        操作提示
+      </div>
+      <div class="shortcut-list">
+        <div class="shortcut-item">
+          <span class="shortcut-key">Enter</span>
+          執行盤點
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Esc</span>
+          返回儀表板
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">F5</span>
+          重新整理
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 自動聚焦輸入框
+    document.addEventListener('DOMContentLoaded', function() {
+      const input = document.querySelector('.scan-input');
+      input.focus();
+      
+      // ESC 鍵返回儀表板
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          window.location.href = '/dashboard';
+        }
+      });
+      
+      // 表單提交後清空輸入框並重新聚焦
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function() {
+        setTimeout(() => {
+          input.value = '';
+          input.focus();
+        }, 100);
+      });
+    });
+  </script>
+</body>
+</html>

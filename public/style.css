@@ -1,0 +1,114 @@
+/* 全域設定 */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+/* 標題 */
+h1, h2 {
+  color: #EA5514;
+  margin-top: 0;
+}
+
+/* 連結與按鈕 */
+a {
+  color: #EA5514;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+button {
+  background: #EA5514;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background: #d04a12;
+}
+
+/* 表格 */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+  margin-top: 10px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background: #EA5514;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* RWD：手機版表格變卡片 */
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  tr {
+    margin-bottom: 10px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  td {
+    border: none;
+    text-align: left;
+    padding: 6px 0;
+  }
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 6px;
+  }
+}
+
+/* 狀態標籤 */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9em;
+}
+.status-pending {
+  background: #f39c12;
+}
+.status-complete {
+  background: #4caf50;
+}
+.status-overdue {
+  background: #e74c3c;
+}
+
+/* 統一卡片樣式 */
+.card {
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.card.blue { background:#3498db; }
+.overdue-row {
+  background: #ffe6e6;
+  animation: blink 1.2s linear infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { background-color: #ffe6e6; }
+  25%, 75% { background-color: #ffb3b3; }
+}

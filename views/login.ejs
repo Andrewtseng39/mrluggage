@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登入 - Mr. Luggage</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* 背景裝飾 */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+      z-index: 0;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: rotate(0deg) translate(-20px, -10px); }
+      50% { transform: rotate(180deg) translate(20px, 10px); }
+    }
+    
+    .login-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+    
+    .login-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px 35px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.8s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .login-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: white;
+      font-size: 2em;
+      box-shadow: 0 8px 25px rgba(234, 85, 20, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .logo::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+    }
+    
+    .logo i {
+      position: relative;
+      z-index: 1;
+    }
+    
+    h1 {
+      color: #2d3748;
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      color: #718096;
+      font-size: 1em;
+      font-weight: 400;
+    }
+    
+    .error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      text-align: center;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      font-weight: 500;
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 1.1em;
+      z-index: 2;
+    }
+    
+    input {
+      width: 100%;
+      padding: 16px 20px 16px 50px;
+      border: 2px solid #e5e7eb;
+      border-radius: 14px;
+      font-size: 1em;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      color: #374151;
+      font-weight: 500;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #EA5514;
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(234, 85, 20, 0.15);
+    }
+    
+    input::placeholder {
+      color: #9ca3af;
+      font-weight: 400;
+    }
+    
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(234, 85, 20, 0.3);
+    }
+    
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .login-btn:hover::before {
+      left: 100%;
+    }
+    
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(234, 85, 20, 0.4);
+    }
+    
+    .login-btn:active {
+      transform: translateY(0);
+    }
+    
+    .login-btn i {
+      margin-left: 8px;
+      transition: transform 0.3s ease;
+    }
+    
+    .login-btn:hover i {
+      transform: translateX(3px);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #718096;
+      font-size: 0.9em;
+    }
+    
+    .footer a {
+      color: #EA5514;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* 載入動畫 */
+    .loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 15px;
+      }
+      
+      .login-box {
+        padding: 30px 25px;
+        border-radius: 20px;
+      }
+      
+      .logo {
+        width: 70px;
+        height: 70px;
+        font-size: 1.8em;
+      }
+      
+      h1 {
+        font-size: 1.6em;
+      }
+      
+      input {
+        padding: 14px 18px 14px 45px;
+      }
+      
+      .login-btn {
+        padding: 14px;
+        font-size: 1em;
+      }
+    }
+    
+    /* 深色模式支援 */
+    @media (prefers-color-scheme: dark) {
+      .login-box {
+        background: rgba(30, 41, 59, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      h1, .subtitle {
+        color: #f8fafc;
+      }
+      
+      input {
+        background: rgba(51, 65, 85, 0.8);
+        border-color: #475569;
+        color: #f8fafc;
+      }
+      
+      input:focus {
+        background: rgba(51, 65, 85, 0.95);
+      }
+      
+      .footer {
+        color: #94a3b8;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <div class="login-header">
+        <div class="logo">
+          <i class="fas fa-suitcase-rolling"></i>
+        </div>
+        <h1>Mr. Luggage</h1>
+        <div class="subtitle">行李寄存管理系統</div>
+      </div>
+      
+      <% if (error) { %>
+        <div class="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <%= error %>
+        </div>
+      <% } %>
+      
+      <form method="POST" action="/login" id="loginForm">
+        <div class="form-group">
+          <i class="fas fa-user"></i>
+          <input 
+            type="text" 
+            name="username" 
+            placeholder="請輸入帳號" 
+            required 
+            autocomplete="username"
+            id="username"
+          >
+        </div>
+        
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input 
+            type="password" 
+            name="password" 
+            placeholder="請輸入密碼" 
+            required 
+            autocomplete="current-password"
+            id="password"
+          >
+        </div>
+        
+        <button type="submit" class="login-btn" id="loginBtn">
+          <span>登入系統</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+      
+      <div class="footer">
+        <p>© 2024 Mr. Luggage System</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class LoginManager {
+      constructor() {
+        this.form = document.getElementById('loginForm');
+        this.loginBtn = document.getElementById('loginBtn');
+        this.usernameInput = document.getElementById('username');
+        this.passwordInput = document.getElementById('password');
+        
+        this.init();
+      }
+      
+      init() {
+        // 表單提交處理
+        this.form.addEventListener('submit', this.handleSubmit.bind(this));
+        
+        // 輸入框焦點效果
+        [this.usernameInput, this.passwordInput].forEach(input => {
+          input.addEventListener('focus', this.handleInputFocus);
+          input.addEventListener('blur', this.handleInputBlur);
+        });
+        
+        // 鍵盤快捷鍵
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            this.form.requestSubmit();
+          }
+        });
+        
+        // 自動聚焦第一個空輸入框
+        this.autoFocus();
+      }
+      
+      handleSubmit(e) {
+        const username = this.usernameInput.value.trim();
+        const password = this.passwordInput.value.trim();
+        
+        if (!username || !password) {
+          e.preventDefault();
+          this.showError('請填寫完整的帳號和密碼');
+          return;
+        }
+        
+        // 顯示載入狀態
+        this.setLoading(true);
+      }
+      
+      handleInputFocus(e) {
+        const formGroup = e.target.closest('.form-group');
+        const icon = formGroup.querySelector('i');
+        icon.style.color = '#EA5514';
+        icon.style.transform = 'translateY(-50%) scale(1.1)';
+      }
+      
+      handleInputBlur(e) {
+        const formGroup = e.target.closest('.form-group');
+        const icon = formGroup.querySelector('i');
+        icon.style.color = '#9ca3af';
+        icon.style.transform = 'translateY(-50%) scale(1)';
+      }
+      
+      setLoading(loading) {
+        if (loading) {
+          this.loginBtn.classList.add('loading');
+          this.loginBtn.disabled = true;
+          this.loginBtn.innerHTML = '<span>登入中...</span>';
+        } else {
+          this.loginBtn.classList.remove('loading');
+          this.loginBtn.disabled = false;
+          this.loginBtn.innerHTML = '<span>登入系統</span><i class="fas fa-arrow-right"></i>';
+        }
+      }
+      
+      showError(message) {
+        // 移除現有錯誤訊息
+        const existingError = document.querySelector('.error');
+        if (existingError) {
+          existingError.remove();
+        }
+        
+        // 創建新錯誤訊息
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+        
+        // 插入到表單前
+        this.form.parentNode.insertBefore(errorDiv, this.form);
+        
+        // 3秒後自動消失
+        setTimeout(() => {
+          if (errorDiv.parentNode) {
+            errorDiv.remove();
+          }
+        }, 3000);
+      }
+      
+      autoFocus() {
+        if (!this.usernameInput.value) {
+          this.usernameInput.focus();
+        } else if (!this.passwordInput.value) {
+          this.passwordInput.focus();
+        }
+      }
+    }
+    
+    // 頁面載入完成後初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      new LoginManager();
+      
+      // 頁面載入動畫
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = '1';
+      }, 100);
+    });
+    
+    // 防止表單重複提交
+    window.addEventListener('beforeunload', () => {
+      const loginBtn = document.getElementById('loginBtn');
+      if (loginBtn && loginBtn.classList.contains('loading')) {
+        return '正在登入中，確定要離開嗎？';
+      }
+    });
+  </script>
+</body>
+</html>

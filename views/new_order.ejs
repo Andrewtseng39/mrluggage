@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增訂單 - 行李寄存系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 30px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .back-link::before {
+            content: '←';
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff5252;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        label.required::after {
+            content: '*';
+            color: #ff6b6b;
+            margin-left: 4px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .luggage-section {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border: 2px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .luggage-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .luggage-title::before {
+            content: '🧳';
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        .datetime-section {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border: 2px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .datetime-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f57c00;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .datetime-title::before {
+            content: '📅';
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        .datetime-input {
+            position: relative;
+        }
+
+        .datetime-input input[type="datetime-local"] {
+            background: white;
+            border: 2px solid #e1e8ed;
+            padding: 15px 20px;
+            font-family: inherit;
+            color: #333;
+        }
+
+        .datetime-input input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>') no-repeat center;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .number-input {
+            position: relative;
+        }
+
+        .number-input input[type="number"] {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .number-controls {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .number-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .number-btn:hover {
+            background: #5a6fd8;
+            transform: scale(1.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .icon-input {
+            position: relative;
+        }
+
+        .icon-input::before {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: #667eea;
+            z-index: 2;
+        }
+
+        .icon-input.name::before { content: '👤'; }
+        .icon-input.phone::before { content: '📞'; }
+        .icon-input.email::before { content: '✉️'; }
+
+        .icon-input input {
+            padding-left: 50px;
+        }
+
+        .price-display {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+
+        .price-breakdown {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 15px;
+            }
+            
+            .form-content {
+                padding: 25px;
+            }
+            
+            .row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧳 新增訂單</h1>
+            <div class="subtitle">快速建立行李寄存訂單</div>
+        </div>
+        
+        <div class="form-content">
+            <a href="/orders" class="back-link">返回訂單列表</a>
+            
+            <% if (error) { %>
+                <div class="error">⚠️ <%= error %></div>
+            <% } %>
+
+            <form method="POST" action="/orders/new" id="orderForm">
+                <!-- 基本資訊 -->
+                <div class="form-group">
+                    <label for="name" class="required">客戶姓名</label>
+                    <div class="input-container icon-input name">
+                        <input type="text" id="name" name="name" required placeholder="請輸入客戶姓名">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="required">聯絡電話</label>
+                    <div class="input-container icon-input phone">
+                        <input type="tel" id="phone" name="phone" required placeholder="0912-345-678">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email 信箱</label>
+                    <div class="input-container icon-input email">
+                        <input type="email" id="email" name="email" placeholder="example@email.com（填寫後將自動發送確認信）">
+                    </div>
+                </div>
+
+                <!-- 行李數量 -->
+                <div class="luggage-section">
+                    <div class="luggage-title">行李數量設定</div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="big_count">大件行李</label>
+                            <div class="number-input">
+                                <input type="number" id="big_count" name="big_count" min="0" value="0" onchange="calculatePrice()">
+                                <div class="number-controls">
+                                    <button type="button" class="number-btn" onclick="changeNumber('big_count', 1)">+</button>
+                                    <button type="button" class="number-btn" onclick="changeNumber('big_count', -1)">-</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="small_count">小件行李</label>
+                            <div class="number-input">
+                                <input type="number" id="small_count" name="small_count" min="0" value="0" onchange="calculatePrice()">
+                                <div class="number-controls">
+                                    <button type="button" class="number-btn" onclick="changeNumber('small_count', 1)">+</button>
+                                    <button type="button" class="number-btn" onclick="changeNumber('small_count', -1)">-</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 時間設定 -->
+                <div class="datetime-section">
+                    <div class="datetime-title">寄存時間設定</div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="checkin_at" class="required">寄存時間</label>
+                            <div class="datetime-input">
+                                <input type="datetime-local" id="checkin_at" name="checkin_at" required value="<%= defaultCheckin %>" onchange="calculatePrice()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkout_at" class="required">取件時間</label>
+                            <div class="datetime-input">
+                                <input type="datetime-local" id="checkout_at" name="checkout_at" required value="<%= defaultCheckout %>" onchange="calculatePrice()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 價格顯示 -->
+                <div class="price-display" id="priceDisplay">
+                    <div>預估總金額: <span id="totalPrice">NT$ 0</span></div>
+                    <div class="price-breakdown" id="priceBreakdown">請選擇行李數量和時間</div>
+                </div>
+
+                <button type="submit" class="submit-btn">✨ 建立訂單</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在建立訂單...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 價格設定
+        const PRICE_BIG = 200;
+        const PRICE_SMALL = 150;
+
+        // 設定預設時間（如果後端沒有提供）
+        function setDefaultTimes() {
+            const checkinInput = document.getElementById('checkin_at');
+            const checkoutInput = document.getElementById('checkout_at');
+            
+            if (!checkinInput.value) {
+                const now = new Date();
+                const checkinTime = new Date(now.getTime() + 60 * 60 * 1000); // 1小時後
+                checkinInput.value = checkinTime.toISOString().slice(0, 16);
+            }
+            
+            if (!checkoutInput.value) {
+                const now = new Date();
+                const checkoutTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24小時後
+                checkoutInput.value = checkoutTime.toISOString().slice(0, 16);
+            }
+        }
+
+        // 修改數量
+        function changeNumber(inputId, delta) {
+            const input = document.getElementById(inputId);
+            const currentValue = parseInt(input.value) || 0;
+            const newValue = Math.max(0, currentValue + delta);
+            input.value = newValue;
+            calculatePrice();
+        }
+
+        // 計算價格
+        function calculatePrice() {
+            const bigCount = parseInt(document.getElementById('big_count').value) || 0;
+            const smallCount = parseInt(document.getElementById('small_count').value) || 0;
+            const checkinTime = new Date(document.getElementById('checkin_at').value);
+            const checkoutTime = new Date(document.getElementById('checkout_at').value);
+
+            if (!checkinTime || !checkoutTime || checkoutTime <= checkinTime) {
+                document.getElementById('priceDisplay').style.display = 'none';
+                return;
+            }
+
+            const diffTime = checkoutTime - checkinTime;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const totalDays = Math.max(1, diffDays);
+
+            const dailyPrice = bigCount * PRICE_BIG + smallCount * PRICE_SMALL;
+            const totalPrice = dailyPrice * totalDays;
+
+            if (bigCount > 0 || smallCount > 0) {
+                document.getElementById('priceDisplay').style.display = 'block';
+                document.getElementById('totalPrice').textContent = `NT$ ${totalPrice.toLocaleString()}`;
+                
+                let breakdown = `${totalDays} 天 × (`;
+                if (bigCount > 0) breakdown += `大件 ${bigCount} × $${PRICE_BIG}`;
+                if (bigCount > 0 && smallCount > 0) breakdown += ' + ';
+                if (smallCount > 0) breakdown += `小件 ${smallCount} × $${PRICE_SMALL}`;
+                breakdown += ')';
+                
+                document.getElementById('priceBreakdown').textContent = breakdown;
+            } else {
+                document.getElementById('priceDisplay').style.display = 'none';
+            }
+        }
+
+        // 表單驗證和提交
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            const bigCount = parseInt(document.getElementById('big_count').value) || 0;
+            const smallCount = parseInt(document.getElementById('small_count').value) || 0;
+            
+            if (bigCount === 0 && smallCount === 0) {
+                e.preventDefault();
+                alert('⚠️ 請至少選擇一件行李！');
+                return false;
+            }
+
+            const checkinTime = new Date(document.getElementById('checkin_at').value);
+            const checkoutTime = new Date(document.getElementById('checkout_at').value);
+            
+            if (checkoutTime <= checkinTime) {
+                e.preventDefault();
+                alert('⚠️ 取件時間必須晚於寄存時間！');
+                return false;
+            }
+
+            // 顯示載入狀態
+            document.querySelector('.form-content').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setDefaultTimes();
+            calculatePrice();
+            
+            // 為所有輸入框添加動畫效果
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

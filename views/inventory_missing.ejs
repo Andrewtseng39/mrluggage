@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>未盤點清單</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    .sidebar {
+      width: 280px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border-right: 1px solid rgba(255, 255, 255, 0.18);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-header {
+      padding: 30px 25px;
+      background: linear-gradient(135deg, #EA5514, #ff7043);
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .sidebar-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+    }
+    
+    .sidebar-header h2 {
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 5px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .sidebar-header .subtitle {
+      font-size: 0.9em;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    
+    .sidebar-nav a {
+      color: #4a5568;
+      text-decoration: none;
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+    
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: linear-gradient(90deg, rgba(234, 85, 20, 0.1), transparent);
+      color: #EA5514;
+      border-left-color: #EA5514;
+      transform: translateX(5px);
+    }
+    
+    .sidebar-nav a i {
+      width: 20px;
+      margin-right: 15px;
+      font-size: 1.1em;
+    }
+    
+    .content {
+      margin-left: 280px;
+      padding: 30px;
+      flex: 1;
+      background: transparent;
+      min-height: 100vh;
+    }
+    
+    .page-header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .page-header h1 {
+      color: #2d3748;
+      font-size: 2.2em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .page-header .breadcrumb {
+      color: #718096;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .breadcrumb a {
+      color: #EA5514;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .breadcrumb a:hover {
+      color: #ff7043;
+    }
+    
+    .alert-card {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(252, 129, 129, 0.05));
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);
+      }
+      50% { 
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+    }
+    
+    .alert-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2em;
+      flex-shrink: 0;
+    }
+    
+    .alert-content h3 {
+      color: #e53e3e;
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .alert-content p {
+      color: #718096;
+      font-size: 1em;
+      line-height: 1.5;
+    }
+    
+    .search-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .search-form {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+      padding: 15px 20px;
+      border: 2px solid rgba(239, 68, 68, 0.1);
+      border-radius: 12px;
+      font-size: 1em;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    
+    .search-input:focus {
+      border-color: #e53e3e;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+    
+    .search-input::placeholder {
+      color: #a0aec0;
+    }
+    
+    .search-btn {
+      padding: 15px 25px;
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .search-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .search-btn:hover::before {
+      left: 100%;
+    }
+    
+    .search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    }
+    
+    .clear-btn {
+      padding: 15px 20px;
+      background: rgba(113, 128, 150, 0.1);
+      color: #718096;
+      border: 2px solid rgba(113, 128, 150, 0.2);
+      border-radius: 12px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .clear-btn:hover {
+      background: rgba(113, 128, 150, 0.2);
+      color: #4a5568;
+      transform: translateY(-1px);
+    }
+    
+    .table-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .table-header {
+      padding: 25px 30px;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .table-title {
+      color: #2d3748;
+      font-size: 1.3em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .missing-count {
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+    }
+    
+    th {
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      color: white;
+      padding: 20px 15px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    th i {
+      margin-right: 8px;
+    }
+    
+    td {
+      padding: 18px 15px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      color: #4a5568;
+      font-size: 0.95em;
+      transition: background-color 0.3s ease;
+    }
+    
+    tbody tr {
+      background: rgba(254, 178, 178, 0.05);
+      border-left: 3px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    tbody tr:hover {
+      background: rgba(254, 178, 178, 0.1);
+      border-left-color: #e53e3e;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 30px;
+      color: #718096;
+    }
+    
+    .empty-icon {
+      font-size: 4em;
+      color: #48bb78;
+      margin-bottom: 20px;
+    }
+    
+    .empty-title {
+      font-size: 1.5em;
+      color: #48bb78;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .empty-desc {
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    
+    .order-code {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: #e53e3e;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    
+    .luggage-code {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: #ed8936;
+      background: rgba(237, 137, 54, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    
+    .customer-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .customer-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #e53e3e, #fc8181);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+    
+    .checkout-time {
+      color: #718096;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .urgent-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, #ed8936, #f6ad55);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+      animation: urgentPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes urgentPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+      
+      .content {
+        margin-left: 0;
+        padding: 20px;
+      }
+      
+      .search-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-input {
+        min-width: unset;
+      }
+      
+      .page-header h1 {
+        font-size: 1.8em;
+      }
+      
+      .alert-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 側邊選單 -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-suitcase-rolling"></i> Mr. Luggage</h2>
+      <div class="subtitle">行李寄存管理系統</div>
+    </div>
+    
+   <nav class="sidebar-nav">
+  <a href="/dashboard"><i class="fas fa-tachometer-alt"></i> 儀表板</a>
+  <a href="/orders"><i class="fas fa-clipboard-list"></i> 訂單列表</a>
+  <a href="/inventory/logs"><i class="fas fa-history"></i> 盤點紀錄</a>
+  <a href="/inventory/missing" class="active"><i class="fas fa-exclamation-triangle"></i> 未盤點清單</a>
+  <a href="/inventory/scan"><i class="fas fa-barcode"></i> 行李盤點</a>
+  <% if (user && user.role === 'Admin') { %>
+    <a href="/departments"><i class="fas fa-building"></i> 部門管理</a>
+    <a href="/staff"><i class="fas fa-users-cog"></i> 員工管理</a>
+    <a href="/orders/export/csv"><i class="fas fa-file-csv"></i> 匯出訂單 CSV</a>
+    <a href="/backup/download"><i class="fas fa-download"></i> 下載備份</a>
+  <% } %>
+  <a href="/logout" style="margin-top: auto; border-top: 1px solid #e2e8f0;"><i class="fas fa-sign-out-alt"></i> 登出</a>
+</nav>
+
+  </div>
+
+  <!-- 主內容 -->
+  <div class="content">
+    <!-- 頁面標題 -->
+    <div class="page-header">
+      <h1>
+        <i class="fas fa-exclamation-triangle"></i>
+        未盤點清單
+      </h1>
+      <div class="breadcrumb">
+        <a href="/dashboard"><i class="fas fa-home"></i> 首頁</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>未盤點清單</span>
+      </div>
+    </div>
+
+    <!-- 警示提醒 -->
+    <% if (missing.length > 0) { %>
+      <div class="alert-card">
+        <div class="alert-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="alert-content">
+          <h3>注意！發現未盤點項目</h3>
+          <p>目前有 <strong><%= missing.length %></strong> 件行李尚未完成盤點，請儘速處理以確保庫存準確性。</p>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- 搜尋區域 -->
+    <div class="search-section">
+      <form class="search-form" method="GET" action="/inventory/missing">
+        <input 
+          type="text" 
+          name="q" 
+          value="<%= query || '' %>" 
+          placeholder="🔍 搜尋訂單編號、行李編號或客戶姓名..." 
+          class="search-input"
+        >
+        <button type="submit" class="search-btn">
+          <i class="fas fa-search"></i>
+          搜尋
+        </button>
+        <% if (query) { %>
+          <a href="/inventory/missing" class="clear-btn">
+            <i class="fas fa-times"></i>
+            清除
+          </a>
+        <% } %>
+      </form>
+    </div>
+
+    <!-- 表格區域 -->
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-title">
+          <i class="fas fa-list-alt"></i>
+          未盤點項目
+          <% if (missing.length > 0) { %>
+            <span class="missing-count"><%= missing.length %> 件</span>
+          <% } %>
+          <% if (query) { %>
+            <span style="color: #718096; font-size: 0.9em;">（搜尋：<%= query %>）</span>
+          <% } %>
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th><i class="fas fa-hashtag"></i> 訂單編號</th>
+              <th><i class="fas fa-suitcase"></i> 行李編號</th>
+              <th><i class="fas fa-user"></i> 客戶姓名</th>
+              <th><i class="fas fa-calendar-clock"></i> 預計取件</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (missing.length === 0) { %>
+              <tr>
+                <td colspan="4">
+                  <div class="empty-state">
+                    <div class="empty-icon">
+                      <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="empty-title">
+                      <% if (query) { %>
+                        找不到相關的未盤點項目
+                      <% } else { %>
+                        太棒了！所有行李都已完成盤點
+                      <% } %>
+                    </div>
+                    <div class="empty-desc">
+                      <% if (query) { %>
+                        請嘗試使用其他關鍵字進行搜尋
+                      <% } else { %>
+                        目前庫存中的所有行李都已經完成盤點作業
+                      <% } %>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            <% } else { %>
+              <% missing.forEach(m => { %>
+                <tr>
+                  <td>
+                    <span class="order-code"><%= m.order_no %></span>
+                  </td>
+                  <td>
+                    <span class="luggage-code"><%= m.code %></span>
+                  </td>
+                  <td>
+                    <div class="customer-name">
+                      <div class="customer-avatar">
+                        <%= m.customer_name.charAt(0) %>
+                      </div>
+                      <%= m.customer_name %>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="checkout-time">
+                      <i class="fas fa-calendar-alt"></i>
+                      <%= m.checkout_at %>
+                      <% 
+                        const checkoutDate = new Date(m.checkout_at);
+                        const now = new Date();
+                        const isUrgent = checkoutDate <= now;
+                      %>
+                      <% if (isUrgent) { %>
+                        <span class="urgent-indicator">
+                          <i class="fas fa-fire"></i>
+                          急需盤點
+                        </span>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

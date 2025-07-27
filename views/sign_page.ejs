@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>簽收確認 - <%= luggage.order_no %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      background: linear-gradient(135deg, #EA5514 0%, #ff7043 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      animation: float 20s linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header .subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 2;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .info-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 4px solid #EA5514;
+      transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(234, 85, 20, 0.1);
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .warning {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .warning-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .signature-section {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .signature-title {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    #signature-pad {
+      border: 3px dashed #EA5514;
+      border-radius: 12px;
+      display: block;
+      margin: 0 auto 20px;
+      cursor: crosshair;
+      background: white;
+      transition: border-color 0.3s ease;
+      width: 100%;
+      max-width: 400px;
+      height: 200px;
+    }
+
+    #signature-pad:hover {
+      border-color: #d04a12;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.3s ease;
+    }
+
+    .btn:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-clear {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      color: white;
+    }
+
+    .btn-clear:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, #EA5514, #d04a12);
+      color: white;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(234, 85, 20, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #6c757d;
+      font-size: 12px;
+      background: #f8f9fa;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        border-radius: 15px;
+      }
+
+      .header {
+        padding: 25px 15px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      #signature-pad {
+        height: 150px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    /* 觸控設備優化 */
+    @media (hover: none) {
+      .info-item:hover {
+        transform: none;
+      }
+      
+      .btn:hover {
+        transform: none;
+      }
+    }
+
+    /* 成功頁面樣式 */
+    .success-page {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-20px);
+      }
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .success-title {
+      font-size: 28px;
+      color: #27ae60;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .success-message {
+      font-size: 16px;
+      color: #6c757d;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .success-details {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .success-details h4 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .detail-value {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .btn-return {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-return:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📦 簽收確認</h1>
+      <div class="subtitle">請確認以下資訊並完成簽名</div>
+    </div>
+
+    <div class="content">
+      <!-- 簽收表單頁面 -->
+      <div id="signaturePage">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">訂單編號</div>
+            <div class="info-value"><%= luggage.order_no %></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">行李編號</div>
+            <div class="info-value"><%= luggage.code %></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">客戶姓名</div>
+            <div class="info-value"><%= luggage.customer_name %></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">聯絡電話</div>
+            <div class="info-value"><%= luggage.phone %></div>
+          </div>
+        </div>
+
+        <!-- 超時費用警告 -->
+        <% if (feeInfo.extraFee > 0) { %>
+        <div class="warning" id="feeWarning">
+          <div class="warning-icon">⚠️</div>
+          <div>此行李已超過預訂時間<br>需加收 <strong>NT$ <%= feeInfo.extraFee %></strong> 元</div>
+        </div>
+        <% } %>
+
+        <form method="POST" action="/sign/<%= luggage.code %>" onsubmit="return validateSignature()">>
+          <div class="signature-section">
+            <div class="signature-title">✍️ 請在下方簽名確認收到行李</div>
+            <canvas id="signature-pad" width="400" height="200"></canvas>
+            <input type="hidden" name="signature" id="signature-input">
+            
+            <div class="button-group">
+              <button type="button" class="btn btn-clear" onclick="clearSignature()">
+                🗑️ 清除
+              </button>
+              <button type="button" class="btn btn-submit" onclick="submitSignature()">
+                ✅ 確認簽收
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- 簽收成功頁面 -->
+      <div id="successPage" class="success-page">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">簽收成功！</div>
+        <div class="success-message">
+          感謝您使用我們的行李運送服務！<br>
+          您的行李已安全送達並完成簽收確認。
+        </div>
+        
+        <div class="success-details">
+          <h4>📋 簽收詳情</h4>
+          <div class="detail-row">
+            <span class="detail-label">訂單編號</span>
+            <span class="detail-value"><%= luggage.order_no %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">行李編號</span>
+            <span class="detail-value"><%= luggage.code %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">簽收時間</span>
+            <span class="detail-value" id="signTime"></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">簽收狀態</span>
+            <span class="detail-value" style="color: #27ae60;">✅ 已完成</span>
+          </div>
+          <% if (feeInfo.extraFee > 0) { %>
+          <div class="detail-row" id="extraFeeRow">
+            <span class="detail-label">超時費用</span>
+            <span class="detail-value" style="color: #e74c3c;">NT$ <%= feeInfo.extraFee %></span>
+          </div>
+          <% } %>
+        </div>
+
+        <a href="#" class="btn-return" onclick="returnToList()">
+          🏠 返回首頁
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">
+      行李運送服務 © 2024 | 如有問題請聯繫客服
+    </div>
+  </div>
+
+  <script>
+    // 簽名板功能
+    const canvas = document.getElementById('signature-pad');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let hasSignature = false;
+
+    // 設置畫筆樣式
+    ctx.strokeStyle = '#2c3e50';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // 響應式 canvas 大小調整
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      ctx.scale(dpr, dpr);
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+    }
+
+    // 獲取觸點位置
+    function getPosition(e) {
+      const rect = canvas.getBoundingClientRect();
+      let clientX, clientY;
+      
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    // 開始繪畫
+    function startDraw(e) {
+      e.preventDefault();
+      drawing = true;
+      hasSignature = true;
+      const pos = getPosition(e);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    }
+
+    // 停止繪畫
+    function stopDraw(e) {
+      e.preventDefault();
+      drawing = false;
+    }
+
+    // 繪畫過程
+    function draw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const pos = getPosition(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+
+    // 清除簽名
+    function clearSignature() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hasSignature = false;
+    }
+
+    // 驗證簽名
+    function validateSignature() {
+      if (!hasSignature) {
+        alert('請先完成簽名再提交！');
+        return false;
+      }
+      return true;
+    }
+
+    // 提交簽名
+    function submitSignature() {
+      if (!hasSignature) {
+        alert('請先完成簽名再提交！');
+        return;
+      }
+
+      // 確認對話框
+      if (confirm('確定要提交簽收確認嗎？提交後將無法修改。')) {
+        // 顯示成功頁面而不是直接提交到後端（演示用）
+        showSuccessPage();
+        
+        // 實際使用時，請取消註解以下代碼來提交到後端
+        // document.getElementById('signature-input').value = canvas.toDataURL();
+        // document.querySelector('form').submit();
+      }
+    }
+
+    // 顯示成功頁面
+    function showSuccessPage() {
+      // 隱藏簽名頁面
+      document.getElementById('signaturePage').style.display = 'none';
+      
+      // 顯示成功頁面
+      document.getElementById('successPage').style.display = 'block';
+      
+      // 更新簽收時間
+      const now = new Date();
+      const timeString = now.getFullYear() + '/' + 
+                        (now.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                        now.getDate().toString().padStart(2, '0') + ' ' +
+                        now.getHours().toString().padStart(2, '0') + ':' + 
+                        now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('signTime').textContent = timeString;
+      
+      // 更新頁面標題
+      document.querySelector('.header h1').innerHTML = '🎉 簽收完成';
+      document.querySelector('.header .subtitle').textContent = '行李已安全送達';
+    }
+
+    // 返回首頁功能
+    function returnToList() {
+      // 實際項目中這裡可以跳轉到行李列表或首頁
+      if (confirm('確定要返回首頁嗎？')) {
+        // window.location.href = '/'; // 實際跳轉
+        
+        // 演示：重置到簽名頁面
+        document.getElementById('successPage').style.display = 'none';
+        document.getElementById('signaturePage').style.display = 'block';
+        document.querySelector('.header h1').innerHTML = '📦 簽收確認';
+        document.querySelector('.header .subtitle').textContent = '請確認以下資訊並完成簽名';
+        clearSignature();
+      }
+    }
+
+    // 顯示成功頁面
+    function showSuccessPage() {
+      // 隱藏簽名頁面
+      document.getElementById('signaturePage').style.display = 'none';
+      
+      // 顯示成功頁面
+      document.getElementById('successPage').style.display = 'block';
+      
+      // 更新簽收時間
+      const now = new Date();
+      const timeString = now.getFullYear() + '/' + 
+                        (now.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                        now.getDate().toString().padStart(2, '0') + ' ' +
+                        now.getHours().toString().padStart(2, '0') + ':' + 
+                        now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('signTime').textContent = timeString;
+      
+      // 更新頁面標題
+      document.querySelector('.header h1').innerHTML = '🎉 簽收完成';
+      document.querySelector('.header .subtitle').textContent = '行李已安全送達';
+    }
+
+    // 返回首頁功能
+    function returnToList() {
+      // 實際項目中這裡可以跳轉到行李列表或首頁
+      if (confirm('確定要返回首頁嗎？')) {
+        // window.location.href = '/'; // 實際跳轉
+        
+        // 示例：重置到簽名頁面
+        document.getElementById('successPage').style.display = 'none';
+        document.getElementById('signaturePage').style.display = 'block';
+        document.querySelector('.header h1').innerHTML = '📦 簽收確認';
+        document.querySelector('.header .subtitle').textContent = '請確認以下資訊並完成簽名';
+        clearSignature();
+      }
+    }
+
+    // 事件監聽器
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('touchend', stopDraw);
+    canvas.addEventListener('touchmove', draw);
+
+    // 初始化
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // 頁面載入時檢查是否有超時費用
+    window.addEventListener('load', function() {
+      document.querySelector('.container').style.animation = 'slideUp 0.8s ease-out';
+    });
+
+    // 超時費用檢查（由後端注入）
+    var hasExtraFee = false;
+    var extraFeeAmount = 0;
+    
+    // 這些變數會由後端 EJS 模板填入
+    
+  </script>
+</body>
+</html>

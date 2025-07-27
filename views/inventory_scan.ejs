@@ -12,6 +12,32 @@
       box-sizing: border-box;
     }
     
+    /* 自定義滾動條 */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #5a6fd8, #6a4190);
+    }
+    
+    /* Firefox 滾動條 */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: #667eea rgba(255, 255, 255, 0.1);
+    }
+    
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,18 +46,20 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
+      padding: 20px 0;
     }
     
     /* 背景動畫元素 */
     .bg-decoration {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
       z-index: 1;
+      pointer-events: none;
     }
     
     .floating-icon {
@@ -90,6 +118,7 @@
       position: relative;
       z-index: 10;
       animation: slideUp 0.8s ease-out;
+      margin: 20px 0;
     }
     
     @keyframes slideUp {
@@ -252,7 +281,7 @@
       gap: 15px;
       align-items: center;
       max-width: 500px;
-      margin: 0 auto;
+      margin: 0 auto 20px;
     }
     
     .scan-input {
@@ -322,6 +351,173 @@
     
     .scan-btn:active {
       transform: translateY(-1px);
+    }
+    
+    /* 相機掃描按鈕 */
+    .camera-btn {
+      width: 100%;
+      padding: 18px 30px;
+      background: linear-gradient(135deg, #3182ce, #4299e1);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+    
+    .camera-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .camera-btn:hover::before {
+      left: 100%;
+    }
+    
+    .camera-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(49, 130, 206, 0.3);
+    }
+    
+    .camera-btn:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    /* 相機預覽區域 */
+    .camera-section {
+      display: none;
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .camera-section.active {
+      display: block;
+      animation: slideDown 0.5s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .camera-preview {
+      width: 100%;
+      max-width: 400px;
+      height: 300px;
+      background: #000;
+      border-radius: 15px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2em;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 15px;
+    }
+    
+    .capture-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #e53e3e, #f56565);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .capture-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(229, 62, 62, 0.3);
+    }
+    
+    .close-camera-btn {
+      width: 100%;
+      padding: 12px;
+      background: rgba(113, 128, 150, 0.2);
+      color: #4a5568;
+      border: 1px solid rgba(113, 128, 150, 0.3);
+      border-radius: 12px;
+      font-size: 1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .close-camera-btn:hover {
+      background: rgba(113, 128, 150, 0.3);
+    }
+    
+    /* 掃描結果覆蓋層 */
+    .scan-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(72, 187, 120, 0.2);
+      border: 3px solid #48bb78;
+      border-radius: 15px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #48bb78;
+      font-size: 1.5em;
+      font-weight: 700;
+      animation: scanFound 0.5s ease-out;
+    }
+    
+    @keyframes scanFound {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
     
     /* 訊息顯示 */
@@ -458,6 +654,10 @@
         margin-bottom: 20px;
         align-self: flex-start;
       }
+      
+      .camera-preview {
+        height: 250px;
+      }
     }
   </style>
 </head>
@@ -502,12 +702,13 @@
         掃描或輸入行李編號
       </div>
       
-      <form method="POST" action="/inventory/scan">
+      <form method="POST" action="/inventory/scan" id="scanForm">
         <div class="input-group">
           <input 
             type="text" 
             name="code" 
             class="scan-input"
+            id="codeInput"
             placeholder="LUG-2024-001"
             autofocus
             autocomplete="off"
@@ -518,18 +719,47 @@
           </button>
         </div>
       </form>
+
+      <!-- 相機掃描按鈕 -->
+      <button type="button" class="camera-btn" id="cameraBtn">
+        <i class="fas fa-camera"></i>
+        使用相機掃描
+      </button>
+    </div>
+
+    <!-- 相機掃描區域 -->
+    <div class="camera-section" id="cameraSection">
+      <div class="camera-preview">
+        <video id="video" autoplay playsinline></video>
+        <div class="scan-overlay" id="scanOverlay">
+          <i class="fas fa-check-circle"></i>
+          掃描成功！
+        </div>
+      </div>
+      <button type="button" class="capture-btn" id="captureBtn">
+        <i class="fas fa-camera-retro"></i>
+        拍照掃描
+      </button>
+      <button type="button" class="close-camera-btn" id="closeCameraBtn">
+        <i class="fas fa-times"></i>
+        關閉相機
+      </button>
     </div>
 
     <!-- 訊息顯示區域 -->
     <div class="message-area">
-      <% if (message) { %>
-        <div class="success-message">
-          <div class="message-icon">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <%= message %>
+      <div class="success-message" id="successMessage" style="display: none;">
+        <div class="message-icon">
+          <i class="fas fa-check-circle"></i>
         </div>
-      <% } %>
+        <span id="messageText"></span>
+      </div>
+      <div class="error-message" id="errorMessage" style="display: none;">
+        <div class="message-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <span id="errorText"></span>
+      </div>
     </div>
 
     <!-- 快捷鍵提示 -->
@@ -551,32 +781,144 @@
           <span class="shortcut-key">F5</span>
           重新整理
         </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">C</span>
+          開啟相機
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // 自動聚焦輸入框
+    // 全域變數
+    let stream = null;
+    let isProcessingCamera = false;
+
+    // DOM 元素
+    const elements = {
+      input: document.getElementById('codeInput'),
+      form: document.getElementById('scanForm'),
+      cameraBtn: document.getElementById('cameraBtn'),
+      cameraSection: document.getElementById('cameraSection'),
+      video: document.getElementById('video'),
+      captureBtn: document.getElementById('captureBtn'),
+      closeCameraBtn: document.getElementById('closeCameraBtn'),
+      scanOverlay: document.getElementById('scanOverlay'),
+      successMessage: document.getElementById('successMessage'),
+      errorMessage: document.getElementById('errorMessage'),
+      messageText: document.getElementById('messageText'),
+      errorText: document.getElementById('errorText')
+    };
+
+    // 初始化
     document.addEventListener('DOMContentLoaded', function() {
-      const input = document.querySelector('.scan-input');
-      input.focus();
-      
+      elements.input.focus();
+      checkCameraSupport();
+      bindEvents();
+    });
+
+    // 檢查相機支援
+    function checkCameraSupport() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        elements.cameraBtn.disabled = true;
+        elements.cameraBtn.innerHTML = '<i class="fas fa-camera-slash"></i>相機不支援';
+      }
+    }
+
+    // 綁定事件
+    function bindEvents() {
       // ESC 鍵返回儀表板
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-          window.location.href = '/dashboard';
+          if (elements.cameraSection.classList.contains('active')) {
+            closeCamera();
+          } else {
+            window.location.href = '/dashboard';
+          }
+        } else if (e.key.toLowerCase() === 'c' && !elements.cameraSection.classList.contains('active')) {
+          openCamera();
         }
       });
-      
-      // 表單提交後清空輸入框並重新聚焦
-      const form = document.querySelector('form');
-      form.addEventListener('submit', function() {
-        setTimeout(() => {
-          input.value = '';
-          input.focus();
-        }, 100);
+
+      // 表單提交
+      elements.form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        processScan(elements.input.value.trim());
       });
-    });
-  </script>
-</body>
-</html>
+
+      // 相機相關按鈕
+      elements.cameraBtn.addEventListener('click', openCamera);
+      elements.captureBtn.addEventListener('click', captureImage);
+      elements.closeCameraBtn.addEventListener('click', closeCamera);
+    }
+
+    // 開啟相機
+    async function openCamera() {
+      if (isProcessingCamera) return;
+      
+      try {
+        isProcessingCamera = true;
+        elements.cameraBtn.disabled = true;
+        elements.cameraBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>啟動中...';
+
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'environment' // 優先使用後置相機
+          }
+        });
+
+        elements.video.srcObject = stream;
+        elements.cameraSection.classList.add('active');
+        elements.cameraBtn.innerHTML = '<i class="fas fa-camera"></i>使用相機掃描';
+        
+        showMessage('相機已啟動，請將鏡頭對準行李標籤', 'success');
+      } catch (error) {
+        console.error('相機啟動失敗:', error);
+        showMessage('無法啟動相機，請檢查權限設定', 'error');
+        elements.cameraBtn.innerHTML = '<i class="fas fa-camera"></i>使用相機掃描';
+      } finally {
+        isProcessingCamera = false;
+        elements.cameraBtn.disabled = false;
+      }
+    }
+
+    // 關閉相機
+    function closeCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      elements.cameraSection.classList.remove('active');
+      elements.scanOverlay.style.display = 'none';
+      showMessage('相機已關閉', 'success');
+    }
+
+    // 拍照掃描
+    function captureImage() {
+      if (!stream) return;
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      
+      canvas.width = elements.video.videoWidth;
+      canvas.height = elements.video.videoHeight;
+      context.drawImage(elements.video, 0, 0);
+
+      // 顯示掃描效果
+      elements.scanOverlay.style.display = 'flex';
+      
+      // 模擬條碼識別（實際應用中需要使用專門的條碼識別庫）
+      setTimeout(() => {
+        // 模擬掃描結果
+        const mockCode = generateMockCode();
+        elements.input.value = mockCode;
+        
+        // 自動處理掃描結果
+        processScan(mockCode);
+        
+        elements.scanOverlay.style.display = 'none';
+        closeCamera();
+      }, 1500);
+    }
+
+    // 生成模擬條碼（實際應用中應該

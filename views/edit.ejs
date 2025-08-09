@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>編輯訂單</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f6f6f6; }
+    form { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    button { background: #EA5514; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 20px; }
+    .hint { font-size: 12px; color: #666; margin-top: 4px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h2>編輯訂單：<%= order.order_id %></h2>
+
+  <form action="/admin/edit/<%= order.order_id %>" method="POST">
+    <label>姓名
+      <input type="text" name="name" value="<%= order.name %>" required>
+    </label>
+
+    <label>電話
+      <input type="text" name="phone" value="<%= order.phone %>" required>
+    </label>
+
+    <label>小件數
+      <input type="number" name="small_count" value="<%= order.small_count %>" min="0" required>
+    </label>
+
+    <label>大件數
+      <input type="number" name="large_count" value="<%= order.large_count %>" min="0" required>
+    </label>
+
+    <label>發票選擇
+      <select name="invoice_type" id="invoice_type" required>
+        <option value="載具" <%= order.invoice_type === '載具' ? 'selected' : '' %>>載具</option>
+        <option value="現場開立" <%= order.invoice_type === '現場開立' ? 'selected' : '' %>>現場開立</option>
+      </select>
+    </label>
+
+    <!-- 新增：載具號碼欄位（只在選擇「載具」時顯示） -->
+    <div id="carrier_group" class="<%= order.invoice_type === '載具' ? '' : 'hidden' %>">
+      <label>手機載具號碼
+        <input
+          type="text"
+          name="carrier_number"
+          id="carrier_number"
+          value="<%= order.carrier_number || '' %>"
+          placeholder="例如：/ABC1234"
+          pattern="^/[A-Za-z0-9]{7}$"
+          oninput="this.value=this.value.toUpperCase()"
+        >
+      </label>
+      <div class="hint">格式：以「/」開頭 + 7 碼英數字（會自動轉大寫）</div>
+    </div>
+
+    <button type="submit">儲存變更</button>
+  </form>
+
+  <script>
+    const invoiceSel = document.getElementById('invoice_type');
+    const carrierGroup = document.getElementById('carrier_group');
+    const carrierInput = document.getElementById('carrier_number');
+
+    function toggleCarrier() {
+      const useCarrier = invoiceSel.value === '載具';
+      carrierGroup.classList.toggle('hidden', !useCarrier);
+      // 必填與否
+      if (useCarrier) {
+        carrierInput.setAttribute('required', 'required');
+      } else {
+        carrierInput.removeAttribute('required');
+        carrierInput.value = '';
+      }
+    }
+
+    invoiceSel.addEventListener('change', toggleCarrier);
+    // 初始執行一次
+    toggleCarrier();
+  </script>
+</body>
+</html>

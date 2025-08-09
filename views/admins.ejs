@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>管理員管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(234, 85, 20, 0.1);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #ea5514 0%, #ff6b35 100%);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    
+    h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .content {
+      padding: 24px;
+    }
+    
+    /* 返回按鈕 */
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 24px;
+      padding: 10px 16px;
+      background: #6c757d;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+      background: #5a6268;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    }
+    
+    /* 管理員列表區域 */
+    .admin-list-section {
+      background: #f8f9fa;
+      padding: 24px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+      border-left: 4px solid #ea5514;
+    }
+    
+    .section-title {
+      color: #ea5514;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* 表格容器 */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      min-width: 500px;
+    }
+    
+    th, td {
+      padding: 16px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+    }
+    
+    th {
+      background: linear-gradient(135deg, #ea5514 0%, #ff6b35 100%);
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+    
+    /* 按鈕樣式 */
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      background: #ea5514;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 4px;
+    }
+    
+    .btn:hover {
+      background: #d64814;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(234, 85, 20, 0.3);
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-success {
+      background: #28a745;
+    }
+    
+    .btn-success:hover {
+      background: #218838;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    /* 新增管理員區域 */
+    .add-admin-section {
+      background: #f8f9fa;
+      padding: 24px;
+      border-radius: 8px;
+      border-left: 4px solid #28a745;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #495057;
+    }
+    
+    .form-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #ea5514;
+      box-shadow: 0 0 0 3px rgba(234, 85, 20, 0.1);
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    
+    /* 空狀態 */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6c757d;
+    }
+    
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    
+    /* 管理員計數 */
+    .admin-count {
+      background: linear-gradient(135deg, #ea5514 0%, #ff6b35 100%);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 20px;
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .header, .content {
+        padding: 16px;
+      }
+      
+      .admin-list-section,
+      .add-admin-section {
+        padding: 16px;
+      }
+      
+      .section-title {
+        font-size: 1.1rem;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+        font-size: 13px;
+      }
+      
+      .form-input {
+        max-width: 100%;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+        margin: 4px 0;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        border-radius: 0;
+        margin: -8px;
+      }
+      
+      h2 {
+        font-size: 1.3rem;
+      }
+      
+      th, td {
+        padding: 10px 6px;
+        font-size: 12px;
+      }
+      
+      .admin-count {
+        font-size: 13px;
+        padding: 10px 16px;
+      }
+    }
+    
+    /* 載入動畫 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .container {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    /* 刪除確認樣式 */
+    .delete-form {
+      display: inline;
+    }
+    
+    /* ID 標籤樣式 */
+    .id-badge {
+      background: #6c757d;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    /* 用戶名樣式 */
+    .username {
+      font-weight: 500;
+      color: #495057;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>👥 管理員管理</h2>
+    </div>
+    
+    <div class="content">
+      <!-- 返回按鈕 -->
+      <a href="/admin" class="back-btn">← 返回訂單管理</a>
+      
+      <!-- 管理員列表區域 -->
+      <div class="admin-list-section">
+        <h3 class="section-title">
+          📋 管理員列表
+        </h3>
+        
+        <div class="admin-count">
+          總共 <%= admins.length %> 位管理員
+        </div>
+
+        <% if (admins.length > 0) { %>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>帳號</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% admins.forEach(admin => { %>
+                  <tr>
+                    <td>
+                      <span class="id-badge">#<%= admin.id %></span>
+                    </td>
+                    <td>
+                      <span class="username"><%= admin.username %></span>
+                    </td>
+                    <td>
+                      <form action="/admin/admins/delete/<%= admin.id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除管理員「<%= admin.username %>」嗎？此操作無法復原！')">
+                        <button type="submit" class="btn btn-danger">🗑️ 刪除</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <div class="empty-state-icon">👤</div>
+            <p>目前沒有任何管理員</p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- 新增管理員區域 -->
+      <div class="add-admin-section">
+        <h3 class="section-title">
+          ➕ 新增管理員
+        </h3>
+        
+        <form action="/admin/admins/add" method="POST">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="username">👤 帳號</label>
+              <input type="text" id="username" name="username" class="form-input" placeholder="請輸入管理員帳號" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="password">🔒 密碼</label>
+              <input type="password" id="password" name="password" class="form-input" placeholder="請輸入密碼" required>
+            </div>
+            
+            <div class="form-group">
+              <button type="submit" class="btn btn-success">✅ 新增管理員</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

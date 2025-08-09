@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>演唱會行李寄存</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 16px; background: #f8f9fa; min-height: 100vh; line-height: 1.6;
+    }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; border: 1px solid #e9ecef; }
+    .header { background: #ea5514; color: #fff; padding: 24px; text-align: center; }
+    h1 { margin: 0; font-size: 1.8rem; font-weight: 600; }
+    .subtitle { margin: 8px 0 0; font-size: 1rem; opacity: .9; }
+    .form-container { padding: 24px; }
+
+    /* 表單樣式 */
+    .form-section { margin-bottom: 32px; }
+    .section-title { color: #ea5514; font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #ea5514; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: #495057; font-size: 14px; }
+    .form-input, .form-select {
+      width: 100%; padding: 12px 16px; border: 1px solid #ced4da; border-radius: 6px; font-size: 16px; background: #fff; transition: border-color .2s ease;
+    }
+    .form-input:focus, .form-select:focus { outline: none; border-color: #ea5514; box-shadow: 0 0 0 2px rgba(234,85,20,.2); }
+
+    /* 數量選擇器 */
+    .quantity-selector { display: flex; align-items: center; gap: 12px; background: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef; }
+    .quantity-btn {
+      background: #ea5514; color: #fff; border: none; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: background-color .2s ease;
+    }
+    .quantity-btn:hover { background: #d64814; }
+    .quantity-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .quantity-input { border: none; background: transparent; text-align: center; font-size: 16px; font-weight: 600; width: 60px; color: #ea5514; }
+    .quantity-input:focus { outline: none; }
+
+    /* 價格卡片 */
+    .price-card { background: #f8f9fa; padding: 16px; border-radius: 6px; margin-bottom: 16px; border-left: 4px solid #ea5514; }
+    .price-header { font-weight: 600; color: #495057; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .price-amount { color: #ea5514; font-size: 1rem; font-weight: 600; }
+
+    /* 總計區域 */
+    .total-section { background: #ea5514; color: #fff; padding: 20px; border-radius: 6px; margin: 24px 0; text-align: center; }
+    .total-label { font-size: 1rem; opacity: .9; margin-bottom: 8px; }
+    .total-amount { font-size: 1.8rem; font-weight: 600; }
+
+    /* 載具輸入欄位 */
+    .carrier-input { display: none; margin-top: 12px; }
+    .carrier-input.show { display: block; }
+
+    /* 條款區域 */
+    .terms-section { background: #f8f9fa; padding: 16px; border-radius: 6px; margin: 20px 0; border: 1px solid #e9ecef; }
+    .checkbox-wrapper { display: flex; align-items: flex-start; gap: 12px; }
+    .custom-checkbox { width: 18px; height: 18px; accent-color: #ea5514; cursor: pointer; margin-top: 2px; }
+    .checkbox-label { color: #495057; cursor: pointer; line-height: 1.5; font-size: 14px; }
+    .terms-link-btn {
+      background: none; border: none; padding: 0; margin-left: 6px; color: #ea5514; text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: 700;
+    }
+
+    /* 提交按鈕 */
+    .submit-btn {
+      background: #ea5514; color: #fff; border: none; padding: 16px 32px; margin-top: 24px; width: 100%;
+      border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: 600; transition: background-color .2s ease;
+    }
+    .submit-btn:hover { background: #d64814; }
+    .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal.show { display: flex; }
+    .modal-dialog {
+      width: min(720px, 92vw); max-height: 86vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,.25);
+    }
+    .modal-header, .modal-footer { padding: 12px 16px; }
+    .modal-header { border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
+    .modal-body { padding: 14px 16px; overflow: auto; line-height: 1.7; font-size: 14px; color: #343a40; }
+    .close { background: none; border: none; font-size: 20px; line-height: 1; cursor: pointer; }
+    .primary-btn {
+      padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; background: #ea5514; color: #fff; font-weight: 700;
+    }
+
+    /* 響應式 */
+    @media (max-width: 768px) {
+      body { padding: 8px; }
+      h1 { font-size: 1.6rem; }
+      .header { padding: 20px 16px; }
+      .form-container { padding: 20px 16px; }
+      .total-amount { font-size: 1.6rem; }
+    }
+    @media (max-width: 480px) {
+      .container { border-radius: 0; border-left: none; border-right: none; }
+      h1 { font-size: 1.4rem; }
+      .total-amount { font-size: 1.4rem; }
+      .form-input, .form-select { font-size: 16px; } /* 防 iOS 縮放 */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>行李寄存</h1>
+      <p class="subtitle">演唱會專用</p>
+    </div>
+
+    <div class="form-container">
+      <form action="/submit" method="POST">
+        <!-- 個人資訊 -->
+        <div class="form-section">
+          <h3 class="section-title">基本資料</h3>
+          <div class="form-group">
+            <label class="form-label" for="name">姓名</label>
+            <input type="text" id="name" name="name" class="form-input" placeholder="請輸入您的姓名" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="phone">聯絡電話</label>
+            <input type="tel" id="phone" name="phone" class="form-input" placeholder="請輸入手機號碼" required>
+          </div>
+        </div>
+
+        <!-- 行李選擇 -->
+        <div class="form-section">
+          <h3 class="section-title">行李選擇</h3>
+          <div class="price-card">
+            <div class="price-header"><span>小件行李</span><span class="price-amount">NT$ 150 / 件</span></div>
+            <div class="quantity-selector">
+              <button type="button" class="quantity-btn" onclick="changeQuantity('small', -1)">-</button>
+              <input type="number" name="small_count" class="quantity-input" value="0" min="0" onchange="calculateTotal()" required readonly>
+              <button type="button" class="quantity-btn" onclick="changeQuantity('small', 1)">+</button>
+            </div>
+          </div>
+          <div class="price-card">
+            <div class="price-header"><span>大件行李</span><span class="price-amount">NT$ 200 / 件</span></div>
+            <div class="quantity-selector">
+              <button type="button" class="quantity-btn" onclick="changeQuantity('large', -1)">-</button>
+              <input type="number" name="large_count" class="quantity-input" value="0" min="0" onchange="calculateTotal()" required readonly>
+              <button type="button" class="quantity-btn" onclick="changeQuantity('large', 1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 發票 -->
+        <div class="form-section">
+          <h3 class="section-title">發票選擇</h3>
+          <div class="form-group">
+            <select name="invoice" class="form-select" id="invoiceSelect" onchange="toggleCarrierInput()" required>
+              <option value="">請選擇發票方式</option>
+              <option value="載具">手機載具</option>
+              <option value="現場開立">現場開立紙本發票</option>
+            </select>
+          </div>
+          <div class="carrier-input" id="carrierInput">
+            <label class="form-label" for="carrier">手機載具號碼</label>
+            <input type="text" id="carrier" name="carrier" class="form-input" placeholder="請輸入載具號碼 (例如：/ABC1234)">
+          </div>
+        </div>
+
+        <!-- 總計 -->
+        <div class="total-section">
+          <div class="total-label">預約總金額</div>
+          <div class="total-amount">NT$ <span id="total">0</span></div>
+        </div>
+
+        <!-- 條款 -->
+        <div class="terms-section">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" name="agree" class="custom-checkbox" id="agree" required>
+            <label for="agree" class="checkbox-label">
+              我已閱讀並同意服務條款
+              <button type="button" class="terms-link-btn" id="openTerms">（查看條款）</button><br>
+              並了解行李寄存相關規定與責任限制
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">請選擇行李數量</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 條款 Modal -->
+  <div id="termsModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+      <div class="modal-header">
+        <h3 id="termsTitle">Mr. Luggage 服務條款</h3>
+        <button type="button" class="close" id="closeTerms" aria-label="關閉">×</button>
+      </div>
+     <div class="modal-body">
+  <p style="margin:0 0 8px; color:#6c757d; font-size:12px;">最後更新：2025-08-09｜條款版本：v1.0</p>
+
+ <ol class="terms-list">
+  <li>
+    <strong>計費方式</strong>：小件每件新臺幣150元／次，大件每件新臺幣200元／次。寄存當日活動結束後<strong>1小時內</strong>須完成領取；逾時未領取者，依日區間重新計費並補足差額。
+  </li>
+  <li>
+    <strong>寄存限制</strong>：不得寄存現金、珠寶、有價證券、護照、易碎物、生鮮食品、動植物、液體及其他易腐爛或危害安全之物品；亦不得寄存違禁品、危險物或不符合法令及場館規定之物品。違反本條款所致之任何損害，由顧客自行承擔全部責任。
+  </li>
+  <li>
+    <strong>責任限制</strong>：對於不可抗力（含天災、停電、交通事故、罷工、政府管制、場館管制等）或寄存物本身瑕疵、包裝不良所致之損害，本公司不負賠償責任。因本公司可歸責事由造成之損害，賠償金額以新臺幣1,000元為上限，且不另賠償間接損失或衍生損害。
+  </li>
+  <li>
+    <strong>領件後責任終止</strong>：顧客完成領取並離開寄存地點後，即視為本公司已依約完成交付，行李及其內容物之保管責任即行終止；其後發生之遺失、毀損或任何爭議，本公司概不負責。
+  </li>
+  <li>
+    <strong>取件規範</strong>：取件時請出示訂單編號及有效證件；若委託他人取件，須事先告知並提供完整訂單資訊，委託取件所生之一切風險由顧客自行承擔。
+  </li>
+  <li>
+    <strong>遺失物處理</strong>：逾期未領取之行李，本公司將保管<u>30日</u>；期滿後視為顧客自動放棄，並得逕行處分而不另行通知。屆時本公司不再承擔任何保管或賠償責任。
+  </li>
+  <li>
+    <strong>物品驗收與包裝</strong>：寄存前應自行妥善包裝及確認物品狀態；本公司不負開箱檢查義務，對於外觀刮傷、內容物移位或因包裝不良所致之損害，不承擔任何責任。
+  </li>
+  <li>
+    <strong>不可抗力與特殊狀況</strong>：因天災、交通事故、罷工、政府或場館管制、公共安全事件等非可歸責於本公司之事由，致服務延遲、中斷或無法履行，本公司不負賠償責任。
+  </li>
+  <li>
+    <strong>聯絡方式</strong>：客服信箱：mr.luggage.tw@gmail.com ／ 客服電話：0932-253-266。服務據點與營業時間以本公司官網公告為準；如遇緊急事項請依現場工作人員指示辦理。
+  </li>
+  <li>
+    <strong>條款變更與準據法</strong>：本公司得視需要修訂本條款並公告後生效；本條款受中華民國法律管轄，爭議以本公司所在地法院為第一審管轄法院。
+  </li>
+</ol>
+
+
+      <div class="modal-footer">
+        <button type="button" class="primary-btn" id="agreeAndClose">我已閱讀並同意</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function changeQuantity(type, change) {
+      const input = document.querySelector(`input[name="${type}_count"]`);
+      const currentValue = parseInt(input.value) || 0;
+      const newValue = Math.max(0, currentValue + change);
+      input.value = newValue;
+      calculateTotal(); updateButtonStates();
+    }
+    function updateButtonStates() {
+      const smallValue = parseInt(document.querySelector('input[name="small_count"]').value) || 0;
+      const largeValue = parseInt(document.querySelector('input[name="large_count"]').value) || 0;
+      document.querySelector('.price-card:nth-of-type(1) .quantity-btn:first-child').disabled = smallValue <= 0;
+      document.querySelector('.price-card:nth-of-type(2) .quantity-btn:first-child').disabled = largeValue <= 0;
+    }
+    function calculateTotal() {
+      const small = parseInt(document.querySelector('input[name="small_count"]').value) || 0;
+      const large = parseInt(document.querySelector('input[name="large_count"]').value) || 0;
+      const total = small * 150 + large * 200;
+      document.getElementById('total').innerText = total.toLocaleString();
+      const submitBtn = document.getElementById('submitBtn');
+      if (total > 0) { submitBtn.disabled = false; submitBtn.innerHTML = '確認預約 - NT$ ' + total.toLocaleString(); }
+      else { submitBtn.disabled = true; submitBtn.innerHTML = '請選擇行李數量'; }
+      updateButtonStates();
+    }
+    function toggleCarrierInput() {
+      const invoiceSelect = document.getElementById('invoiceSelect');
+      const carrierInput = document.getElementById('carrierInput');
+      const carrierField = document.getElementById('carrier');
+      if (invoiceSelect.value === '載具') { carrierInput.classList.add('show'); carrierField.required = true; }
+      else { carrierInput.classList.remove('show'); carrierField.required = false; carrierField.value = ''; }
+    }
+    // 表單驗證：至少一件
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const small = parseInt(document.querySelector('input[name="small_count"]').value) || 0;
+      const large = parseInt(document.querySelector('input[name="large_count"]').value) || 0;
+      if (small + large === 0) { e.preventDefault(); alert('請至少選擇一件行李！'); return false; }
+    });
+
+    // 條款 Modal 控制
+    const modal = document.getElementById('termsModal');
+    const openBtn = document.getElementById('openTerms');
+    const closeBtn = document.getElementById('closeTerms');
+    const agreeAndCloseBtn = document.getElementById('agreeAndClose');
+    const agreeCheckbox = document.getElementById('agree');
+
+    function openModal() {
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      document.addEventListener('keydown', escClose);
+    }
+    function closeModal() {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      document.removeEventListener('keydown', escClose);
+    }
+    function escClose(e) { if (e.key === 'Escape') closeModal(); }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    agreeAndCloseBtn.addEventListener('click', () => { agreeCheckbox.checked = true; closeModal(); });
+
+    // 初始化
+    calculateTotal(); updateButtonStates();
+  </script>
+</body>
+</html>

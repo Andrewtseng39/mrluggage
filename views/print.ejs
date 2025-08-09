@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>訂單印刷單</title>
+  <style>
+    /* ---- 票面尺寸 (10cm x 10cm) ---- */
+    @page {
+      size: 100mm 100mm;
+      margin: 0;
+    }
+
+    :root {
+      --pad-x: 10mm;    /* 左右內距 */
+      --pad-y: 12mm;    /* 上下基礎內距 */
+      --gap:   8mm;     /* 文字之間間距 */
+      --shift: 20mm;    /* 下移距離：若要 2.5 公分請改 25mm */
+    }
+
+    html, body { height: 100%; margin: 0; padding: 0; background: #fff; }
+    body { font-family: 'Microsoft JhengHei', Arial, sans-serif; }
+
+    /* ---- 單張票面 ---- */
+    .ticket {
+      width: 100mm;
+      height: 100mm;
+      box-sizing: border-box;
+      padding: calc(var(--pad-y) + var(--shift)) var(--pad-x) var(--pad-y) var(--pad-x);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      gap: var(--gap);
+      text-align: center;
+      page-break-after: always;
+    }
+
+    /* ---- 文字樣式 ---- */
+    .order-id {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      line-height: 1.1;
+      margin: 0;
+      color: #000;
+      font-family: 'Arial Black', Arial, sans-serif;
+    }
+    .customer-name {
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 0;
+      color: #111;
+    }
+    .item-count {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin: 0;
+      color: #000;
+      letter-spacing: 0.5px;
+    }
+
+    /* ---- 簽收單（覆寫部分，往上 0.3 公分） ---- */
+    .sign-sheet{
+      /* 比一般票面少 8mm 的上內距，再額外上移 2mm（比上版多 3mm） */
+      padding: calc(var(--pad-y) + var(--shift) - 8mm - 2mm) var(--pad-x) var(--pad-y) var(--pad-x);
+    }
+    .sign-sheet .sign-title{
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0 0 4mm;
+      letter-spacing: 1px;
+    }
+    .sign-sheet .sign-rows{
+      width: 100%;
+      display: grid;
+      grid-template-columns: 28mm 1fr;
+      row-gap: 3mm;
+      column-gap: 4mm;
+      text-align: left;
+      font-size: 17px;
+      line-height: 1.2;
+    }
+    .sign-sheet .sign-label{ font-weight: 700; color:#000; }
+    .sign-sheet .sign-value{ font-weight: 600; color:#111; word-break: break-all; }
+
+    .sign-sheet .signature-box{
+      width: 100%;
+      margin-top: 6mm;
+      border: 2px dashed #000;
+      border-radius: 2mm;
+      padding: 3mm;
+      box-sizing: border-box;
+      flex: 1;
+      min-height: 20mm;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+    .sign-sheet .signature-hint{
+      font-size: 12px;
+      color:#000;
+    }
+
+    /* ---- 列印最佳化 ---- */
+    @media print {
+      .print-button { display: none !important; }
+      .ticket {
+        padding: calc(var(--pad-y) + var(--shift)) var(--pad-x) var(--pad-y) var(--pad-x) !important;
+        background: #fff !important;
+        page-break-before: auto;
+        page-break-after: always;
+        page-break-inside: avoid;
+      }
+      /* 列印時同樣上移 0.3 公分 */
+      .sign-sheet{
+        padding: calc(var(--pad-y) + var(--shift) - 8mm - 2mm) var(--pad-x) var(--pad-y) var(--pad-x) !important;
+      }
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    /* ---- 螢幕操作按鈕 ---- */
+    .print-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 16px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .print-button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <!-- 快速列印按鈕 -->
+  <button class="print-button" onclick="window.print()">快速列印</button>
+
+  <%
+    const small = parseInt(order.small_count || 0, 10);
+    const large = parseInt(order.large_count || 0, 10);
+    const totalCount = small + large;
+  %>
+
+  <!-- 每件一張 -->
+  <% for (let i = 1; i <= totalCount; i++) { %>
+    <div class="ticket">
+      <div class="order-id"><%= order.order_id %></div>
+      <div class="customer-name"><%= order.name %></div>
+      <div class="item-count">第 <%= i %> 件　共 <%= totalCount %> 件</div>
+    </div>
+  <% } %>
+
+  <!-- 追加：簽收單（每筆訂單最後一張） -->
+  <div class="ticket sign-sheet">
+    <div class="sign-title">領件單</div>
+
+    <div class="sign-rows">
+      <div class="sign-label">訂單編號</div>
+      <div class="sign-value"><%= order.order_id %></div>
+
+      <div class="sign-label">姓名</div>
+      <div class="sign-value"><%= order.name %></div>
+
+      <div class="sign-label">件數</div>
+      <div class="sign-value"><%= totalCount %> 件</div>
+    </div>
+
+    <div class="signature-box">
+      <span class="signature-hint">簽名 / 日期</span>
+      </div>
+  </div>
+
+  <script>
+    // Ctrl+P 快速列印
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        window.print();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>後台管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f8f9fa;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      border: 1px solid #e9ecef;
+    }
+    
+    .header {
+      background: #ea5514;
+      color: white;
+      padding: 24px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+    
+    .content {
+      padding: 24px;
+    }
+    
+    /* 搜尋表單樣式 */
+    .search-form {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+      margin-bottom: 24px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .search-input {
+      padding: 10px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
+      width: 100%;
+      max-width: 300px;
+      margin-right: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #ea5514;
+      box-shadow: 0 0 0 2px rgba(234, 85, 20, 0.2);
+    }
+    
+    /* 篩選按鈕 */
+    .filter-buttons {
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .filter-btn {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    
+    .filter-btn.active {
+      background: #ea5514;
+      color: white;
+      border-color: #ea5514;
+    }
+    
+    .filter-btn:hover {
+      background: #f8f9fa;
+    }
+    
+    .filter-btn.active:hover {
+      background: #d64814;
+    }
+    
+    /* 按鈕樣式 */
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      background: #ea5514;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin: 2px;
+    }
+    
+    .btn:hover {
+      background: #d64814;
+    }
+    
+    .btn-success {
+      background: #28a745;
+    }
+    
+    .btn-success:hover {
+      background: #218838;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+    }
+    
+    .btn-small {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    
+    /* 緊急提醒 */
+    .urgent-notice {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border: 1px solid #f5c6cb;
+      font-weight: 500;
+    }
+    
+    /* 統計資訊樣式 */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .stat-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      padding: 20px;
+      border-radius: 6px;
+      text-align: center;
+      border-left: 4px solid #ea5514;
+    }
+    
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 8px 0;
+      color: #ea5514;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+      font-weight: 500;
+    }
+    
+    /* 表格容器 */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      min-width: 1000px;
+    }
+    
+    th, td {
+      padding: 12px 8px;
+      text-align: center;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 14px;
+    }
+    
+    th {
+      background: #ea5514;
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+    
+    /* 需要現場開發票的訂單樣式 */
+    .invoice-required {
+      background-color: #fff3cd !important;
+      border-left: 4px solid #ffc107;
+    }
+    
+    .invoice-required:hover {
+      background-color: #ffeaa7 !important;
+    }
+    
+    /* 發票類型標籤 */
+    .invoice-badge {
+      background-color: #dc3545;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+      animation: pulse 2s infinite;
+    }
+    
+    .invoice-normal {
+      background-color: #28a745;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    
+    .invoice-digital {
+      background-color: #17a2b8;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    
+    /* 閃爍動畫 */
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    
+    /* 載具號碼樣式 */
+    .carrier-number {
+      font-family: monospace;
+      background: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    
+    /* 操作按鈕群組 */
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+    }
+    
+    .delete-form {
+      display: inline;
+    }
+    
+    /* 管理員連結 */
+    .admin-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: #ea5514;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 8px 16px;
+      border: 1px solid #ea5514;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    
+    .admin-link:hover {
+      background: #ea5514;
+      color: white;
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .header, .content {
+        padding: 16px;
+      }
+      
+      .search-input {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 12px;
+      }
+      
+      .btn {
+        width: 100%;
+        margin: 4px 0;
+      }
+      
+      .filter-buttons {
+        flex-direction: column;
+      }
+      
+      .filter-btn {
+        width: 100%;
+      }
+      
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .stat-value {
+        font-size: 1.4rem;
+      }
+      
+      th, td {
+        padding: 8px 4px;
+        font-size: 12px;
+      }
+      
+      .action-group {
+        flex-direction: column;
+      }
+      
+      .action-group .btn {
+        width: 100%;
+        margin: 2px 0;
+      }
+      
+      table {
+        min-width: 800px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+      
+      h1 {
+        font-size: 1.3rem;
+      }
+      
+      .stat-value {
+        font-size: 1.2rem;
+      }
+      
+      th, td {
+        padding: 6px 3px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>訂單管理系統</h1>
+    </div>
+    
+    <div class="content">
+      <!-- 搜尋表單 -->
+      <div class="search-form">
+        <form method="GET" action="/admin">
+          <input type="text" name="keyword" placeholder="搜尋姓名或電話" value="<%= keyword %>" class="search-input">
+          <button type="submit" class="btn btn-success">搜尋</button>
+        </form>
+      </div>
+
+      <!-- 篩選按鈕 -->
+      <div class="filter-buttons">
+        <a href="/admin" class="filter-btn <%= !filter ? 'active' : '' %>">全部訂單</a>
+        <a href="/admin?filter=invoice" class="filter-btn <%= filter === 'invoice' ? 'active' : '' %>">現場開立</a>
+        <a href="/admin?filter=digital" class="filter-btn <%= filter === 'digital' ? 'active' : '' %>">載具發票</a>
+      </div>
+
+      <!-- 匯出按鈕 -->
+      <p>
+        <a href="/admin/export" class="btn btn-success">匯出今日訂單 Excel</a>
+      </p>
+
+      <!-- 統計資訊 -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value"><%= totalCount %></div>
+          <div class="stat-label">今日總件數</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">$<%= totalAmount %></div>
+          <div class="stat-label">今日總金額</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= keyword || '無' %></div>
+          <div class="stat-label">搜尋關鍵字</div>
+        </div>
+      </div>
+
+      <a href="/admin/admins" class="admin-link">管理員管理</a>
+
+      <!-- 訂單表格 -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>訂單編號</th>
+              <th>姓名</th>
+              <th>電話</th>
+              <th>小件</th>
+              <th>大件</th>
+              <th>總件數</th>
+              <th>總金額</th>
+              <th>發票類型</th>
+              <th>載具號碼</th>
+              <th>建立時間</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach(order => { %>
+              <tr class="<%= order.invoice_type === '現場開立' ? 'invoice-required' : '' %>">
+                <td>
+                  <% if (order.invoice_type === '現場開立') { %>
+                    <strong><%= order.order_id %></strong>
+                  <% } else { %>
+                    <%= order.order_id %>
+                  <% } %>
+                </td>
+                <td><%= order.name %></td>
+                <td><%= order.phone %></td>
+                <td><%= order.small_count %></td>
+                <td><%= order.large_count %></td>
+                <td><%= order.total_count %></td>
+                <td>$<%= order.total_price %></td>
+                <td>
+                  <% if (order.invoice_type === '現場開立') { %>
+                    <span class="invoice-badge">現場開立</span>
+                  <% } else if (order.invoice_type === '載具') { %>
+                    <span class="invoice-digital">載具</span>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td>
+                  <% if (order.carrier_number) { %>
+                    <span class="carrier-number"><%= order.carrier_number %></span>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td><%= order.created_at %></td>
+                <td>
+                  <div class="action-group">
+                    <a href="/admin/print/<%= order.order_id %>" class="btn btn-small" target="_blank">列印</a>
+                    <a href="/admin/edit/<%= order.order_id %>" class="btn btn-success btn-small">編輯</a>
+                    <form action="/admin/delete/<%= order.order_id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除這筆訂單嗎？');">
+                      <button type="submit" class="btn btn-danger btn-small">刪除</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

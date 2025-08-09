@@ -1,25 +1,32 @@
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
+const BetterSqlite3Store = require('better-sqlite3-session-store')(session);
+const Database = require('better-sqlite3');
 const path = require('path');
 
-app.set('trust proxy', 1); // 在 Railway 這種代理後面建議開啟
+app.set('trust proxy', 1);
+
+// 創建 session 資料庫
+const sessionDbPath = path.join(process.env.SESSION_DIR || path.join(__dirname, 'db'), 'sessions.sqlite');
+const sessionDb = new Database(sessionDbPath);
 
 app.use(
   session({
-    store: new SQLiteStore({
-      // 在雲端用 Volume：/data；本機則落到專案 db 目錄
-      dir: process.env.SESSION_DIR || path.join(__dirname, 'db'),
-      db: 'sessions.sqlite'
+    store: new BetterSqlite3Store({
+      client: sessionDb,
+      expired: {
+        clear: true,
+        intervalMs: 900000 // 15 分鐘清理一次過期 session
+      }
     }),
     secret: process.env.SESSION_SECRET || 'mySecretKey',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 60 * 60 * 1000,          // 1 小時
+      maxAge: 60 * 60 * 1000,
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production' // Railway 走 HTTPS 時會自動設為 true
+      secure: process.env.NODE_ENV === 'production'
     },
-    name: 'sid' // 可自訂 cookie 名稱
+    name: 'sid'
   })
 );
 

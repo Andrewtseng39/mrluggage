@@ -1,0 +1,4 @@
+node_modules/
+db/sessions.sqlite
+npm-debug.log*
+.DS_Store

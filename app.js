@@ -1,32 +1,25 @@
-// app.js
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
 const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
+const path = require('path');
 
-const app = express();
+app.set('trust proxy', 1); // 在 Railway 這種代理後面建議開啟
 
-// 若之後部署在 Railway/反向代理，建議打開 trust proxy
-app.set('trust proxy', 1);
-
-// EJS
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-// 靜態資源
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// Session（改用環境變數；本機沒設就用預設值）
 app.use(
   session({
+    store: new SQLiteStore({
+      // 在雲端用 Volume：/data；本機則落到專案 db 目錄
+      dir: process.env.SESSION_DIR || path.join(__dirname, 'db'),
+      db: 'sessions.sqlite'
+    }),
     secret: process.env.SESSION_SECRET || 'mySecretKey',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-      maxAge: 60 * 60 * 1000, // 1 小時
-      // 之後上 Railway 若用 HTTPS，可加 secure: true
+      maxAge: 60 * 60 * 1000,          // 1 小時
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production' // Railway 走 HTTPS 時會自動設為 true
     },
+    name: 'sid' // 可自訂 cookie 名稱
   })
 );
 

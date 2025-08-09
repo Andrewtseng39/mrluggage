@@ -1,23 +1,15 @@
-// db/addColumns.js
+// db/connection.js
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./db/database.db');
+const path = require('path');
 
-db.serialize(() => {
-  db.run(`ALTER TABLE orders ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0`, (err) => {
-    if (err && !err.message.includes('duplicate column')) {
-      console.error('加欄位 is_archived 錯誤:', err.message);
-    } else {
-      console.log('已新增欄位 is_archived ✅');
-    }
-  });
+const dbPath = path.join(__dirname, 'database.db');
 
-  db.run(`ALTER TABLE orders ADD COLUMN archived_at TEXT`, (err) => {
-    if (err && !err.message.includes('duplicate column')) {
-      console.error('加欄位 archived_at 錯誤:', err.message);
-    } else {
-      console.log('已新增欄位 archived_at ✅');
-    }
-  });
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('開啟資料庫失敗：', err);
+  } else {
+    console.log('SQLite 已連線：', dbPath);
+  }
 });
 
-db.close();
+module.exports = db;

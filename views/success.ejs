@@ -5,339 +5,95 @@
   <title>預約成功</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 16px;
-      background: #f8f9fa;
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 40px;
-      padding-bottom: 40px;
-    }
-    
-    .success-container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      max-width: 500px;
-      width: 100%;
-      border: 1px solid #e9ecef;
-    }
-    
-    /* 訂單編號在最上方 */
-    .order-number {
-      background: linear-gradient(135deg, #ea5514 0%, #d64910 100%);
-      color: white;
-      padding: 32px 30px;
-      text-align: center;
-      position: relative;
-    }
-    
-    .order-number-label {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-    
-    .order-number-value {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      margin-bottom: 0;
-      word-break: break-all;
-    }
-    
-    .copy-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 8px 10px;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-      font-size: 1rem;
-    }
-    
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-    
-    /* 狀態指示器 */
-    .status-indicator {
-      background: rgba(234, 85, 20, 0.1);
-      color: #ea5514;
-      padding: 16px 30px;
-      text-align: center;
-      font-weight: 500;
-      border-bottom: 1px solid #f1f3f4;
-    }
-    
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: #ea5514;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 8px;
-      animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
-    
-    /* 詳細資訊 */
-    .order-details {
-      padding: 32px 30px;
-    }
-    
-    .details-grid {
-      display: grid;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    
-    .detail-card {
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      border-left: 4px solid #ea5514;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .detail-label {
-      font-size: 0.95rem;
-      color: #6c757d;
-      font-weight: 500;
-    }
-    
-    .detail-value {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #212529;
-    }
-    
-    /* 總金額特殊樣式 */
-    .total-card {
-      background: linear-gradient(135deg, #ea5514 0%, #d64910 100%);
-      color: white;
-      border-left: none;
-    }
-    
-    .total-card .detail-label,
-    .total-card .detail-value {
-      color: white;
-    }
-    
-    .total-card .detail-value {
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
-    
-    /* 行動按鈕 */
-    .action-buttons {
-      display: flex;
-      justify-content: center;
-      padding-top: 16px;
-      border-top: 1px solid #f1f3f4;
-    }
-    
-    .btn {
-      padding: 16px 32px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-width: 200px;
-    }
-    
-    .btn-line {
-      background: #ea5514;
-      color: white;
-      box-shadow: 0 2px 8px rgba(234, 85, 20, 0.3);
-    }
-    
-    .btn-line:hover {
-      background: #d64910;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(234, 85, 20, 0.4);
-    }
-    
-    /* 載入動畫 */
-    @keyframes fadeIn {
-      from { 
-        opacity: 0; 
-        transform: translateY(20px);
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0);
-      }
-    }
-    
-    .success-container {
-      animation: fadeIn 0.5s ease-out;
-    }
-    
-    /* 響應式設計 */
-    @media (max-width: 768px) {
-      body {
-        padding: 12px;
-        padding-top: 20px;
-      }
-      
-      .order-number {
-        padding: 24px 20px;
-      }
-      
-      .order-number-value {
-        font-size: 1.8rem;
-        letter-spacing: 1px;
-      }
-      
-      .status-indicator {
-        padding: 12px 20px;
-      }
-      
-      .order-details {
-        padding: 24px 20px;
-      }
-      
-      .btn {
-        width: 100%;
-        min-width: auto;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      body {
-        padding: 8px;
-        padding-top: 16px;
-      }
-      
-      .success-container {
-        border-radius: 8px;
-      }
-      
-      .order-number {
-        padding: 20px 16px;
-      }
-      
-      .order-number-value {
-        font-size: 1.6rem;
-      }
-      
-      .status-indicator {
-        padding: 12px 16px;
-        font-size: 0.9rem;
-      }
-      
-      .order-details {
-        padding: 20px 16px;
-      }
-      
-      .detail-card {
-        padding: 16px;
-      }
-    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 16px; background: #f8f9fa; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding-top: 40px; padding-bottom: 40px; }
+    .success-container { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; max-width: 500px; width: 100%; border: 1px solid #e9ecef; animation: fadeIn .5s ease-out; }
+    .order-number { background: linear-gradient(135deg, #ea5514 0%, #d64910 100%); color: white; padding: 32px 30px; text-align: center; position: relative; }
+    .order-number-label { font-size: 0.9rem; opacity: 0.9; margin-bottom: 12px; font-weight: 500; }
+    .order-number-value { font-size: 2.2rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 0; word-break: break-all; }
+    .status-indicator { background: rgba(234,85,20,0.1); color: #ea5514; padding: 16px 30px; text-align: center; font-weight: 500; border-bottom: 1px solid #f1f3f4; }
+    .status-dot { width: 8px; height: 8px; background: #ea5514; border-radius: 50%; display: inline-block; margin-right: 8px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%{opacity:1} 50%{opacity:.5} 100%{opacity:1} }
+    .order-details { padding: 32px 30px; }
+    .details-grid { display: grid; gap: 16px; margin-bottom: 32px; }
+    .detail-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ea5514; display: flex; justify-content: space-between; align-items: center; }
+    .detail-label { font-size: .95rem; color: #6c757d; font-weight: 500; }
+    .detail-value { font-size: 1.1rem; font-weight: 600; color: #212529; }
+    .total-card { background: linear-gradient(135deg, #ea5514 0%, #d64910 100%); color: white; border-left: none; }
+    .total-card .detail-label, .total-card .detail-value { color: white; }
+    .total-card .detail-value { font-size: 1.4rem; font-weight: 700; }
+    .action-buttons { display: flex; justify-content: center; padding-top: 16px; border-top: 1px solid #f1f3f4; }
+    .btn { padding: 16px 32px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all .3s ease; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 200px; }
+    .btn-line { background: #ea5514; color: white; box-shadow: 0 2px 8px rgba(234,85,20,0.3); }
+    .btn-line:hover { background: #d64910; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(234,85,20,0.4); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
+    @media (max-width: 768px){ .order-number{padding:24px 20px} .order-number-value{font-size:1.8rem;letter-spacing:1px} .status-indicator{padding:12px 20px} .order-details{padding:24px 20px} .btn{width:100%;min-width:auto} }
+    @media (max-width:480px){ .order-number{padding:20px 16px} .order-number-value{font-size:1.6rem} .status-indicator{padding:12px 16px;font-size:.9rem} .order-details{padding:20px 16px} .detail-card{padding:16px} }
   </style>
 </head>
 <body>
   <div class="success-container">
-    <!-- 訂單編號在最上方 -->
     <div class="order-number">
       <div class="order-number-label">訂單編號</div>
-      <div class="order-number-value">
-        <%= orderNo %>
-      </div>
+      <div class="order-number-value"><%= orderNo %></div>
     </div>
-    
-    <!-- 狀態指示器 -->
+
     <div class="status-indicator">
       <span class="status-dot"></span>
-      預約已確認，請按時前往寄存
+      預約已確認，請截圖此畫面作保存
     </div>
-    
+
     <div class="order-details">
-      <!-- 詳細資訊 -->
       <div class="details-grid">
         <div class="detail-card">
           <div class="detail-label">預約姓名</div>
           <div class="detail-value"><%= name %></div>
         </div>
-        
+
         <div class="detail-card">
           <div class="detail-label">聯絡電話</div>
           <div class="detail-value"><%= phone %></div>
         </div>
-        
+
+        <% if (email) { %>
+        <div class="detail-card">
+          <div class="detail-label">Email</div>
+          <div class="detail-value"><%= email %></div>
+        </div>
+        <% } %>
+
+        <div class="detail-card">
+          <div class="detail-label">寄件地</div>
+          <div class="detail-value"><%= locationName %></div>
+        </div>
+
         <div class="detail-card">
           <div class="detail-label">小件行李</div>
           <div class="detail-value"><%= small %> 件</div>
         </div>
-        
+
         <div class="detail-card">
           <div class="detail-label">大件行李</div>
           <div class="detail-value"><%= large %> 件</div>
         </div>
-        
+
         <div class="detail-card total-card">
           <div class="detail-label">總金額</div>
           <div class="detail-value">NT$ <%= total %></div>
         </div>
       </div>
-      
-      <!-- 行動按鈕 -->
+
       <div class="action-buttons">
-        <a href="https://lin.ee/fbFwwKdb" target="_blank" class="btn btn-line">
-          加入官方 LINE
-        </a>
+        <a href="https://lin.ee/fbFwwKdb" target="_blank" class="btn btn-line">加入官方 LINE</a>
       </div>
     </div>
   </div>
 
   <script>
-    // 複製訂單編號
-    function copyOrderNumber() {
-      const orderNo = '<%= orderNo %>';
-      navigator.clipboard.writeText(orderNo).then(() => {
-        alert('訂單編號已複製到剪貼簿');
-      }).catch(err => {
-        console.error('複製失敗:', err);
-      });
-    }
-    
-    // 自動選中訂單編號（點擊時）
-    document.querySelector('.order-number-value').addEventListener('click', function(e) {
-      if (window.getSelection) {
-        const range = document.createRange();
-        range.selectNodeContents(this);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-      // 同時複製到剪貼簿
-      copyOrderNumber();
+    // 點擊即複製訂單編號
+    document.querySelector('.order-number-value').addEventListener('click', function() {
+      const text = this.textContent.trim();
+      navigator.clipboard?.writeText(text).then(()=>alert('訂單編號已複製到剪貼簿'));
     });
   </script>
 </body>

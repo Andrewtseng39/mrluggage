@@ -6,82 +6,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 16px; background: #f8f9fa; min-height: 100vh; line-height: 1.6;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 16px; background: #f8f9fa; min-height: 100vh; line-height: 1.6; }
     .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; border: 1px solid #e9ecef; }
     .header { background: #ea5514; color: #fff; padding: 24px; text-align: center; }
     h1 { margin: 0; font-size: 1.8rem; font-weight: 600; }
     .subtitle { margin: 8px 0 0; font-size: 1rem; opacity: .9; }
     .form-container { padding: 24px; }
 
-    /* 表單樣式 */
     .form-section { margin-bottom: 32px; }
     .section-title { color: #ea5514; font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #ea5514; }
     .form-group { margin-bottom: 20px; }
     .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: #495057; font-size: 14px; }
-    .form-input, .form-select {
-      width: 100%; padding: 12px 16px; border: 1px solid #ced4da; border-radius: 6px; font-size: 16px; background: #fff; transition: border-color .2s ease;
-    }
+    .form-input, .form-select { width: 100%; padding: 12px 16px; border: 1px solid #ced4da; border-radius: 6px; font-size: 16px; background: #fff; transition: border-color .2s ease; }
     .form-input:focus, .form-select:focus { outline: none; border-color: #ea5514; box-shadow: 0 0 0 2px rgba(234,85,20,.2); }
 
-    /* 數量選擇器 */
     .quantity-selector { display: flex; align-items: center; gap: 12px; background: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef; }
-    .quantity-btn {
-      background: #ea5514; color: #fff; border: none; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: background-color .2s ease;
-    }
+    .quantity-btn { background: #ea5514; color: #fff; border: none; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: background-color .2s ease; }
     .quantity-btn:hover { background: #d64814; }
     .quantity-btn:disabled { background: #ccc; cursor: not-allowed; }
     .quantity-input { border: none; background: transparent; text-align: center; font-size: 16px; font-weight: 600; width: 60px; color: #ea5514; }
     .quantity-input:focus { outline: none; }
 
-    /* 價格卡片 */
     .price-card { background: #f8f9fa; padding: 16px; border-radius: 6px; margin-bottom: 16px; border-left: 4px solid #ea5514; }
     .price-header { font-weight: 600; color: #495057; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     .price-amount { color: #ea5514; font-size: 1rem; font-weight: 600; }
 
-    /* 總計區域 */
     .total-section { background: #ea5514; color: #fff; padding: 20px; border-radius: 6px; margin: 24px 0; text-align: center; }
     .total-label { font-size: 1rem; opacity: .9; margin-bottom: 8px; }
     .total-amount { font-size: 1.8rem; font-weight: 600; }
 
-    /* 載具輸入欄位 */
     .carrier-input { display: none; margin-top: 12px; }
     .carrier-input.show { display: block; }
 
-    /* 條款區域 */
     .terms-section { background: #f8f9fa; padding: 16px; border-radius: 6px; margin: 20px 0; border: 1px solid #e9ecef; }
     .checkbox-wrapper { display: flex; align-items: flex-start; gap: 12px; }
     .custom-checkbox { width: 18px; height: 18px; accent-color: #ea5514; cursor: pointer; margin-top: 2px; }
     .checkbox-label { color: #495057; cursor: pointer; line-height: 1.5; font-size: 14px; }
-    .terms-link-btn {
-      background: none; border: none; padding: 0; margin-left: 6px; color: #ea5514; text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: 700;
-    }
+    .terms-link-btn { background: none; border: none; padding: 0; margin-left: 6px; color: #ea5514; text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: 700; }
 
-    /* 提交按鈕 */
-    .submit-btn {
-      background: #ea5514; color: #fff; border: none; padding: 16px 32px; margin-top: 24px; width: 100%;
-      border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: 600; transition: background-color .2s ease;
-    }
+    .submit-btn { background: #ea5514; color: #fff; border: none; padding: 16px 32px; margin-top: 24px; width: 100%; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: 600; transition: background-color .2s ease; }
     .submit-btn:hover { background: #d64814; }
     .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-    /* Modal */
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 1000; }
     .modal.show { display: flex; }
-    .modal-dialog {
-      width: min(720px, 92vw); max-height: 86vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,.25);
-    }
+    .modal-dialog { width: min(720px, 92vw); max-height: 86vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,.25); }
     .modal-header, .modal-footer { padding: 12px 16px; }
     .modal-header { border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
     .modal-body { padding: 14px 16px; overflow: auto; line-height: 1.7; font-size: 14px; color: #343a40; }
     .close { background: none; border: none; font-size: 20px; line-height: 1; cursor: pointer; }
-    .primary-btn {
-      padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; background: #ea5514; color: #fff; font-weight: 700;
-    }
+    .primary-btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; background: #ea5514; color: #fff; font-weight: 700; }
 
-    /* 響應式 */
     @media (max-width: 768px) {
       body { padding: 8px; }
       h1 { font-size: 1.6rem; }
@@ -93,58 +68,206 @@
       .container { border-radius: 0; border-left: none; border-right: none; }
       h1 { font-size: 1.4rem; }
       .total-amount { font-size: 1.4rem; }
-      .form-input, .form-select { font-size: 16px; } /* 防 iOS 縮放 */
+      .form-input, .form-select { font-size: 16px; }
+    }
+
+    /* ===== Intro Transition（修正版） ===== */
+    :root{
+      --brand:#EA5514;
+      --ink:#1b1f24;
+      --muted:#e5e7eb;
+    }
+    .intro-overlay{
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(1200px 800px at 20% 10%, rgba(255,255,255,.08), transparent 50%),
+        linear-gradient(135deg, var(--brand) 0%, #7b3ecf 100%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; color: #fff; text-align: center; overflow: hidden;
+      opacity: 1; visibility: visible;
+      transition: opacity .5s ease, visibility .5s ease;
+    }
+    .intro-overlay.is-hide{ opacity:0; visibility:hidden; }
+
+    .intro-wrap{
+      position: relative;
+      width: min(680px, 92vw);
+      padding: 28px;
+    }
+    .intro-card{
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.10));
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      padding: 28px 28px 24px;
+      animation: fadeUp .6s ease both;
+    }
+
+    .intro-badge{
+      display: inline-flex; align-items: center; gap:8px;
+      padding: 8px 12px; border-radius: 999px;
+      background: rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.25);
+      font-size: 12px; letter-spacing:.03em; margin-bottom: 14px;
+    }
+    .intro-dot{ width:8px; height:8px; border-radius:50%; background:#fff; opacity:.9; }
+
+    .intro-title{
+      font-size: clamp(28px, 5.2vw, 44px);
+      font-weight: 900; letter-spacing:.04em; margin: 0 0 6px;
+    }
+    .intro-sub{ opacity:.92; margin: 0 0 18px; font-size: 14px; }
+
+    .intro-icons{ display: flex; justify-content: center; gap:14px; margin: 18px 0 8px; }
+    .intro-icon{
+      width: 64px; height: 64px; border-radius: 18px;
+      display: grid; place-items: center;
+      background: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+    }
+    .intro-icon svg{ width: 34px; height: 34px; }
+
+    .intro-actions{ margin-top: 18px; }
+    .intro-btn{
+      appearance:none; border:none; cursor:pointer; width: 100%;
+      max-width: 340px; padding: 14px 22px; border-radius: 999px;
+      font-size: 16px; font-weight: 800; letter-spacing:.02em;
+      background: #ffb703; color: var(--ink);
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
+      transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .intro-btn:hover{ transform: translateY(-2px); box-shadow: 0 16px 34px rgba(0,0,0,.28); }
+    .intro-muted{ margin-top: 10px; font-size: 12px; color: var(--muted); }
+
+    .intro-glow{ position:absolute; inset: -25% -10% auto auto; pointer-events:none; }
+    .intro-glow::before, .intro-glow::after{
+      content:""; position:absolute; width: 60vmax; height: 60vmax; border-radius: 50%;
+      filter: blur(30px); opacity:.25; mix-blend-mode: screen;
+      animation: rotateGlow 24s linear infinite;
+    }
+    .intro-glow::before{ background: radial-gradient(closest-side, rgba(255,255,255,.28), transparent 60%); top:-10%; left:-10%; }
+    .intro-glow::after{ background: radial-gradient(closest-side, rgba(255,255,255,.18), transparent 60%); top:10%; left:30%; animation-duration: 32s; }
+
+    @keyframes fadeUp{ from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)} }
+    @keyframes rotateGlow{ from{ transform: rotate(0) } to{ transform: rotate(360deg) } }
+
+    @media (max-width: 480px){
+      .intro-wrap{ padding: 18px; }
+      .intro-card{ padding: 22px 18px 18px; border-radius: 16px; }
+      .intro-icons{ gap:12px; }
+      .intro-icon{ width: 56px; height: 56px; border-radius: 14px; }
+      .intro-icon svg{ width: 30px; height: 30px; }
+    }
+
+    body.intro-lock{ height:100vh; overflow:hidden; }
+
+    @media (prefers-reduced-motion: reduce){
+      .intro-overlay{ transition:none; }
+      .intro-card{ animation:none; }
+      .intro-glow::before, .intro-glow::after{ animation:none; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>行李寄存</h1>
-      <p class="subtitle">演唱會專用</p>
-    </div>
+  <!-- ===== Intro Transition Overlay ===== -->
+  <div id="intro" class="intro-overlay" aria-hidden="false" role="dialog" aria-modal="true" aria-label="立即預約轉場">
+    <div class="intro-glow" aria-hidden="true"></div>
+    <div class="intro-glow glow2" aria-hidden="true"></div>
 
-    <div class="form-container">
-      <form action="/submit" method="POST">
-        <!-- 個人資訊 -->
-        <div class="form-section">
-          <h3 class="section-title">基本資料</h3>
+    <div class="intro-wrap">
+      <div class="intro-card">
+        <div class="intro-badge" aria-hidden="true">
+          <span class="intro-dot"></span>有些重量，您不用自己扛
+        </div>
+
+        <h2 class="intro-title">歡迎使用行李先生寄存服務</h2>
+        <p class="intro-sub">2 秒後自動進入表單，或直接點擊下方按鈕開始</p>
+
+        
+        <div class="intro-actions">
+          <button id="introBtn" class="intro-btn" type="button" aria-label="立即開始填寫">立即填寫</button>
+          <div class="intro-muted" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <h1>行李先生服務有限公司</h1>
+      <p class="subtitle">演唱會專用寄存系統</p>
+    </header>
+
+    <main class="form-container">
+      <form action="/submit" method="POST" id="bookingForm" novalidate>
+        <!-- 基本資料 -->
+        <section class="form-section" aria-labelledby="section-basic">
+          <h3 id="section-basic" class="section-title">基本資料</h3>
           <div class="form-group">
             <label class="form-label" for="name">姓名</label>
-            <input type="text" id="name" name="name" class="form-input" placeholder="請輸入您的姓名" required>
+            <input type="text" id="name" name="name" class="form-input" placeholder="請輸入您的姓名" required autocomplete="name">
           </div>
           <div class="form-group">
             <label class="form-label" for="phone">聯絡電話</label>
-            <input type="tel" id="phone" name="phone" class="form-input" placeholder="請輸入手機號碼" required>
+            <input type="tel" inputmode="numeric" id="phone" name="phone" class="form-input" placeholder="請輸入手機號碼" required autocomplete="tel">
           </div>
-        </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email（必填）</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="mr.luggage.tw@gmail.com"
+              autocomplete="email"
+              inputmode="email"
+              required
+              pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+            />
+            <small class="hint"></small>
+          </div>
+
+          <!-- 寄件地 -->
+          <div class="form-group">
+            <label class="form-label" for="location">寄件地</label>
+            <select id="location" name="location_id" class="form-select" required>
+              <option value="">請選擇寄件地</option>
+              <% (locations || []).forEach(l => { %>
+                <option value="<%= l.id %>"><%= l.name %></option>
+              <% }) %>
+            </select>
+          </div>
+        </section>
 
         <!-- 行李選擇 -->
-        <div class="form-section">
-          <h3 class="section-title">行李選擇</h3>
+        <section class="form-section" aria-labelledby="section-bags">
+          <h3 id="section-bags" class="section-title">行李選擇</h3>
+
           <div class="price-card">
             <div class="price-header"><span>束口袋</span><span class="price-amount">NT$ 150 / 件</span></div>
             <div class="quantity-selector">
-              <button type="button" class="quantity-btn" onclick="changeQuantity('small', -1)">-</button>
-              <input type="number" name="small_count" class="quantity-input" value="0" min="0" onchange="calculateTotal()" required readonly>
-              <button type="button" class="quantity-btn" onclick="changeQuantity('small', 1)">+</button>
+              <button type="button" class="quantity-btn" data-type="small" data-delta="-1">-</button>
+              <input type="number" name="small_count" class="quantity-input" value="0" min="0" readonly aria-label="束口袋數量">
+              <button type="button" class="quantity-btn" data-type="small" data-delta="1">+</button>
             </div>
           </div>
+
           <div class="price-card">
-            <div class="price-header"><span>大件行李</span><span class="price-amount">NT$ 200 / 件</span></div>
+            <div class="price-header"><span>行李箱</span><span class="price-amount">NT$ 200 / 件</span></div>
             <div class="quantity-selector">
-              <button type="button" class="quantity-btn" onclick="changeQuantity('large', -1)">-</button>
-              <input type="number" name="large_count" class="quantity-input" value="0" min="0" onchange="calculateTotal()" required readonly>
-              <button type="button" class="quantity-btn" onclick="changeQuantity('large', 1)">+</button>
+              <button type="button" class="quantity-btn" data-type="large" data-delta="-1">-</button>
+              <input type="number" name="large_count" class="quantity-input" value="0" min="0" readonly aria-label="大件行李數量">
+              <button type="button" class="quantity-btn" data-type="large" data-delta="1">+</button>
             </div>
           </div>
-        </div>
+        </section>
 
         <!-- 發票 -->
-        <div class="form-section">
-          <h3 class="section-title">發票選擇</h3>
+        <section class="form-section" aria-labelledby="section-invoice">
+          <h3 id="section-invoice" class="section-title">發票選擇</h3>
           <div class="form-group">
-            <select name="invoice" class="form-select" id="invoiceSelect" onchange="toggleCarrierInput()" required>
+            <select name="invoice" class="form-select" id="invoiceSelect" required>
               <option value="">請選擇發票方式</option>
               <option value="載具">手機載具</option>
               <option value="現場開立">現場開立紙本發票</option>
@@ -152,18 +275,28 @@
           </div>
           <div class="carrier-input" id="carrierInput">
             <label class="form-label" for="carrier">手機載具號碼</label>
-            <input type="text" id="carrier" name="carrier" class="form-input" placeholder="請輸入載具號碼 (例如：/ABC1234)">
+            <input
+              type="text"
+              id="carrier"
+              name="carrier"
+              class="form-input"
+              placeholder="請輸入載具號碼（例如：/ABC1234）"
+              pattern="\/[0-9A-Z.\-+]{7}"
+              inputmode="latin"
+              autocomplete="off"
+            />
+            <small class="hint">格式：以「/」開頭 + 7 碼（允許 0-9 A-Z . - +）</small>
           </div>
-        </div>
+        </section>
 
         <!-- 總計 -->
-        <div class="total-section">
-          <div class="total-label">預約總金額</div>
+        <section class="total-section" aria-live="polite">
+          <div class="total-label">總金額</div>
           <div class="total-amount">NT$ <span id="total">0</span></div>
-        </div>
+        </section>
 
         <!-- 條款 -->
-        <div class="terms-section">
+        <section class="terms-section">
           <div class="checkbox-wrapper">
             <input type="checkbox" name="agree" class="custom-checkbox" id="agree" required>
             <label for="agree" class="checkbox-label">
@@ -172,57 +305,36 @@
               並了解行李寄存相關規定與責任限制
             </label>
           </div>
-        </div>
+        </section>
 
-        <button type="submit" class="submit-btn" id="submitBtn">請選擇行李數量</button>
+        <button type="submit" class="submit-btn" id="submitBtn" disabled>請選擇行李數量</button>
       </form>
-    </div>
+    </main>
   </div>
 
   <!-- 條款 Modal -->
   <div id="termsModal" class="modal" aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
       <div class="modal-header">
-        <h3 id="termsTitle">Mr. Luggage 服務條款</h3>
+        <h3 id="termsTitle">行李先生服務有限公司/Mr. Luggage 服務條款</h3>
         <button type="button" class="close" id="closeTerms" aria-label="關閉">×</button>
       </div>
-     <div class="modal-body">
-  <p style="margin:0 0 8px; color:#6c757d; font-size:12px;">最後更新：2025-08-09｜條款版本：v1.0</p>
-
- <ol class="terms-list">
-  <li>
-    <strong>計費方式</strong>：小件每件新臺幣150元／次，大件每件新臺幣200元／次。寄存當日活動結束後<strong>1小時內</strong>須完成領取；逾時未領取者，依日區間重新計費並補足差額。
-  </li>
-  <li>
-    <strong>寄存限制</strong>：不得寄存現金、珠寶、有價證券、護照、易碎物、生鮮食品、動植物、液體及其他易腐爛或危害安全之物品；亦不得寄存違禁品、危險物或不符合法令及場館規定之物品。違反本條款所致之任何損害，由顧客自行承擔全部責任。
-  </li>
-  <li>
-    <strong>責任限制</strong>：對於不可抗力（含天災、停電、交通事故、罷工、政府管制、場館管制等）或寄存物本身瑕疵、包裝不良所致之損害，本公司不負賠償責任。因本公司可歸責事由造成之損害，賠償金額以新臺幣1,000元為上限，且不另賠償間接損失或衍生損害。
-  </li>
-  <li>
-    <strong>領件後責任終止</strong>：顧客完成領取並離開寄存地點後，即視為本公司已依約完成交付，行李及其內容物之保管責任即行終止；其後發生之遺失、毀損或任何爭議，本公司概不負責。
-  </li>
-  <li>
-    <strong>取件規範</strong>：取件時請出示訂單編號及有效證件；若委託他人取件，須事先告知並提供完整訂單資訊，委託取件所生之一切風險由顧客自行承擔。
-  </li>
-  <li>
-    <strong>遺失物處理</strong>：逾期未領取之行李，本公司將保管<u>30日</u>；期滿後視為顧客自動放棄，並得逕行處分而不另行通知。屆時本公司不再承擔任何保管或賠償責任。
-  </li>
-  <li>
-    <strong>物品驗收與包裝</strong>：寄存前應自行妥善包裝及確認物品狀態；本公司不負開箱檢查義務，對於外觀刮傷、內容物移位或因包裝不良所致之損害，不承擔任何責任。
-  </li>
-  <li>
-    <strong>不可抗力與特殊狀況</strong>：因天災、交通事故、罷工、政府或場館管制、公共安全事件等非可歸責於本公司之事由，致服務延遲、中斷或無法履行，本公司不負賠償責任。
-  </li>
-  <li>
-    <strong>聯絡方式</strong>：客服信箱：mr.luggage.tw@gmail.com ／ 客服電話：0932-253-266。服務據點與營業時間以本公司官網公告為準；如遇緊急事項請依現場工作人員指示辦理。
-  </li>
-  <li>
-    <strong>條款變更與準據法</strong>：本公司得視需要修訂本條款並公告後生效；本條款受中華民國法律管轄，爭議以本公司所在地法院為第一審管轄法院。
-  </li>
-</ol>
-
-
+      <div class="modal-body">
+        <p style="margin:0 0 8px; color:#6c757d; font-size:12px;">最後更新：2025-08-09｜條款版本：v1.0</p>
+        <ol class="terms-list">
+          <li><strong>計費方式</strong>：小件每件150元；大件每件200元。寄存當日活動結束後1小時內須完成領取；逾時未領取者，依日區間重新計費並補足差額。</li>
+          <li><strong>寄存限制：</strong>不得寄存現金、珠寶、有價證券、護照、易碎物、生鮮食品、動植物、液體及其他易腐爛或危害安全之物品；亦不得寄存違禁品、危險物或不符合法令及場館規定之物品。違反本條款所致之任何損害，由顧客自行承擔全部責任。</li>
+          <li><strong>責任限制：</strong>對於不可抗力（含天災、停電、交通事故、罷工、政府管制、場館管制等）或寄存物本身瑕疵、包裝不良所致之損害，本公司不負賠償責任。因本公司可歸責事由造成之損害，賠償金額以新臺幣1,000元為上限，且不另賠償間接損失或衍生損害。</li>
+          <li><strong>領件後責任終止：</strong>顧客完成領取並離開寄存地點後，即視為本公司已依約完成交付，行李及其內容物之保管責任即行終止；其後發生之遺失、毀損或任何爭議，本公司概不負責。</li>
+          <li><strong>取件規範：</strong>取件時請出示訂單編號及有效證件；若委託他人取件，須事先告知並提供完整訂單資訊，委託取件所生之一切風險由顧客自行承擔。</li>
+          <li><strong>領取單遺失：</strong>領取者需憑領取單及本人有效證件。如領取單遺失請立刻向本公司報失，如被他人拿單冒領本公司不負責賠償責任。</li>
+          <li><strong>遺失物處理：</strong>逾期未領取之行李，本公司將保管30日；期滿後視為顧客自動放棄，並得逕行處分而不另行通知。屆時本公司不再承擔任何保管或賠償責任。</li>
+          <li><strong>物品驗收與包裝</strong>：寄存前應自行妥善包裝及確認物品狀態；本公司不負開箱檢查義務，對於外觀刮傷、內容物移位或因包裝不良所致之損害，不承擔任何責任。</li>
+          <li><strong>不可抗力與特殊狀況：</strong>因天災、交通事故、罷工、政府或場館管制、公共安全事件等非可歸責於本公司之事由，致服務延遲、中斷或無法履行，本公司不負賠償責任。</li>
+          <li><strong>聯絡方式：</strong>客服信箱：mr.luggage.tw@gmail.com ／ 客服電話：0932-253-266。服務據點與營業時間以本公司官網公告為準；如遇緊急事項請依現場工作人員指示辦理。</li>
+          <li><strong>條款變更與準據法：</strong>本公司得視需要修訂本條款並公告後生效；本條款受中華民國法律管轄，爭議以本公司所在地法院為第一審管轄法院。</li>
+        </ol>
+      </div>
       <div class="modal-footer">
         <button type="button" class="primary-btn" id="agreeAndClose">我已閱讀並同意</button>
       </div>
@@ -230,60 +342,116 @@
   </div>
 
   <script>
-    function changeQuantity(type, change) {
-      const input = document.querySelector(`input[name="${type}_count"]`);
-      const currentValue = parseInt(input.value) || 0;
-      const newValue = Math.max(0, currentValue + change);
-      input.value = newValue;
-      calculateTotal(); updateButtonStates();
-    }
-    function updateButtonStates() {
-      const smallValue = parseInt(document.querySelector('input[name="small_count"]').value) || 0;
-      const largeValue = parseInt(document.querySelector('input[name="large_count"]').value) || 0;
-      document.querySelector('.price-card:nth-of-type(1) .quantity-btn:first-child').disabled = smallValue <= 0;
-      document.querySelector('.price-card:nth-of-type(2) .quantity-btn:first-child').disabled = largeValue <= 0;
-    }
-    function calculateTotal() {
-      const small = parseInt(document.querySelector('input[name="small_count"]').value) || 0;
-      const large = parseInt(document.querySelector('input[name="large_count"]').value) || 0;
-      const total = small * 150 + large * 200;
-      document.getElementById('total').innerText = total.toLocaleString();
-      const submitBtn = document.getElementById('submitBtn');
-      if (total > 0) { submitBtn.disabled = false; submitBtn.innerHTML = '確認預約 - NT$ ' + total.toLocaleString(); }
-      else { submitBtn.disabled = true; submitBtn.innerHTML = '請選擇行李數量'; }
-      updateButtonStates();
-    }
-    function toggleCarrierInput() {
-      const invoiceSelect = document.getElementById('invoiceSelect');
-      const carrierInput = document.getElementById('carrierInput');
-      const carrierField = document.getElementById('carrier');
-      if (invoiceSelect.value === '載具') { carrierInput.classList.add('show'); carrierField.required = true; }
-      else { carrierInput.classList.remove('show'); carrierField.required = false; carrierField.value = ''; }
-    }
-    // 表單驗證：至少一件
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const small = parseInt(document.querySelector('input[name="small_count"]').value) || 0;
-      const large = parseInt(document.querySelector('input[name="large_count"]').value) || 0;
-      if (small + large === 0) { e.preventDefault(); alert('請至少選擇一件行李！'); return false; }
+    // ===== Intro Transition Logic（修正版） =====
+    (function () {
+      const intro = document.getElementById('intro');
+      const btn = document.getElementById('introBtn');
+      const KEY = 'introSeen';
+      const AUTO_MS = 90000; // 2 秒
+      let timer = null;
+
+      if (!intro || !btn) return;
+
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const seen = sessionStorage.getItem(KEY);
+
+      function hideOverlay() {
+        if (!intro || intro.classList.contains('is-hide')) return;
+        intro.classList.add('is-hide');
+        intro.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('intro-lock');
+        sessionStorage.setItem(KEY, '1');
+
+        const removeAfter = prefersReduced ? 0 : 500;
+        setTimeout(() => { intro.parentNode && intro.parentNode.removeChild(intro); }, removeAfter + 50);
+      }
+
+      if (seen === '1') {
+        intro.classList.add('is-hide');
+        intro.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('intro-lock');
+      } else {
+        document.body.classList.add('intro-lock');
+        timer = setTimeout(hideOverlay, AUTO_MS);
+
+        btn.addEventListener('click', () => { if (timer) clearTimeout(timer); hideOverlay(); }, { once: true });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { if (timer) clearTimeout(timer); hideOverlay(); }
+        }, { once: true });
+      }
+    })();
+
+    // --- 數量控制 ---
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.type;       // small / large
+        const delta = parseInt(btn.dataset.delta, 10);
+        const input = document.querySelector('input[name="' + type + '_count"]');
+        const current = parseInt(input.value || '0', 10);
+        const next = Math.max(0, current + delta);
+        input.value = next;
+        updateTotal();
+      });
     });
 
-    // 條款 Modal 控制
+    function updateMinusDisabled() {
+      const s = parseInt(document.querySelector('input[name="small_count"]').value || '0', 10);
+      const l = parseInt(document.querySelector('input[name="large_count"]').value || '0', 10);
+      document.querySelectorAll('.price-card')[0].querySelector('.quantity-btn[data-delta="-1"]').disabled = s <= 0;
+      document.querySelectorAll('.price-card')[1].querySelector('.quantity-btn[data-delta="-1"]').disabled = l <= 0;
+    }
+
+    function updateTotal() {
+      const small = parseInt(document.querySelector('input[name="small_count"]').value || '0', 10);
+      const large = parseInt(document.querySelector('input[name="large_count"]').value || '0', 10);
+      const total = small * 150 + large * 200;
+      document.getElementById('total').textContent = total.toLocaleString();
+
+      const submitBtn = document.getElementById('submitBtn');
+      if (total > 0) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '確認預約 - NT$ ' + total.toLocaleString();
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '請選擇行李數量';
+      }
+      updateMinusDisabled();
+    }
+
+    // --- 發票／載具 ---
+    const invoiceSelect = document.getElementById('invoiceSelect');
+    const carrierInputWrap = document.getElementById('carrierInput');
+    const carrierField = document.getElementById('carrier');
+
+    function toggleCarrier() {
+      if (invoiceSelect.value === '載具') {
+        carrierInputWrap.classList.add('show');
+        carrierField.required = true;
+      } else {
+        carrierInputWrap.classList.remove('show');
+        carrierField.required = false;
+        carrierField.value = '';
+        carrierField.setCustomValidity('');
+      }
+    }
+    invoiceSelect.addEventListener('change', toggleCarrier);
+
+    // 強制大寫 + 全形轉半形
+    carrierField.addEventListener('input', () => {
+      const toHalf = (s) => s.normalize('NFKC');
+      carrierField.value = toHalf(carrierField.value).toUpperCase();
+      carrierField.setCustomValidity('');
+    });
+
+    // --- 條款 Modal ---
     const modal = document.getElementById('termsModal');
     const openBtn = document.getElementById('openTerms');
     const closeBtn = document.getElementById('closeTerms');
     const agreeAndCloseBtn = document.getElementById('agreeAndClose');
     const agreeCheckbox = document.getElementById('agree');
 
-    function openModal() {
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden', 'false');
-      document.addEventListener('keydown', escClose);
-    }
-    function closeModal() {
-      modal.classList.remove('show');
-      modal.setAttribute('aria-hidden', 'true');
-      document.removeEventListener('keydown', escClose);
-    }
+    function openModal() { modal.classList.add('show'); modal.setAttribute('aria-hidden', 'false'); document.addEventListener('keydown', escClose); }
+    function closeModal() { modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true'); document.removeEventListener('keydown', escClose); }
     function escClose(e) { if (e.key === 'Escape') closeModal(); }
 
     openBtn.addEventListener('click', openModal);
@@ -291,8 +459,51 @@
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
     agreeAndCloseBtn.addEventListener('click', () => { agreeCheckbox.checked = true; closeModal(); });
 
-    // 初始化
-    calculateTotal(); updateButtonStates();
+    // --- 送出前前端強制驗證（搭配後端雙重驗證） ---
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      const small = parseInt(document.querySelector('input[name="small_count"]').value || '0', 10);
+      const large = parseInt(document.querySelector('input[name="large_count"]').value || '0', 10);
+      if (small + large === 0) { e.preventDefault(); alert('請至少選擇一件行李！'); return; }
+
+      const locationSelect = document.getElementById('location');
+      if (!locationSelect.value) { e.preventDefault(); alert('請選擇寄件地'); locationSelect.focus(); return; }
+
+      if (!invoiceSelect.value) { e.preventDefault(); alert('請選擇發票方式'); invoiceSelect.focus(); return; }
+
+      if (invoiceSelect.value === '載具') {
+        const re = /^\/[0-9A-Z.\-+]{7}$/;
+        if (!carrierField.value) { e.preventDefault(); alert('請輸入載具號碼'); carrierField.focus(); return; }
+        if (!re.test(carrierField.value)) {
+          e.preventDefault();
+          alert('載具號碼格式錯誤，需以「/」開頭 + 7 碼，允許 0-9 A-Z . - +');
+          carrierField.focus();
+          return;
+        }
+      }
+
+      const emailEl = document.getElementById('email');
+      if (emailEl && emailEl.value.trim()) {
+        const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+        if (!emailRe.test(emailEl.value.trim())) {
+          e.preventDefault();
+          alert('Email 格式不正確');
+          emailEl.focus();
+          return;
+        }
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '送出中…';
+    });
+
+    // --- 初始化 ---
+    (function init(){
+      // 若首次載入，Intro 還沒隱藏會鎖住捲動；非首次將不鎖
+      updateTotal();
+      toggleCarrier();
+      updateMinusDisabled();
+    })();
   </script>
 </body>
 </html>

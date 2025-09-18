@@ -11,14 +11,19 @@
     }
 
     :root {
-      --pad-x: 10mm;    /* 左右內距 */
-      --pad-y: 12mm;    /* 上下基礎內距 */
-      --gap:   8mm;     /* 文字之間間距 */
-      --shift: 20mm;    /* 下移距離：若要 2.5 公分請改 25mm */
+      --pad-x: 8mm;     /* 左右內距 */
+      --pad-y: 10mm;    /* 上下基礎內距 */
+      --gap: 6mm;       /* 文字之間間距 */
+      --shift: 15mm;    /* 下移距離 */
     }
 
-    html, body { height: 100%; margin: 0; padding: 0; background: #fff; }
-    body { font-family: 'Microsoft JhengHei', Arial, sans-serif; }
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      padding: 0; 
+      background: #fff; 
+      font-family: 'Microsoft JhengHei', 'PingFang TC', 'Helvetica Neue', Arial, sans-serif;
+    }
 
     /* ---- 單張票面 ---- */
     .ticket {
@@ -29,98 +34,141 @@
       background: #fff;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
       gap: var(--gap);
       text-align: center;
       page-break-after: always;
+      position: relative;
     }
 
-    /* ---- 文字樣式 ---- */
+    /* ---- 文字樣式 (針對熱感應紙優化) ---- */
     .order-id {
-      font-size: 72px;
+      font-size: 60px;
       font-weight: 900;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
+      line-height: 0.9;
+      margin: 0;
+      color: #000;
+      font-family: 'Arial Black', 'Microsoft JhengHei', Arial, sans-serif;
+      text-shadow: none;
+    }
+    
+    .customer-name {
+      font-size: 32px;
+      font-weight: 700;
       line-height: 1.1;
       margin: 0;
       color: #000;
-      font-family: 'Arial Black', Arial, sans-serif;
+      max-width: 80mm;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
-    .customer-name {
-      font-size: 42px;
-      font-weight: 700;
-      line-height: 1.25;
-      margin: 0;
-      color: #111;
-    }
+    
     .item-count {
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 1.25;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
       margin: 0;
       color: #000;
       letter-spacing: 0.5px;
     }
 
-    /* ---- 簽收單（覆寫部分，往上 0.3 公分） ---- */
-    .sign-sheet{
-      /* 比一般票面少 8mm 的上內距，再額外上移 2mm（比上版多 3mm） */
-      padding: calc(var(--pad-y) + var(--shift) - 8mm - 2mm) var(--pad-x) var(--pad-y) var(--pad-x);
+    /* ---- 簽收單優化 (壓縮版面避免換頁) ---- */
+    .sign-sheet {
+      padding: calc(var(--pad-y) + var(--shift) - 8mm) var(--pad-x) calc(var(--pad-y) - 2mm) var(--pad-x);
+      justify-content: flex-start;
     }
-    .sign-sheet .sign-title{
-      font-size: 28px;
+    
+    .sign-sheet .sign-title {
+      font-size: 20px;
       font-weight: 900;
-      margin: 0 0 4mm;
+      margin: 0 0 5mm 0;
       letter-spacing: 1px;
+      color: #000;
+      border-bottom: 1px solid #000;
+      padding-bottom: 1mm;
+      width: 100%;
     }
-    .sign-sheet .sign-rows{
+    
+    .sign-sheet .sign-rows {
       width: 100%;
       display: grid;
-      grid-template-columns: 28mm 1fr;
-      row-gap: 3mm;
-      column-gap: 4mm;
+      grid-template-columns: 22mm 1fr;
+      row-gap: 2.5mm;
+      column-gap: 3mm;
       text-align: left;
-      font-size: 17px;
+      font-size: 12px;
       line-height: 1.2;
+      margin-bottom: 5mm;
     }
-    .sign-sheet .sign-label{ font-weight: 700; color:#000; }
-    .sign-sheet .sign-value{ font-weight: 600; color:#111; word-break: break-all; }
+    
+    .sign-sheet .sign-label { 
+      font-weight: 700; 
+      color: #000;
+      white-space: nowrap;
+    }
+    
+    .sign-sheet .sign-value { 
+      font-weight: 600; 
+      color: #000;
+      word-break: break-all;
+      overflow-wrap: break-word;
+    }
 
-    .sign-sheet .signature-box{
+    .sign-sheet .signature-box {
       width: 100%;
-      margin-top: 6mm;
-      border: 2px dashed #000;
+      border: 1px solid #000;
       border-radius: 2mm;
       padding: 3mm;
       box-sizing: border-box;
       flex: 1;
-      min-height: 20mm;
+      min-height: 12mm;
       display: flex;
       align-items: flex-end;
       justify-content: flex-end;
+      background: #fff;
     }
-    .sign-sheet .signature-hint{
-      font-size: 12px;
-      color:#000;
+    
+    .sign-sheet .signature-hint {
+      font-size: 9px;
+      color: #666;
+      font-weight: 500;
     }
 
-    /* ---- 列印最佳化 ---- */
+    /* ---- 熱感應紙列印最佳化 ---- */
     @media print {
       .print-button { display: none !important; }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+      
       .ticket {
-        padding: calc(var(--pad-y) + var(--shift)) var(--pad-x) var(--pad-y) var(--pad-x) !important;
         background: #fff !important;
         page-break-before: auto;
         page-break-after: always;
         page-break-inside: avoid;
+        border: none !important;
+        box-shadow: none !important;
       }
-      /* 列印時同樣上移 0.3 公分 */
-      .sign-sheet{
-        padding: calc(var(--pad-y) + var(--shift) - 8mm - 2mm) var(--pad-x) var(--pad-y) var(--pad-x) !important;
+      
+      .sign-sheet {
+        padding: calc(var(--pad-y) + var(--shift) - 5mm) var(--pad-x) var(--pad-y) var(--pad-x) !important;
       }
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+      
+      /* 確保文字清晰 */
+      .order-id, .customer-name, .item-count, 
+      .sign-title, .sign-label, .sign-value {
+        color: #000 !important;
+        text-shadow: none !important;
+      }
+      
+      .signature-box {
+        border: 2px solid #000 !important;
+        background: #fff !important;
       }
     }
 
@@ -129,29 +177,46 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      padding: 10px 16px;
-      background: #007bff;
+      padding: 12px 20px;
+      background: #28a745;
       color: #fff;
       border: none;
-      border-radius: 6px;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
       z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.2s;
     }
-    .print-button:hover { background: #0056b3; }
+    
+    .print-button:hover { 
+      background: #218838; 
+    }
+
+    /* ---- 響應式調整 ---- */
+    @media screen and (max-width: 480px) {
+      .print-button {
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
   <!-- 快速列印按鈕 -->
-  <button class="print-button" onclick="window.print()">快速列印</button>
+  <button class="print-button" onclick="window.print()">🖨️ 列印標籤</button>
 
   <%
     const small = parseInt(order.small_count || 0, 10);
     const large = parseInt(order.large_count || 0, 10);
     const totalCount = small + large;
+    const count = totalCount;
   %>
 
-  <!-- 每件一張 -->
+  <!-- 每件一張標籤 -->
   <% for (let i = 1; i <= totalCount; i++) { %>
     <div class="ticket">
       <div class="order-id"><%= order.order_id %></div>
@@ -160,7 +225,7 @@
     </div>
   <% } %>
 
-  <!-- 追加：簽收單（每筆訂單最後一張） -->
+  <!-- 簽收單（每筆訂單最後一張） -->
   <div class="ticket sign-sheet">
     <div class="sign-title">領件單</div>
 
@@ -171,22 +236,40 @@
       <div class="sign-label">姓名</div>
       <div class="sign-value"><%= order.name %></div>
 
+      <div class="sign-label">領件位置</div>
+      <div class="sign-value"><%= order.location_name || '-' %></div>
+
       <div class="sign-label">件數</div>
-      <div class="sign-value"><%= totalCount %> 件</div>
+      <div class="sign-value">
+        <%= count %> 件
+        <% 
+          const parts = [];
+          if (large > 0) parts.push(`大${large}件`);
+          if (small > 0) parts.push(`小${small}件`);
+        %>
+        <% if (parts.length) { %>
+          （<%= parts.join('、') %>）
+        <% } %>
+      </div>
     </div>
 
     <div class="signature-box">
       <span class="signature-hint">簽名 / 日期</span>
-      </div>
+    </div>
   </div>
 
   <script>
-    // Ctrl+P 快速列印
+    // 快捷鍵列印
     document.addEventListener('keydown', function(e) {
       if (e.ctrlKey && (e.key === 'p' || e.key === 'P')) {
         e.preventDefault();
         window.print();
       }
+    });
+
+    // 頁面載入完成後提示
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('熱感應紙列印單已載入完成');
     });
   </script>
 </body>

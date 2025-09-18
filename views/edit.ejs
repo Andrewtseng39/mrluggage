@@ -6,10 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #f6f6f6; }
-    form { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
-    label { display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 8px; margin-top: 5px; }
-    button { background: #EA5514; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 20px; }
+    h2 { text-align: center; }
+    form { background: white; padding: 20px; border-radius: 10px; max-width: 420px; margin: 16px auto; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    label { display: block; margin-top: 12px; font-weight: 600; color: #333; }
+    input, select { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    input:focus, select:focus { outline: none; border-color: #EA5514; box-shadow: 0 0 0 2px rgba(234,85,20,.15); }
+    button { background: #EA5514; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; margin-top: 18px; font-weight: 700; cursor: pointer; }
+    button:hover { background: #d64814; }
     .hint { font-size: 12px; color: #666; margin-top: 4px; }
     .hidden { display: none; }
   </style>
@@ -17,13 +20,18 @@
 <body>
   <h2>編輯訂單：<%= order.order_id %></h2>
 
-  <form action="/admin/edit/<%= order.order_id %>" method="POST">
+  <form action="/admin/edit/<%= order.order_id %>" method="POST" novalidate>
     <label>姓名
       <input type="text" name="name" value="<%= order.name %>" required>
     </label>
 
     <label>電話
       <input type="text" name="phone" value="<%= order.phone %>" required>
+    </label>
+
+    <!-- ✅ 新增 Email 欄位 -->
+    <label>Email
+      <input type="email" name="email" value="<%= order.email || '' %>" required placeholder="name@example.com">
     </label>
 
     <label>小件數
@@ -41,7 +49,7 @@
       </select>
     </label>
 
-    <!-- 新增：載具號碼欄位（只在選擇「載具」時顯示） -->
+    <!-- 載具號碼（僅在發票=載具時顯示） -->
     <div id="carrier_group" class="<%= order.invoice_type === '載具' ? '' : 'hidden' %>">
       <label>手機載具號碼
         <input
@@ -49,12 +57,17 @@
           name="carrier_number"
           id="carrier_number"
           value="<%= order.carrier_number || '' %>"
-          placeholder="例如：/ABC1234"
-          pattern="^/[A-Za-z0-9]{7}$"
-          oninput="this.value=this.value.toUpperCase()"
+          placeholder="例如：/ABC12.+"
+          pattern="\/[0-9A-Z.\-+]{7}"
+          inputmode="latin"
+          autocomplete="off"
+          oninput="
+            this.value = this.value.normalize('NFKC').toUpperCase();
+            this.setCustomValidity('');
+          "
         >
       </label>
-      <div class="hint">格式：以「/」開頭 + 7 碼英數字（會自動轉大寫）</div>
+      <div class="hint">格式：以「/」開頭 + 7 碼；允許 0–9、A–Z、<code>.</code>、<code>-</code>、<code>+</code></div>
     </div>
 
     <button type="submit">儲存變更</button>
@@ -68,18 +81,30 @@
     function toggleCarrier() {
       const useCarrier = invoiceSel.value === '載具';
       carrierGroup.classList.toggle('hidden', !useCarrier);
-      // 必填與否
       if (useCarrier) {
-        carrierInput.setAttribute('required', 'required');
+        carrierInput.required = true;
       } else {
-        carrierInput.removeAttribute('required');
+        carrierInput.required = false;
         carrierInput.value = '';
+        carrierInput.setCustomValidity('');
       }
     }
 
     invoiceSel.addEventListener('change', toggleCarrier);
-    // 初始執行一次
     toggleCarrier();
+
+    // 送出前再做一次人性化驗證
+    document.querySelector('form').addEventListener('submit', (e) => {
+      if (invoiceSel.value === '載具') {
+        const re = /^\/[0-9A-Z.\-+]{7}$/;
+        const val = (carrierInput.value || '').normalize('NFKC').toUpperCase();
+        if (!re.test(val)) {
+          e.preventDefault();
+          carrierInput.setCustomValidity('載具格式錯誤：需以「/」開頭 + 7 碼（允許 0–9、A–Z、.、-、+）');
+          carrierInput.reportValidity();
+        }
+      }
+    });
   </script>
 </body>
 </html>

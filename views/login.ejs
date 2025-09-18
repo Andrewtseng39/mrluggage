@@ -361,22 +361,22 @@
     
     <div class="login-form">
       <div class="security-notice">
-        🛡️ 請確保您在安全的網路環境下登入
+        🛡️      上班啦!!!還記得帳號密碼嗎?蛤
       </div>
       
       <form action="/admin/login" method="POST" id="loginForm">
         <div class="form-group">
-          <input type="text" name="username" class="form-input" placeholder="請輸入帳號" required autocomplete="username">
+          <input type="text" name="username" class="form-input" placeholder="帳號記得嗎?快填阿" required autocomplete="username">
           <div class="input-icon">👤</div>
         </div>
         
         <div class="form-group">
-          <input type="password" name="password" class="form-input" placeholder="請輸入密碼" required autocomplete="current-password">
+          <input type="password" name="password" class="form-input" placeholder="密碼忘了你就試試看!" required autocomplete="current-password">
           <div class="input-icon">🔑</div>
         </div>
         
         <button type="submit" class="login-btn" id="loginBtn">
-          🚀 立即登入
+          點擊後立即上班 耶~
         </button>
         
         <% if (typeof error !== 'undefined' && error) { %>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>寄件地管理</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; padding: 20px; background:#f8f9fa; }
+    h1 { color: #EA5514; margin: 0 0 12px; }
+    .card { background:#fff; border:1px solid #e9ecef; border-radius:8px; padding:16px; }
+    .row { margin-bottom: 12px; display:flex; gap:8px; flex-wrap: wrap; }
+    input { padding:10px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; }
+    .btn { background:#EA5514; color:#fff; border:none; border-radius:6px; padding:10px 14px; cursor:pointer; }
+    .btn.gray { background:#6c757d; }
+    .btn.link { background:transparent; color:#EA5514; border:1px solid #EA5514; }
+    table { width:100%; border-collapse: collapse; margin-top:12px; background:#fff; }
+    th, td { border:1px solid #e9ecef; padding:10px; text-align:center; }
+    th { background:#fff5f0; }
+    form.inline { display:inline-block; margin:0 4px; }
+    .toolbar { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+    a { text-decoration:none; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1 style="flex:1">寄件地管理</h1>
+    <a href="/admin" class="btn link">← 返回後台</a>
+  </div>
+
+  <div class="card">
+    <form method="POST" action="/admin/locations/add" class="row">
+      <input name="name" placeholder="寄件地名稱（例：寄件地A）" required />
+      <input name="prefixes" placeholder="字母集合（例：A,B,C,D）" required />
+      <button class="btn" type="submit">新增寄件地</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>名稱</th>
+          <th>字母集合</th>
+          <th>狀態</th>
+          <th>建立時間</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (locations || []).forEach(l => { %>
+          <tr>
+            <td><%= l.id %></td>
+            <td><%= l.name %></td>
+            <td><%= l.prefixes %></td>
+            <td><%= l.is_active ? '啟用' : '停用' %></td>
+            <td><%= l.created_at || '-' %></td>
+            <td>
+              <form class="inline" method="POST" action="/admin/locations/toggle/<%= l.id %>">
+                <button class="btn"><%= l.is_active ? '停用' : '啟用' %></button>
+              </form>
+              <form class="inline" method="POST" action="/admin/locations/delete/<%= l.id %>" onsubmit="return confirm('確定刪除？已有訂單綁定將無法刪除，請改用停用。');">
+                <button class="btn gray">刪除</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

@@ -1,4 +1,3 @@
-// app.js
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
@@ -7,7 +6,9 @@ const SQLiteStore = require('connect-sqlite3')(session);
 const app = express();
 
 // 設定靜態檔案目錄
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+// 🔽 新增這行，讓專案根目錄的 uploads/ 可以被瀏覽器存取
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 設定模板引擎
 app.set('view engine', 'ejs');
@@ -29,7 +30,6 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
 }));
-
 
 // 路由設定
 const customerRoutes = require('./routes/customer');

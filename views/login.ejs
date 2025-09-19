@@ -1,442 +1,705 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <title>後台登入</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 16px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    /* 背景動畫 */
-    body::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: 
-        radial-gradient(circle at 25% 25%, rgba(234, 85, 20, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.1) 0%, transparent 50%);
-      animation: rotate 20s linear infinite;
-    }
-    
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .login-container {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      max-width: 400px;
-      width: 100%;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .login-header {
-      background: linear-gradient(135deg, #ea5514 0%, #ff6b35 100%);
-      color: white;
-      padding: 40px 30px;
-      text-align: center;
-      position: relative;
-    }
-    
-    .login-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    }
-    
-    .login-icon {
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 2.5rem;
-      position: relative;
-      z-index: 1;
-    }
-    
-    h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      font-weight: 600;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      position: relative;
-      z-index: 1;
-    }
-    
-    .login-subtitle {
-      margin: 8px 0 0 0;
-      font-size: 0.9rem;
-      opacity: 0.9;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .login-form {
-      padding: 40px 30px;
-    }
-    
-    .form-group {
-      margin-bottom: 24px;
-      position: relative;
-    }
-    
-    .form-input {
-      width: 100%;
-      padding: 16px 20px 16px 50px;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      background: #fff;
-    }
-    
-    .form-input:focus {
-      outline: none;
-      border-color: #ea5514;
-      box-shadow: 0 0 0 4px rgba(234, 85, 20, 0.1);
-      transform: translateY(-2px);
-    }
-    
-    .form-input::placeholder {
-      color: #adb5bd;
-    }
-    
-    .input-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #6c757d;
-      font-size: 1.2rem;
-      transition: color 0.3s ease;
-    }
-    
-    .form-input:focus + .input-icon {
-      color: #ea5514;
-    }
-    
-    .login-btn {
-      background: linear-gradient(135deg, #ea5514 0%, #ff6b35 100%);
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      width: 100%;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(234, 85, 20, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .login-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
-    
-    .login-btn:hover::before {
-      left: 100%;
-    }
-    
-    .login-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(234, 85, 20, 0.4);
-    }
-    
-    .login-btn:active {
-      transform: translateY(0);
-    }
-    
-    .login-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    /* 錯誤訊息 */
-    .error-message {
-      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-      color: white;
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: shake 0.5s ease-in-out;
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    
-    .error-icon {
-      font-size: 1.2rem;
-    }
-    
-    /* 載入狀態 */
-    .loading {
-      position: relative;
-    }
-    
-    .loading::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      margin: auto;
-      border: 2px solid transparent;
-      border-top-color: #ffffff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* 返回鏈接 */
-    .back-link {
-      text-align: center;
-      margin-top: 24px;
-    }
-    
-    .back-link a {
-      color: #6c757d;
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.3s ease;
-    }
-    
-    .back-link a:hover {
-      color: #ea5514;
-    }
-    
-    /* 響應式設計 */
-    @media (max-width: 768px) {
-      body {
-        padding: 8px;
-      }
-      
-      .login-container {
-        border-radius: 16px;
-      }
-      
-      .login-header {
-        padding: 32px 24px;
-      }
-      
-      .login-icon {
-        width: 70px;
-        height: 70px;
-        font-size: 2rem;
-      }
-      
-      h1 {
-        font-size: 1.6rem;
-      }
-      
-      .login-form {
-        padding: 32px 24px;
-      }
-      
-      .form-input {
-        font-size: 16px; /* 防止 iOS 縮放 */
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .login-container {
-        margin: 0;
-        border-radius: 12px;
-      }
-      
-      .login-header {
-        padding: 24px 20px;
-      }
-      
-      .login-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 1.8rem;
-      }
-      
-      h1 {
-        font-size: 1.4rem;
-      }
-      
-      .login-form {
-        padding: 24px 20px;
-      }
-    }
-    
-    /* 載入動畫 */
-    @keyframes fadeInUp {
-      from { 
-        opacity: 0; 
-        transform: translateY(30px);
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0);
-      }
-    }
-    
-    .login-container {
-      animation: fadeInUp 0.6s ease-out;
-    }
-    
-    /* 安全提示 */
-    .security-notice {
-      background: rgba(40, 167, 69, 0.1);
-      border: 1px solid rgba(40, 167, 69, 0.2);
-      color: #155724;
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 24px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>後台登入 - 管理系統</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ff6018 0%, #ff8c42 100%);
+            --secondary-gradient: linear-gradient(135deg, #ff6018 0%, #ff4757 100%);
+            --accent-gradient: linear-gradient(135deg, #ff6018 0%, #ff7675 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --shadow-light: 0 8px 32px rgba(255, 96, 24, 0.37);
+            --shadow-heavy: 0 20px 60px rgba(255, 96, 24, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 動態背景粒子 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 96, 24, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 140, 66, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 118, 117, 0.3) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(-60px) rotate(240deg); }
+        }
+
+        /* 浮動幾何形狀 */
+        .geometric-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: drift 15s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 70%;
+            animation-delay: -10s;
+        }
+
+        @keyframes drift {
+            0% { transform: rotate(0deg) translateX(0px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+        }
+
+        /* 登入容器 */
+        .login-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .login-header {
+            padding: 48px 40px 32px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+        }
+
+        .login-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--accent-gradient);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: 0 12px 40px rgba(255, 96, 24, 0.4);
+            transform: rotate(-5deg);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .login-icon svg {
+            width: 52px;
+            height: 52px;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .login-icon:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.02em;
+        }
+
+        .login-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .login-form {
+            padding: 40px;
+        }
+
+        .security-notice {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 20px 20px 20px 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            font-size: 16px;
+            color: white;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 96, 24, 0.8);
+            box-shadow: 0 0 0 4px rgba(255, 96, 24, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset;
+            -webkit-text-fill-color: white;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.4rem;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .form-input:focus + .input-icon {
+            transform: translateY(-50%) scale(1.1);
+            filter: brightness(1.2);
+        }
+
+        .login-btn {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 20px 32px;
+            width: 100%;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(255, 96, 24, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 60px rgba(255, 96, 24, 0.5);
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .login-btn:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 載入動畫 */
+        .loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            margin: auto;
+            border: 3px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 錯誤訊息 */
+        .error-message {
+            background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+            border: 1px solid rgba(248, 113, 113, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+            animation: shake 0.6s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .error-icon {
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .back-link a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-4px);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .login-container {
+                border-radius: 20px;
+            }
+
+            .login-header {
+                padding: 40px 32px 24px;
+            }
+
+            .login-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .login-icon svg {
+                width: 40px;
+                height: 40px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .login-form {
+                padding: 32px;
+            }
+
+            .form-input {
+                padding: 18px 18px 18px 55px;
+                font-size: 16px;
+            }
+
+            .input-icon {
+                left: 18px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 16px;
+            }
+
+            .login-header {
+                padding: 32px 24px 20px;
+            }
+
+            .login-icon {
+                width: 70px;
+                height: 70px;
+                border-radius: 18px;
+            }
+
+            .login-icon svg {
+                width: 32px;
+                height: 32px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .login-form {
+                padding: 24px;
+            }
+
+            .form-input {
+                padding: 16px 16px 16px 50px;
+            }
+
+            .input-icon {
+                left: 16px;
+            }
+        }
+
+        /* 微互動效果 */
+        .form-group {
+            transition: transform 0.2s ease;
+        }
+
+        .form-group:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 進階玻璃效果 */
+        @supports (backdrop-filter: blur(20px)) {
+            .login-container {
+                background: rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(20px) saturate(180%);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="login-container">
-    <div class="login-header">
-      <div class="login-icon">
-        🔐
-      </div>
-      <h1>管理員登入</h1>
-      <p class="login-subtitle">請輸入您的帳號密碼</p>
+    <div class="geometric-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
     </div>
-    
-    <div class="login-form">
-      <div class="security-notice">
-        🛡️      上班啦!!!還記得帳號密碼嗎?蛤
-      </div>
-      
-      <form action="/admin/login" method="POST" id="loginForm">
-        <div class="form-group">
-          <input type="text" name="username" class="form-input" placeholder="帳號記得嗎?快填阿" required autocomplete="username">
-          <div class="input-icon">👤</div>
-        </div>
-        
-        <div class="form-group">
-          <input type="password" name="password" class="form-input" placeholder="密碼忘了你就試試看!" required autocomplete="current-password">
-          <div class="input-icon">🔑</div>
-        </div>
-        
-        <button type="submit" class="login-btn" id="loginBtn">
-          點擊後立即上班 耶~
-        </button>
-        
-        <% if (typeof error !== 'undefined' && error) { %>
-          <div class="error-message">
-            <span class="error-icon">⚠️</span>
-            <span><%= error %></span>
-          </div>
-        <% } %>
-      </form>
-      
-      <div class="back-link">
-        <a href="/">← 返回首頁</a>
-      </div>
-    </div>
-  </div>
 
-  <script>
-    // 表單提交處理
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      const btn = document.getElementById('loginBtn');
-      const username = document.querySelector('input[name="username"]').value.trim();
-      const password = document.querySelector('input[name="password"]').value.trim();
-      
-      if (!username || !password) {
-        e.preventDefault();
-        return;
-      }
-      
-      // 顯示載入狀態
-      btn.disabled = true;
-      btn.classList.add('loading');
-      btn.innerHTML = '登入中...';
-      
-      // 防止重複提交
-      setTimeout(() => {
-        if (btn.disabled) {
-          btn.disabled = false;
-          btn.classList.remove('loading');
-          btn.innerHTML = '🚀 立即登入';
-        }
-      }, 10000);
-    });
-    
-    // 輸入框焦點效果
-    document.querySelectorAll('.form-input').forEach(input => {
-      input.addEventListener('focus', function() {
-        this.parentElement.style.transform = 'scale(1.02)';
-      });
-      
-      input.addEventListener('blur', function() {
-        this.parentElement.style.transform = 'scale(1)';
-      });
-    });
-    
-    // 鍵盤快捷鍵
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-        document.getElementById('loginForm').submit();
-      }
-    });
-  </script>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-icon">
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- 漸層定義 -->
+                        <linearGradient id="suitcaseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.95);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.85);stop-opacity:1" />
+                        </linearGradient>
+                        
+                        <!-- 陰影濾鏡 -->
+                        <filter id="dropShadow">
+                            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+                        </filter>
+                    </defs>
+                    
+                    <!-- 行李箱主體 - 立體六邊形 -->
+                    <path d="M 30 40 L 90 40 L 95 50 L 95 75 L 90 85 L 30 85 L 25 75 L 25 50 Z" 
+                          fill="url(#suitcaseGradient)" 
+                          stroke="rgba(255,255,255,0.4)" 
+                          stroke-width="2"
+                          filter="url(#dropShadow)"/>
+                    
+                    <!-- 側面立體效果 -->
+                    <path d="M 90 40 L 95 35 L 95 80 L 90 85" 
+                          fill="rgba(255,255,255,0.7)" 
+                          stroke="rgba(255,255,255,0.3)" 
+                          stroke-width="1"/>
+                    
+                    <!-- 頂面立體效果 -->
+                    <path d="M 30 40 L 35 35 L 95 35 L 90 40" 
+                          fill="rgba(255,255,255,0.8)" 
+                          stroke="rgba(255,255,255,0.3)" 
+                          stroke-width="1"/>
+                    
+                    <!-- 把手 -->
+                    <path d="M 45 25 Q 45 20 50 20 L 70 20 Q 75 20 75 25 L 75 30 Q 75 35 70 35 L 50 35 Q 45 35 45 30 Z" 
+                          fill="none" 
+                          stroke="rgba(255,255,255,0.9)" 
+                          stroke-width="4" 
+                          stroke-linecap="round"/>
+                    
+                    <!-- 把手連接點 -->
+                    <rect x="47" y="33" width="4" height="7" rx="2" fill="rgba(255,255,255,0.8)"/>
+                    <rect x="69" y="33" width="4" height="7" rx="2" fill="rgba(255,255,255,0.8)"/>
+                    
+                    <!-- 笑臉表情 -->
+                    <!-- 眼睛 -->
+                    <circle cx="45" cy="55" r="2.5" fill="rgba(255,255,255,0.9)"/>
+                    <circle cx="75" cy="55" r="2.5" fill="rgba(255,255,255,0.9)"/>
+                    
+                    <!-- 微笑嘴巴 -->
+                    <path d="M 50 65 Q 60 72 70 65" 
+                          fill="none" 
+                          stroke="rgba(255,255,255,0.9)" 
+                          stroke-width="3" 
+                          stroke-linecap="round"/>
+                    
+                    <!-- 裝飾線條 -->
+                    <rect x="35" y="50" width="15" height="2" rx="1" fill="rgba(255,255,255,0.6)"/>
+                    <rect x="70" y="50" width="15" height="2" rx="1" fill="rgba(255,255,255,0.6)"/>
+                    
+                    <!-- 輪子 -->
+                    <circle cx="35" cy="92" r="6" 
+                            fill="rgba(255,255,255,0.9)" 
+                            stroke="rgba(255,255,255,0.6)" 
+                            stroke-width="2"
+                            filter="url(#dropShadow)"/>
+                    <circle cx="85" cy="92" r="6" 
+                            fill="rgba(255,255,255,0.9)" 
+                            stroke="rgba(255,255,255,0.6)" 
+                            stroke-width="2"
+                            filter="url(#dropShadow)"/>
+                    
+                    <!-- 輪子內圈 -->
+                    <circle cx="35" cy="92" r="3" fill="rgba(255,255,255,0.7)"/>
+                    <circle cx="85" cy="92" r="3" fill="rgba(255,255,255,0.7)"/>
+                    
+                    <!-- 拉桿 -->
+                    <rect x="58" y="85" width="4" height="12" rx="2" 
+                          fill="rgba(255,255,255,0.8)" 
+                          filter="url(#dropShadow)"/>
+                    
+                    <!-- 拉桿頂部裝飾 -->
+                    <rect x="56" y="85" width="8" height="3" rx="1.5" 
+                          fill="rgba(255,255,255,0.7)"/>
+                </svg>
+            </div>
+            <h1>管理員登入</h1>
+            <p class="login-subtitle">請輸入您的帳號密碼</p>
+        </div>
+        
+        <div class="login-form">
+            <div class="security-notice">
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如忘記帳號密碼請聯絡Andrew</p>
+            </div>
+            
+            <form action="/admin/login" method="POST" id="loginForm">
+                <div class="form-group">
+                    <input type="text" 
+                           name="username" 
+                           class="form-input" 
+                           placeholder="請填寫帳號" 
+                           required 
+                           autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" 
+                           name="password" 
+                           class="form-input" 
+                           placeholder="請填寫密碼" 
+                           required 
+                           autocomplete="current-password">
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">
+                     立即登入
+                </button>
+                
+                <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error-message">
+                    <span class="error-icon">⚠️</span>
+                    <span><%= error %></span>
+                </div>
+                <% } %>
+            </form>
+            
+            <div class="back-link">
+                <a href="/">← 返回首頁</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 表單提交處理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('loginBtn');
+            const username = document.querySelector('input[name="username"]').value.trim();
+            const password = document.querySelector('input[name="password"]').value.trim();
+
+            if (!username || !password) {
+                e.preventDefault();
+                return;
+            }
+
+            // 顯示載入狀態
+            btn.disabled = true;
+            btn.classList.add('loading');
+            btn.innerHTML = '登入中...';
+
+            // 防止重複提交
+            setTimeout(() => {
+                if (btn.disabled) {
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    btn.innerHTML = '✨ 立即登入';
+                }
+            }, 10000);
+        });
+
+        // 輸入框聚焦效果
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-4px) scale(1.02)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // 鍵盤快捷鍵
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                document.getElementById('loginForm').submit();
+            }
+        });
+
+        // 動態背景互動
+        document.addEventListener('mousemove', function(e) {
+            const shapes = document.querySelectorAll('.shape');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+
+            shapes.forEach((shape, index) => {
+                const speed = (index + 1) * 0.5;
+                const x = mouseX * speed * 10;
+                const y = mouseY * speed * 10;
+                shape.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+
+        // 頁面載入動畫
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // 增強的表單驗證
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.style.borderColor = 'rgba(255, 96, 24, 0.6)';
+                    this.style.boxShadow = '0 0 0 4px rgba(255, 96, 24, 0.2)';
+                } else {
+                    this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

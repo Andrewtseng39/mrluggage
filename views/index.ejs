@@ -198,13 +198,15 @@
             </div>
 
             <!-- 寄件地 -->
-            <div class="form-group">
-              <label class="form-label" for="location">寄件地</label>
-              <select id="location" name="location_id" class="form-select" required>
-                <option value="">請選擇寄件地</option>
-              </select>
-            </div>
-          </section>
+<div class="form-group">
+  <label class="form-label" for="location">寄件地</label>
+  <select id="location" name="location_id" class="form-select" required>
+    <option value="">請選擇寄件地</option>
+    <% (locations || []).forEach(loc => { %>
+      <option value="<%= loc.id %>"><%= loc.name %></option>
+    <% }) %>
+  </select>
+</div>
 
           <!-- 行李選擇 -->
           <section class="form-section" aria-labelledby="section-bags">

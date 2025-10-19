@@ -154,7 +154,7 @@
         </div>
 
         <h2 class="intro-title">歡迎使用行李先生寄存服務</h2>
-        <p class="intro-sub">15 秒後自動進入表單，或直接點擊下方按鈕開始</p>
+        <p class="intro-sub">10 秒後自動進入表單，或直接點擊下方按鈕開始</p>
 
         
         <div class="intro-actions">
@@ -317,7 +317,7 @@
       const intro = document.getElementById('intro');
       const btn = document.getElementById('introBtn');
       const KEY = 'introSeen';
-      const AUTO_MS = 2000;
+      const AUTO_MS = 10000;
       let timer = null;
 
       if (!intro || !btn) return;

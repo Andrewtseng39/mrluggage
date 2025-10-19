@@ -8,10 +8,13 @@
     * { box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 16px; background: #f8f9fa; min-height: 100vh; line-height: 1.6; }
     .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; border: 1px solid #e9ecef; }
+    
+    .main-content { display: flex; flex-direction: column; }
+    
     .header { background: #ea5514; color: #fff; padding: 24px; text-align: center; }
     h1 { margin: 0; font-size: 1.8rem; font-weight: 600; }
     .subtitle { margin: 8px 0 0; font-size: 1rem; opacity: .9; }
-    .form-container { padding: 24px; }
+    .form-container { padding: 24px; flex: 1; }
 
     .form-section { margin-bottom: 32px; }
     .section-title { color: #ea5514; font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #ea5514; }
@@ -118,16 +121,6 @@
     }
     .intro-sub{ opacity:.92; margin: 0 0 18px; font-size: 14px; }
 
-    .intro-icons{ display: flex; justify-content: center; gap:14px; margin: 18px 0 8px; }
-    .intro-icon{
-      width: 64px; height: 64px; border-radius: 18px;
-      display: grid; place-items: center;
-      background: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
-      border: 1px solid rgba(255,255,255,.22);
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
-    }
-    .intro-icon svg{ width: 34px; height: 34px; }
-
     .intro-actions{ margin-top: 18px; }
     .intro-btn{
       appearance:none; border:none; cursor:pointer; width: 100%;
@@ -138,178 +131,155 @@
       transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
     }
     .intro-btn:hover{ transform: translateY(-2px); box-shadow: 0 16px 34px rgba(0,0,0,.28); }
-    .intro-muted{ margin-top: 10px; font-size: 12px; color: var(--muted); }
-
-    .intro-glow{ position:absolute; inset: -25% -10% auto auto; pointer-events:none; }
-    .intro-glow::before, .intro-glow::after{
-      content:""; position:absolute; width: 60vmax; height: 60vmax; border-radius: 50%;
-      filter: blur(30px); opacity:.25; mix-blend-mode: screen;
-      animation: rotateGlow 24s linear infinite;
-    }
-    .intro-glow::before{ background: radial-gradient(closest-side, rgba(255,255,255,.28), transparent 60%); top:-10%; left:-10%; }
-    .intro-glow::after{ background: radial-gradient(closest-side, rgba(255,255,255,.18), transparent 60%); top:10%; left:30%; animation-duration: 32s; }
 
     @keyframes fadeUp{ from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)} }
-    @keyframes rotateGlow{ from{ transform: rotate(0) } to{ transform: rotate(360deg) } }
-
-    @media (max-width: 480px){
-      .intro-wrap{ padding: 18px; }
-      .intro-card{ padding: 22px 18px 18px; border-radius: 16px; }
-      .intro-icons{ gap:12px; }
-      .intro-icon{ width: 56px; height: 56px; border-radius: 14px; }
-      .intro-icon svg{ width: 30px; height: 30px; }
-    }
 
     body.intro-lock{ height:100vh; overflow:hidden; }
 
     @media (prefers-reduced-motion: reduce){
       .intro-overlay{ transition:none; }
       .intro-card{ animation:none; }
-      .intro-glow::before, .intro-glow::after{ animation:none; }
     }
   </style>
 </head>
 <body>
   <!-- ===== Intro Transition Overlay ===== -->
   <div id="intro" class="intro-overlay" aria-hidden="false" role="dialog" aria-modal="true" aria-label="立即預約轉場">
-    <div class="intro-glow" aria-hidden="true"></div>
-    <div class="intro-glow glow2" aria-hidden="true"></div>
-
     <div class="intro-wrap">
       <div class="intro-card">
+        <img src="https://www.mrluggagetw.com/img/driver_logo.png" alt="行李先生 Logo" style="width: 120px; height: 120px; object-fit: contain; margin-bottom: 20px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
+
         <div class="intro-badge" aria-hidden="true">
           <span class="intro-dot"></span>有些重量，您不用自己扛
         </div>
 
         <h2 class="intro-title">歡迎使用行李先生寄存服務</h2>
-        <p class="intro-sub">2 秒後自動進入表單，或直接點擊下方按鈕開始</p>
+        <p class="intro-sub">15 秒後自動進入表單，或直接點擊下方按鈕開始</p>
 
         
         <div class="intro-actions">
           <button id="introBtn" class="intro-btn" type="button" aria-label="立即開始填寫">立即填寫</button>
-          <div class="intro-muted" aria-live="polite"></div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="container">
-    <header class="header">
-      <h1>行李先生服務有限公司</h1>
-      <p class="subtitle">演唱會專用寄存系統</p>
-    </header>
+    <!-- 主要內容 -->
+    <div class="main-content">
+      <header class="header">
+        <h1>行李先生服務有限公司</h1>
+        <p class="subtitle">演唱會專用寄存系統</p>
+      </header>
 
-    <main class="form-container">
-      <form action="/submit" method="POST" id="bookingForm" novalidate>
-        <!-- 基本資料 -->
-        <section class="form-section" aria-labelledby="section-basic">
-          <h3 id="section-basic" class="section-title">基本資料</h3>
-          <div class="form-group">
-            <label class="form-label" for="name">姓名</label>
-            <input type="text" id="name" name="name" class="form-input" placeholder="請輸入您的姓名" required autocomplete="name">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="phone">聯絡電話</label>
-            <input type="tel" inputmode="numeric" id="phone" name="phone" class="form-input" placeholder="請輸入手機號碼" required autocomplete="tel">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="email">Email（必填）</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="form-input"
-              placeholder="mr.luggage.tw@gmail.com"
-              autocomplete="email"
-              inputmode="email"
-              required
-              pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
-            />
-            <small class="hint"></small>
-          </div>
-
-          <!-- 寄件地 -->
-          <div class="form-group">
-            <label class="form-label" for="location">寄件地</label>
-            <select id="location" name="location_id" class="form-select" required>
-              <option value="">請選擇寄件地</option>
-              <% (locations || []).forEach(l => { %>
-                <option value="<%= l.id %>"><%= l.name %></option>
-              <% }) %>
-            </select>
-          </div>
-        </section>
-
-        <!-- 行李選擇 -->
-        <section class="form-section" aria-labelledby="section-bags">
-          <h3 id="section-bags" class="section-title">行李選擇</h3>
-
-          <div class="price-card">
-            <div class="price-header"><span>束口袋</span><span class="price-amount">NT$ 150 / 件</span></div>
-            <div class="quantity-selector">
-              <button type="button" class="quantity-btn" data-type="small" data-delta="-1">-</button>
-              <input type="number" name="small_count" class="quantity-input" value="0" min="0" readonly aria-label="束口袋數量">
-              <button type="button" class="quantity-btn" data-type="small" data-delta="1">+</button>
+      <main class="form-container">
+        <form action="/submit" method="POST" id="bookingForm" novalidate>
+          <!-- 基本資料 -->
+          <section class="form-section" aria-labelledby="section-basic">
+            <h3 id="section-basic" class="section-title">基本資料</h3>
+            <div class="form-group">
+              <label class="form-label" for="name">姓名</label>
+              <input type="text" id="name" name="name" class="form-input" placeholder="請輸入您的姓名" required autocomplete="name">
             </div>
-          </div>
-
-          <div class="price-card">
-            <div class="price-header"><span>行李箱</span><span class="price-amount">NT$ 200 / 件</span></div>
-            <div class="quantity-selector">
-              <button type="button" class="quantity-btn" data-type="large" data-delta="-1">-</button>
-              <input type="number" name="large_count" class="quantity-input" value="0" min="0" readonly aria-label="大件行李數量">
-              <button type="button" class="quantity-btn" data-type="large" data-delta="1">+</button>
+            <div class="form-group">
+              <label class="form-label" for="phone">聯絡電話</label>
+              <input type="tel" inputmode="numeric" id="phone" name="phone" class="form-input" placeholder="請輸入手機號碼" required autocomplete="tel">
             </div>
-          </div>
-        </section>
+            <div class="form-group">
+              <label class="form-label" for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="mr.luggage.tw@gmail.com"
+                autocomplete="email"
+                inputmode="email"
+                required
+                pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+              />
+            </div>
 
-        <!-- 發票 -->
-        <section class="form-section" aria-labelledby="section-invoice">
-          <h3 id="section-invoice" class="section-title">發票選擇</h3>
-          <div class="form-group">
-            <select name="invoice" class="form-select" id="invoiceSelect" required>
-              <option value="">請選擇發票方式</option>
-              <option value="載具">手機載具</option>
-              <option value="現場開立">現場開立紙本發票</option>
-            </select>
-          </div>
-          <div class="carrier-input" id="carrierInput">
-            <label class="form-label" for="carrier">手機載具號碼</label>
-            <input
-              type="text"
-              id="carrier"
-              name="carrier"
-              class="form-input"
-              placeholder="請輸入載具號碼（例如：/ABC1234）"
-              pattern="\/[0-9A-Z.\-+]{7}"
-              inputmode="latin"
-              autocomplete="off"
-            />
-            <small class="hint">格式：以「/」開頭 + 7 碼（允許 0-9 A-Z . - +）</small>
-          </div>
-        </section>
+            <!-- 寄件地 -->
+            <div class="form-group">
+              <label class="form-label" for="location">寄件地</label>
+              <select id="location" name="location_id" class="form-select" required>
+                <option value="">請選擇寄件地</option>
+              </select>
+            </div>
+          </section>
 
-        <!-- 總計 -->
-        <section class="total-section" aria-live="polite">
-          <div class="total-label">總金額</div>
-          <div class="total-amount">NT$ <span id="total">0</span></div>
-        </section>
+          <!-- 行李選擇 -->
+          <section class="form-section" aria-labelledby="section-bags">
+            <h3 id="section-bags" class="section-title">行李選擇</h3>
 
-        <!-- 條款 -->
-        <section class="terms-section">
-          <div class="checkbox-wrapper">
-            <input type="checkbox" name="agree" class="custom-checkbox" id="agree" required>
-            <label for="agree" class="checkbox-label">
-              我已閱讀並同意服務條款
-              <button type="button" class="terms-link-btn" id="openTerms">（查看條款）</button><br>
-              並了解行李寄存相關規定與責任限制
-            </label>
-          </div>
-        </section>
+            <div class="price-card">
+              <div class="price-header"><span>束口袋</span><span class="price-amount">NT$ 150 / 件</span></div>
+              <div class="quantity-selector">
+                <button type="button" class="quantity-btn" data-type="small" data-delta="-1">-</button>
+                <input type="number" name="small_count" class="quantity-input" value="0" min="0" readonly aria-label="束口袋數量">
+                <button type="button" class="quantity-btn" data-type="small" data-delta="1">+</button>
+              </div>
+            </div>
 
-        <button type="submit" class="submit-btn" id="submitBtn" disabled>請選擇行李數量</button>
-      </form>
-    </main>
+            <div class="price-card">
+              <div class="price-header"><span>行李箱</span><span class="price-amount">NT$ 200 / 件</span></div>
+              <div class="quantity-selector">
+                <button type="button" class="quantity-btn" data-type="large" data-delta="-1">-</button>
+                <input type="number" name="large_count" class="quantity-input" value="0" min="0" readonly aria-label="大件行李數量">
+                <button type="button" class="quantity-btn" data-type="large" data-delta="1">+</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 發票 -->
+          <section class="form-section" aria-labelledby="section-invoice">
+            <h3 id="section-invoice" class="section-title">發票選擇</h3>
+            <div class="form-group">
+              <select name="invoice" class="form-select" id="invoiceSelect" required>
+                <option value="">請選擇發票方式</option>
+                <option value="載具">手機載具</option>
+                <option value="現場開立">現場開立紙本發票</option>
+              </select>
+            </div>
+            <div class="carrier-input" id="carrierInput">
+              <label class="form-label" for="carrier">手機載具號碼</label>
+              <input
+                type="text"
+                id="carrier"
+                name="carrier"
+                class="form-input"
+                placeholder="請輸入載具號碼（例如：/ABC1234）"
+                pattern="\/[0-9A-Z.\-+]{7}"
+                inputmode="latin"
+                autocomplete="off"
+              />
+              <small class="hint">格式：以「/」開頭 + 7 碼（允許 0-9 A-Z . - +）</small>
+            </div>
+          </section>
+
+          <!-- 總計 -->
+          <section class="total-section" aria-live="polite">
+            <div class="total-label">總金額</div>
+            <div class="total-amount">NT$ <span id="total">0</span></div>
+          </section>
+
+          <!-- 條款 -->
+          <section class="terms-section">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" name="agree" class="custom-checkbox" id="agree" required>
+              <label for="agree" class="checkbox-label">
+                我已閱讀並同意服務條款
+                <button type="button" class="terms-link-btn" id="openTerms">（查看條款）</button><br>
+                並了解行李寄存相關規定與責任限制
+              </label>
+            </div>
+          </section>
+
+          <button type="submit" class="submit-btn" id="submitBtn" disabled>請選擇行李數量</button>
+        </form>
+      </main>
+    </div>
   </div>
 
   <!-- 條款 Modal -->
@@ -347,7 +317,7 @@
       const intro = document.getElementById('intro');
       const btn = document.getElementById('introBtn');
       const KEY = 'introSeen';
-      const AUTO_MS = 90000; // 2 秒
+      const AUTO_MS = 2000;
       let timer = null;
 
       if (!intro || !btn) return;
@@ -384,7 +354,7 @@
     // --- 數量控制 ---
     document.querySelectorAll('.quantity-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const type = btn.dataset.type;       // small / large
+        const type = btn.dataset.type;
         const delta = parseInt(btn.dataset.delta, 10);
         const input = document.querySelector('input[name="' + type + '_count"]');
         const current = parseInt(input.value || '0', 10);
@@ -436,7 +406,6 @@
     }
     invoiceSelect.addEventListener('change', toggleCarrier);
 
-    // 強制大寫 + 全形轉半形
     carrierField.addEventListener('input', () => {
       const toHalf = (s) => s.normalize('NFKC');
       carrierField.value = toHalf(carrierField.value).toUpperCase();
@@ -461,18 +430,41 @@
 
     // --- 送出前前端強制驗證（搭配後端雙重驗證） ---
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      // 檢查姓名
+      const nameEl = document.getElementById('name');
+      if (!nameEl.value.trim()) { e.preventDefault(); alert('請輸入姓名'); nameEl.focus(); return; }
+
+      // 檢查電話
+      const phoneEl = document.getElementById('phone');
+      if (!phoneEl.value.trim()) { e.preventDefault(); alert('請輸入聯絡電話'); phoneEl.focus(); return; }
+
+      // 檢查 Email
+      const emailEl = document.getElementById('email');
+      if (!emailEl.value.trim()) { e.preventDefault(); alert('請輸入 Email'); emailEl.focus(); return; }
+      const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      if (!emailRe.test(emailEl.value.trim())) {
+        e.preventDefault();
+        alert('Email 格式不正確');
+        emailEl.focus();
+        return;
+      }
+
+      // 檢查寄件地
+      const locationSelect = document.getElementById('location');
+      if (!locationSelect.value) { e.preventDefault(); alert('請選擇寄件地'); locationSelect.focus(); return; }
+
+      // 檢查行李數量
       const small = parseInt(document.querySelector('input[name="small_count"]').value || '0', 10);
       const large = parseInt(document.querySelector('input[name="large_count"]').value || '0', 10);
       if (small + large === 0) { e.preventDefault(); alert('請至少選擇一件行李！'); return; }
 
-      const locationSelect = document.getElementById('location');
-      if (!locationSelect.value) { e.preventDefault(); alert('請選擇寄件地'); locationSelect.focus(); return; }
-
+      // 檢查發票方式
       if (!invoiceSelect.value) { e.preventDefault(); alert('請選擇發票方式'); invoiceSelect.focus(); return; }
 
+      // 檢查載具號碼（如果選擇載具）
       if (invoiceSelect.value === '載具') {
         const re = /^\/[0-9A-Z.\-+]{7}$/;
-        if (!carrierField.value) { e.preventDefault(); alert('請輸入載具號碼'); carrierField.focus(); return; }
+        if (!carrierField.value.trim()) { e.preventDefault(); alert('請輸入手機載具號碼'); carrierField.focus(); return; }
         if (!re.test(carrierField.value)) {
           e.preventDefault();
           alert('載具號碼格式錯誤，需以「/」開頭 + 7 碼，允許 0-9 A-Z . - +');
@@ -481,16 +473,9 @@
         }
       }
 
-      const emailEl = document.getElementById('email');
-      if (emailEl && emailEl.value.trim()) {
-        const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-        if (!emailRe.test(emailEl.value.trim())) {
-          e.preventDefault();
-          alert('Email 格式不正確');
-          emailEl.focus();
-          return;
-        }
-      }
+      // 檢查服務條款
+      const agreeCheckbox = document.getElementById('agree');
+      if (!agreeCheckbox.checked) { e.preventDefault(); alert('請閱讀並勾選同意服務條款'); agreeCheckbox.focus(); return; }
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
@@ -499,7 +484,6 @@
 
     // --- 初始化 ---
     (function init(){
-      // 若首次載入，Intro 還沒隱藏會鎖住捲動；非首次將不鎖
       updateTotal();
       toggleCarrier();
       updateMinusDisabled();

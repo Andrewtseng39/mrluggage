@@ -484,98 +484,14 @@
         <div class="shape"></div>
     </div>
 
-    <div class="login-container">
-        <div class="login-header">
-            <div class="login-icon">
-                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <!-- 漸層定義 -->
-                        <linearGradient id="suitcaseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.95);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.85);stop-opacity:1" />
-                        </linearGradient>
-                        
-                        <!-- 陰影濾鏡 -->
-                        <filter id="dropShadow">
-                            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
-                        </filter>
-                    </defs>
-                    
-                    <!-- 行李箱主體 - 立體六邊形 -->
-                    <path d="M 30 40 L 90 40 L 95 50 L 95 75 L 90 85 L 30 85 L 25 75 L 25 50 Z" 
-                          fill="url(#suitcaseGradient)" 
-                          stroke="rgba(255,255,255,0.4)" 
-                          stroke-width="2"
-                          filter="url(#dropShadow)"/>
-                    
-                    <!-- 側面立體效果 -->
-                    <path d="M 90 40 L 95 35 L 95 80 L 90 85" 
-                          fill="rgba(255,255,255,0.7)" 
-                          stroke="rgba(255,255,255,0.3)" 
-                          stroke-width="1"/>
-                    
-                    <!-- 頂面立體效果 -->
-                    <path d="M 30 40 L 35 35 L 95 35 L 90 40" 
-                          fill="rgba(255,255,255,0.8)" 
-                          stroke="rgba(255,255,255,0.3)" 
-                          stroke-width="1"/>
-                    
-                    <!-- 把手 -->
-                    <path d="M 45 25 Q 45 20 50 20 L 70 20 Q 75 20 75 25 L 75 30 Q 75 35 70 35 L 50 35 Q 45 35 45 30 Z" 
-                          fill="none" 
-                          stroke="rgba(255,255,255,0.9)" 
-                          stroke-width="4" 
-                          stroke-linecap="round"/>
-                    
-                    <!-- 把手連接點 -->
-                    <rect x="47" y="33" width="4" height="7" rx="2" fill="rgba(255,255,255,0.8)"/>
-                    <rect x="69" y="33" width="4" height="7" rx="2" fill="rgba(255,255,255,0.8)"/>
-                    
-                    <!-- 笑臉表情 -->
-                    <!-- 眼睛 -->
-                    <circle cx="45" cy="55" r="2.5" fill="rgba(255,255,255,0.9)"/>
-                    <circle cx="75" cy="55" r="2.5" fill="rgba(255,255,255,0.9)"/>
-                    
-                    <!-- 微笑嘴巴 -->
-                    <path d="M 50 65 Q 60 72 70 65" 
-                          fill="none" 
-                          stroke="rgba(255,255,255,0.9)" 
-                          stroke-width="3" 
-                          stroke-linecap="round"/>
-                    
-                    <!-- 裝飾線條 -->
-                    <rect x="35" y="50" width="15" height="2" rx="1" fill="rgba(255,255,255,0.6)"/>
-                    <rect x="70" y="50" width="15" height="2" rx="1" fill="rgba(255,255,255,0.6)"/>
-                    
-                    <!-- 輪子 -->
-                    <circle cx="35" cy="92" r="6" 
-                            fill="rgba(255,255,255,0.9)" 
-                            stroke="rgba(255,255,255,0.6)" 
-                            stroke-width="2"
-                            filter="url(#dropShadow)"/>
-                    <circle cx="85" cy="92" r="6" 
-                            fill="rgba(255,255,255,0.9)" 
-                            stroke="rgba(255,255,255,0.6)" 
-                            stroke-width="2"
-                            filter="url(#dropShadow)"/>
-                    
-                    <!-- 輪子內圈 -->
-                    <circle cx="35" cy="92" r="3" fill="rgba(255,255,255,0.7)"/>
-                    <circle cx="85" cy="92" r="3" fill="rgba(255,255,255,0.7)"/>
-                    
-                    <!-- 拉桿 -->
-                    <rect x="58" y="85" width="4" height="12" rx="2" 
-                          fill="rgba(255,255,255,0.8)" 
-                          filter="url(#dropShadow)"/>
-                    
-                    <!-- 拉桿頂部裝飾 -->
-                    <rect x="56" y="85" width="8" height="3" rx="1.5" 
-                          fill="rgba(255,255,255,0.7)"/>
-                </svg>
-            </div>
-            <h1>管理員登入</h1>
-            <p class="login-subtitle">請輸入您的帳號密碼</p>
+<div class="login-container">
+    <div class="login-header">
+        <div class="login-icon">
+            <img src="https://www.mrluggagetw.com/img/driver_logo.png" alt="行李先生 Logo" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
+        <h1>管理員登入</h1>
+        <p class="login-subtitle">請輸入您的帳號密碼</p>
+    </div>
         
         <div class="login-form">
             <div class="security-notice">

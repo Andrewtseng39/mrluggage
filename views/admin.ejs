@@ -164,6 +164,9 @@
           href="/admin/export?<%= 'from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&filter=' + encodeURIComponent(filter || '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
           class="btn btn-success">匯出 Excel（依目前篩選）</a>
       </p>
+<a
+  href="/admin/export_acpay?<%= 'from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
+  class="btn btn-success">匯出 ACPAY（載具）</a>
 
       <!-- 統計資訊 -->
       <div class="stats">

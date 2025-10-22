@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
+const { ensureLogin } = require('./middlewares/auth');
 
 const app = express();
 
@@ -51,6 +52,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
 }));
+
+const { exportAcpay } = require('./routes/admin-export-acpay');
+app.get('/admin/export_acpay', ensureLogin, exportAcpay);
 
 // 路由設定
 const customerRoutes = require('./routes/customer');

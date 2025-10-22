@@ -143,7 +143,6 @@
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        color-adjust: exact !important;
       }
       
       .ticket {
@@ -257,6 +256,53 @@
       <span class="signature-hint">簽名 / 日期</span>
     </div>
   </div>
+<script>
+  // === 印表完成後回報後端 ===
+  (function () {
+    const ORDER_ID = "<%= order.order_id %>";
+    const KEY = "printed:" + ORDER_ID;
+
+    // 確保同一頁不重複回報
+    function alreadyReported() {
+      try { return sessionStorage.getItem(KEY) === "1"; } catch (e) { return false; }
+    }
+    function markReported() {
+      try { sessionStorage.setItem(KEY, "1"); } catch (e) {}
+    }
+
+    async function reportPrinted() {
+      if (alreadyReported()) return;
+      try {
+        await fetch("/admin/printed/" + encodeURIComponent(ORDER_ID), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ source: "afterprint" })
+        });
+        markReported();
+        console.log("✅ 已回報列印完成");
+      } catch (e) {
+        console.warn("⚠️ 回報列印失敗", e);
+      }
+    }
+
+    // 列印對話框關閉後觸發
+    window.addEventListener("afterprint", reportPrinted);
+
+    // 備援：偵測 print mode 結束
+    const mq = window.matchMedia("print");
+    if (mq && mq.addEventListener) {
+      mq.addEventListener("change", (e) => {
+        if (!e.matches) reportPrinted();
+      });
+    }
+
+    // 若使用者直接關閉頁面，也嘗試回報
+    window.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") reportPrinted();
+    });
+    window.addEventListener("pagehide", reportPrinted);
+  })();
+</script>
 
   <script>
     // 快捷鍵列印

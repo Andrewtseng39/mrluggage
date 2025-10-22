@@ -1,3 +1,4 @@
+const db = require('./db/connection');
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
@@ -17,6 +18,26 @@ app.set('views', path.join(__dirname, 'views'));
 // 解析 POST 資料
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// 印完才記錄列印
+app.post('/admin/printed/:order_id', async (req, res) => {
+  const { order_id } = req.params;
+  const who = (req.session?.admin?.email) || 'unknown';
+  const now = new Date().toISOString();
+
+  const existing = await db.get('SELECT first_print_at FROM orders WHERE order_id = ?', [order_id]);
+  await db.run(`
+    UPDATE orders
+    SET print_count   = COALESCE(print_count, 0) + 1,
+        first_print_at= COALESCE(first_print_at, ?),
+        last_print_at = ?,
+        last_print_by = ?
+    WHERE order_id = ?
+  `, [now, now, who, order_id]);
+
+  res.json({ ok: true });
+});
+
 
 // ✅ 加入 session middleware（一定要放在路由之前）
 app.use(session({

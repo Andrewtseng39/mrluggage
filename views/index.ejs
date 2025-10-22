@@ -151,7 +151,6 @@
 
 
         <h2 class="intro-title">歡迎使用行李先生寄存服務</h2>
-        <p class="intro-sub">10 秒後自動進入表單，或直接點擊下方按鈕開始</p>
 
         
         <div class="intro-actions">
@@ -275,7 +274,7 @@
             </div>
           </section>
 
-          <button type="submit" class="submit-btn" id="submitBtn" disabled>請選擇行李數量</button>
+          <button type="submit" class="submit-btn" id="submitBtn" disabled>送出</button>
         </form>
       </main>
     </div>
@@ -379,10 +378,10 @@
       const submitBtn = document.getElementById('submitBtn');
       if (total > 0) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '確認預約 - NT$ ' + total.toLocaleString();
+        submitBtn.textContent = '送出';
       } else {
         submitBtn.disabled = true;
-        submitBtn.textContent = '請選擇行李數量';
+        submitBtn.textContent = '送出';
       }
       updateMinusDisabled();
     }

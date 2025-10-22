@@ -43,6 +43,8 @@
     .stat-value { font-size: 1.6rem; font-weight: 600; margin: 8px 0; color: #ea5514; }
     .stat-label { font-size: .9rem; color: #6c757d; font-weight: 500; }
 
+    
+
     .table-container { overflow-x: auto; border-radius: 6px; border: 1px solid #e9ecef; }
     table { width: 100%; border-collapse: collapse; background: white; min-width: 1100px; }
     th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #e9ecef; font-size: 14px; }
@@ -58,6 +60,17 @@
     .invoice-normal { background:#28a745; }
     .invoice-digital { background:#17a2b8; }
     @keyframes pulse { 0%{opacity:1} 50%{opacity:.7} 100%{opacity:1} }
+
+    .badge-printed{
+  display:inline-block;
+  background:#6c757d;
+  color:#fff;
+  padding:4px 8px;
+  border-radius:4px;
+  font-size:12px;
+  font-weight:600;
+}
+
 
     .carrier-number { font-family: monospace; background:#e9ecef; padding:2px 6px; border-radius:3px; font-size:12px; }
     .action-group { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; }
@@ -222,14 +235,23 @@
                 <td><%= order.location_name || '-' %></td>
                 <td><%= order.created_at %></td>
                 <td>
-                  <div class="action-group">
-                    <a href="/admin/print/<%= order.order_id %>" class="btn btn-small" target="_blank">列印</a>
-                    <a href="/admin/edit/<%= order.order_id %>" class="btn btn-success btn-small">編輯</a>
-                    <form action="/admin/delete/<%= order.order_id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除這筆訂單嗎？');">
-                      <button type="submit" class="btn btn-danger btn-small">刪除</button>
-                    </form>
-                  </div>
-                </td>
+  <div class="action-group">
+    <% if ((order.print_count || 0) > 0) { %>
+      <span class="badge-printed"
+            title="首次：<%= order.first_print_at || '-' %>；最後：<%= order.last_print_at || '-' %>（<%= order.last_print_by || '-' %>）">
+        已列印（<%= order.print_count %>次）
+      </span>
+      <a href="/admin/print/<%= order.order_id %>" class="btn btn-small" target="_blank">重新列印</a>
+    <% } else { %>
+      <a href="/admin/print/<%= order.order_id %>" class="btn btn-small" target="_blank">列印</a>
+    <% } %>
+
+    <a href="/admin/edit/<%= order.order_id %>" class="btn btn-success btn-small">編輯</a>
+    <form action="/admin/delete/<%= order.order_id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除這筆訂單嗎？');">
+      <button type="submit" class="btn btn-danger btn-small">刪除</button>
+    </form>
+  </div>
+</td>
               </tr>
             <% }) %>
           </tbody>

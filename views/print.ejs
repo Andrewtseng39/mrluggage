@@ -229,7 +229,7 @@
           });
           markReported();
           console.log("✅ 已回報完成");
-        }catch(e){ console.warn("⚠️ 回報列印失敗", e); }
+        }catch(e){ console.warn("⚠️ 回報失敗", e); }
       }
 
       window.addEventListener("afterprint", reportPrinted);

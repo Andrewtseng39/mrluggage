@@ -63,16 +63,19 @@ router.get('/', (req, res) => {
     params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
   }
 
-  const sql = `
+  const whereSql = where.join(' AND ');
+
+  // 訂單列表
+  const listSql = `
     SELECT *,
            (COALESCE(small_count,0) + COALESCE(large_count,0)) AS total_count 
     FROM orders 
-    WHERE ${where.join(' AND ')}
+    WHERE ${whereSql}
     ORDER BY created_at DESC
     LIMIT 1000
   `;
 
-  db.all(sql, params, (err, rows) => {
+  db.all(listSql, params, (err, rows) => {
     if (err) return res.send('查詢失敗：' + err.message);
 
     let totalAmount = 0;
@@ -82,20 +85,70 @@ router.get('/', (req, res) => {
       totalCount  += order.total_count || 0;
     });
 
-    db.all(`SELECT id, name FROM locations WHERE is_active = 1 ORDER BY name ASC`, (e2, locs) => {
-      if (e2) return res.send('讀取寄件地失敗：' + e2.message);
+    // 🔍 重複偵測（✅ 已修正電話號碼 +886 處理）
+    const dupSql = `
+      WITH base AS (
+        -- 檢查姓名重複
+        SELECT 'name' AS field, TRIM(name) AS value
+        FROM orders WHERE ${whereSql}
+        
+        UNION ALL
+        
+        -- 檢查電話重複 (✅ 處理 +886 開頭)
+        SELECT 'phone_norm' AS field,
+               CASE 
+                 WHEN phone LIKE '+886%' 
+                 THEN '0' || SUBSTR(
+                        REPLACE(REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'(',''),')',''), 
+                        5
+                      )
+                 ELSE REPLACE(REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'(',''),')','')
+               END AS value
+        FROM orders WHERE ${whereSql}
+        
+        UNION ALL
+        
+        -- 檢查 Email 重複
+        SELECT 'email' AS field, LOWER(TRIM(email)) AS value
+        FROM orders WHERE ${whereSql}
+      )
+      SELECT
+        CASE field WHEN 'phone_norm' THEN 'phone' ELSE field END AS field,
+        value,
+        COUNT(*) AS count
+      FROM base
+      WHERE value IS NOT NULL AND value != ''
+      GROUP BY field, value
+      HAVING COUNT(*) > 1
+      ORDER BY count DESC, field ASC, value ASC
+    `;
 
-      res.render('admin', {
-        orders: rows,
-        totalAmount,
-        totalCount,
-        keyword,
-        filter,
-        from,
-        to,
-        archived: String(archived),
-        locations: locs,
-        selectedLocationId: locationId
+    // 因為在 CTE 裡用了三次 whereSql，要把 params 複製三份
+    const dupParams = [...params, ...params, ...params];
+
+    db.all(dupSql, dupParams, (eDup, duplicates) => {
+      if (eDup) {
+        console.error('重複檢查失敗：', eDup.message);
+        // 即使檢查失敗也繼續顯示頁面，只是沒有重複資訊
+        duplicates = [];
+      }
+
+      db.all(`SELECT id, name FROM locations WHERE is_active = 1 ORDER BY name ASC`, (e2, locs) => {
+        if (e2) return res.send('讀取寄件地失敗：' + e2.message);
+
+        res.render('admin', {
+          orders: rows,
+          totalAmount,
+          totalCount,
+          keyword,
+          filter,
+          from,
+          to,
+          archived: String(archived),
+          locations: locs,
+          selectedLocationId: locationId,
+          duplicates // 👈 傳給 EJS 的查重結果
+        });
       });
     });
   });
@@ -214,7 +267,7 @@ router.post('/edit/:order_id', (req, res) => {
 
   const small = parseInt(small_count, 10) || 0;
   const large = parseInt(large_count, 10) || 0;
-  const total = small * 150 + large * 200;
+  const total = small * 170 + large * 220;
 
   // 載具處理
   const toHalf = (s) => (s || '').toString().normalize('NFKC');
@@ -302,7 +355,7 @@ router.get('/locations', (req, res) => {
 // 新增
 router.post('/locations/add', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
-  const { name, prefixes } = req.body; // 例：name='寄件地A' prefixes='A,B,C,D'
+  const { name, prefixes } = req.body;
   if (!name || !prefixes) return res.send('名稱與開頭字母不得為空');
   db.run(
     `INSERT INTO locations (name, prefixes, is_active) VALUES (?, ?, 1)`,

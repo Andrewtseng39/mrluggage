@@ -328,7 +328,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h2>👥 管理員管理</h2>
+      <h2>管理員管理</h2>
     </div>
     
     <div class="content">
@@ -338,7 +338,7 @@
       <!-- 管理員列表區域 -->
       <div class="admin-list-section">
         <h3 class="section-title">
-          📋 管理員列表
+           管理員列表
         </h3>
         
         <div class="admin-count">
@@ -366,7 +366,7 @@
                     </td>
                     <td>
                       <form action="/admin/admins/delete/<%= admin.id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除管理員「<%= admin.username %>」嗎？此操作無法復原！')">
-                        <button type="submit" class="btn btn-danger">🗑️ 刪除</button>
+                        <button type="submit" class="btn btn-danger">刪除</button>
                       </form>
                     </td>
                   </tr>
@@ -376,7 +376,7 @@
           </div>
         <% } else { %>
           <div class="empty-state">
-            <div class="empty-state-icon">👤</div>
+            <div class="empty-state-icon"></div>
             <p>目前沒有任何管理員</p>
           </div>
         <% } %>
@@ -385,23 +385,23 @@
       <!-- 新增管理員區域 -->
       <div class="add-admin-section">
         <h3 class="section-title">
-          ➕ 新增管理員
+           新增管理員
         </h3>
         
         <form action="/admin/admins/add" method="POST">
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="username">👤 帳號</label>
+              <label class="form-label" for="username">帳號</label>
               <input type="text" id="username" name="username" class="form-input" placeholder="請輸入管理員帳號" required>
             </div>
             
             <div class="form-group">
-              <label class="form-label" for="password">🔒 密碼</label>
+              <label class="form-label" for="password">密碼</label>
               <input type="password" id="password" name="password" class="form-input" placeholder="請輸入密碼" required>
             </div>
             
             <div class="form-group">
-              <button type="submit" class="btn btn-success">✅ 新增管理員</button>
+              <button type="submit" class="btn btn-success">新增管理員</button>
             </div>
           </div>
         </form>

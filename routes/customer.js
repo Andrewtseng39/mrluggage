@@ -107,7 +107,7 @@ router.post('/submit', (req, res) => {
       .send('載具號碼格式錯誤，請輸入正確的手機條碼（例：/ABC12.+ 或 /A1B-2C3）。');
   }
 
-  const total = smallCount * 150 + largeCount * 200;
+  const total = smallCount * 170 + largeCount * 220;
   const createdAt = nowTaiwan();
 
   // 1) 讀寄件地設定

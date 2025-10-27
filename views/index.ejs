@@ -164,8 +164,9 @@
     <!-- 主要內容 -->
     <div class="main-content">
       <header class="header">
-        <h1>行李先生服務有限公司</h1>
-        <p class="subtitle">演唱會專用寄存系統</p>
+       <h1>
+  <img src="https://www.mrluggagetw.com/img/foot_logo.svg" alt="Mr. Luggage Logo" style="height:70px; vertical-align:middle; margin-right:10px;">
+</h1>
       </header>
 
       <main class="form-container">
@@ -212,7 +213,7 @@
             <h3 id="section-bags" class="section-title">行李選擇</h3>
 
             <div class="price-card">
-              <div class="price-header"><span>束口袋</span><span class="price-amount">NT$ 150 / 件</span></div>
+              <div class="price-header"><span>束口袋</span><span class="price-amount">NT$ 170 / 件</span></div>
               <div class="quantity-selector">
                 <button type="button" class="quantity-btn" data-type="small" data-delta="-1">-</button>
                 <input type="number" name="small_count" class="quantity-input" value="0" min="0" readonly aria-label="束口袋數量">
@@ -221,7 +222,7 @@
             </div>
 
             <div class="price-card">
-              <div class="price-header"><span>行李箱</span><span class="price-amount">NT$ 200 / 件</span></div>
+              <div class="price-header"><span>行李箱</span><span class="price-amount">NT$ 220 / 件</span></div>
               <div class="quantity-selector">
                 <button type="button" class="quantity-btn" data-type="large" data-delta="-1">-</button>
                 <input type="number" name="large_count" class="quantity-input" value="0" min="0" readonly aria-label="大件行李數量">
@@ -290,7 +291,7 @@
       <div class="modal-body">
         <p style="margin:0 0 8px; color:#6c757d; font-size:12px;">最後更新：2025-08-09｜條款版本：v1.0</p>
         <ol class="terms-list">
-          <li><strong>計費方式</strong>：小件每件150元；大件每件200元。寄存當日活動結束後1小時內須完成領取；逾時未領取者，依日區間重新計費並補足差額。</li>
+          <li><strong>計費方式</strong>：小件每件170元；大件每件220元。寄存當日活動結束後1小時內須完成領取；逾時未領取者，依日區間重新計費並補足差額。</li>
           <li><strong>寄存限制：</strong>不得寄存現金、珠寶、有價證券、護照、易碎物、生鮮食品、動植物、液體及其他易腐爛或危害安全之物品；亦不得寄存違禁品、危險物或不符合法令及場館規定之物品。違反本條款所致之任何損害，由顧客自行承擔全部責任。</li>
           <li><strong>責任限制：</strong>對於不可抗力（含天災、停電、交通事故、罷工、政府管制、場館管制等）或寄存物本身瑕疵、包裝不良所致之損害，本公司不負賠償責任。因本公司可歸責事由造成之損害，賠償金額以新臺幣1,000元為上限，且不另賠償間接損失或衍生損害。</li>
           <li><strong>領件後責任終止：</strong>顧客完成領取並離開寄存地點後，即視為本公司已依約完成交付，行李及其內容物之保管責任即行終止；其後發生之遺失、毀損或任何爭議，本公司概不負責。</li>
@@ -372,7 +373,7 @@
     function updateTotal() {
       const small = parseInt(document.querySelector('input[name="small_count"]').value || '0', 10);
       const large = parseInt(document.querySelector('input[name="large_count"]').value || '0', 10);
-      const total = small * 150 + large * 200;
+      const total = small * 170 + large * 220;
       document.getElementById('total').textContent = total.toLocaleString();
 
       const submitBtn = document.getElementById('submitBtn');

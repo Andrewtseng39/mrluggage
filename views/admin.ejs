@@ -106,7 +106,9 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>行李先生演唱會寄存管理系統</h1>
+     <h1>
+  <img src="https://www.mrluggagetw.com/img/foot_logo.svg" alt="Mr. Luggage Logo" style="height:70px; vertical-align:middle; margin-right:10px;">
+</h1>
       <div class="header-actions">
         <a href="/admin/locations" class="admin-link" style="border-color:#fff;color:#fff">寄件地管理</a>
         <a href="/admin/admins" class="admin-link" style="border-color:#fff;color:#fff">管理員管理</a>
@@ -132,13 +134,7 @@
                 <option value="<%= l.id %>" <%= String(selectedLocationId||'')===String(l.id) ? 'selected' : '' %>><%= l.name %></option>
               <% }) %>
             </select>
-
-            <select name="archived" class="search-select" title="狀態">
-              <option value="0" <%= archived === '0' ? 'selected' : '' %> >未歸檔</option>
-              <option value="1" <%= archived === '1' ? 'selected' : '' %> >已歸檔</option>
-            </select>
-
-            <button type="submit" class="btn btn-success">搜尋 / 套用篩選</button>
+            <button type="submit" class="btn btn-success">搜尋</button>
           </div>
         </form>
       </div>
@@ -158,15 +154,230 @@
           class="filter-btn <%= filter === 'digital' ? 'active' : '' %>">載具發票</a>
       </div>
 
+     <!-- 在 admin.ejs 中找到重複預約區塊（約第 106-124 行），替換為以下內容 -->
+
+<% if (typeof duplicates !== 'undefined' && duplicates.length > 0) { %>
+  <div class="duplicate-alert">
+    <div class="duplicate-header">
+      <div class="duplicate-title-section">
+        <div>
+          <strong class="duplicate-title">請注意偵測到重複預約</strong>
+          <span class="duplicate-subtitle">
+            區間：<%= from %> ~ <%= to %> 
+          </span>
+        </div>
+      </div>
+      
+      <% if (duplicates.length > 3) { %>
+      <button onclick="toggleDuplicates()" id="toggleBtn" class="duplicate-toggle-btn">
+        展開全部
+      </button>
+      <% } %>
+    </div>
+
+    <div id="duplicatesContainer" class="duplicates-grid">
+      <% duplicates.forEach(function(d, index) { 
+        var q = encodeURIComponent(d.value || '');
+        var link = '/admin?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + q + '&archived=' + archived;
+        var fieldName = d.field === 'name' ? '姓名' : (d.field === 'phone' ? '電話' : 'Email');
+        var isHidden = duplicates.length > 3 && index >= 3;
+        var hiddenClass = isHidden ? 'duplicate-hidden' : '';
+        var displayStyle = isHidden ? 'style="display:none"' : '';
+      %>
+        <a href="<%= link %>" class="duplicate-card <%= hiddenClass %>" <%- displayStyle %>>
+          <div class="duplicate-card-content">
+            <div class="duplicate-card-label"><%= fieldName %></div>
+            <div class="duplicate-card-value" title="<%= d.value %>"><%= d.value %></div>
+          </div>
+          <span class="duplicate-card-count"><%= d.count %> 筆</span>
+        </a>
+      <% }); %>
+    </div>
+
+    <div class="duplicate-tip">
+      <span>點擊卡片可直接查看該組重複訂單</span>
+    </div>
+  </div>
+
+  <style>
+    .duplicate-alert {
+      background: linear-gradient(135deg, #fff5f5 0%, #ffe8e6 100%);
+      border-left: 5px solid #dc3545;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 3px 10px rgba(220,53,69,0.15);
+    }
+    .duplicate-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .duplicate-title-section {
+      display: flex;
+      align-items: center;
+    }
+    .duplicate-title {
+      font-size: 18px;
+      color: #b71c1c;
+      display: block;
+    }
+    .duplicate-subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+      display: block;
+    }
+    .duplicate-badge {
+      background: #dc3545;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+    .duplicate-toggle-btn {
+      background: white;
+      border: 2px solid #dc3545;
+      color: #dc3545;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+    .duplicate-toggle-btn:hover {
+      background: #dc3545;
+      color: white;
+    }
+    .duplicates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .duplicate-card {
+      background: white;
+      border: 1px solid #ffcdd2;
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .duplicate-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220,53,69,0.2);
+    }
+    .duplicate-card-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .duplicate-card-label {
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .duplicate-card-value {
+      font-weight: 600;
+      color: #d32f2f;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .duplicate-card-count {
+      background: #dc3545;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .duplicate-tip {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #ffcdd2;
+      font-size: 13px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+
+  <script>
+    (function() {
+      var isExpanded = false;
+      
+      window.toggleDuplicates = function() {
+        var hiddenItems = document.querySelectorAll('.duplicate-hidden');
+        var btn = document.getElementById('toggleBtn');
+        
+        isExpanded = !isExpanded;
+        
+        hiddenItems.forEach(function(item) {
+          item.style.display = isExpanded ? 'flex' : 'none';
+        });
+        
+        if (btn) {
+          btn.textContent = isExpanded ? '收合' : '展開全部 (還有 ' + hiddenItems.length + ' 組)';
+        }
+      };
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('toggleBtn');
+        var hiddenCount = document.querySelectorAll('.duplicate-hidden').length;
+        if (btn && hiddenCount > 0) {
+          btn.textContent = '展開全部 (還有 ' + hiddenCount + ' 組)';
+        }
+      });
+    })();
+  </script>
+
+<% } else { %>
+  <div class="no-duplicate-alert">
+    <span class="no-duplicate-text">目前無重複預約</span>
+  </div>
+
+  <style>
+    .no-duplicate-alert {
+      background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
+      border-left: 5px solid #28a745;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(40,167,69,0.1);
+    }
+    .no-duplicate-text {
+      color: #1b5e20;
+      font-weight: 500;
+      font-size: 15px;
+    }
+  </style>
+<% } %>
+
+
       <!-- 匯出 -->
       <p>
         <a
           href="/admin/export?<%= 'from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&filter=' + encodeURIComponent(filter || '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
           class="btn btn-success">匯出 Excel（依目前篩選）</a>
-      </p>
+      
 <a
   href="/admin/export_acpay?<%= 'from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
-  class="btn btn-success">匯出 ACPAY（載具）</a>
+  class="btn btn-success">匯出載具訂單</a>
 
       <!-- 統計資訊 -->
       <div class="stats">

@@ -5,7 +5,7 @@ const dbConn = require('../db/connection'); // 依你的實際路徑
 const OPEN_METHOD_CARRIER = 1; // ACPAY：發票開立方式（載具）
 const TAX_CODE = 'T';
 const EMAIL_FALLBACK = 'noemail@mrluggage.tw';
-const PRICE = { small: 150, large: 200 };
+const PRICE = { small: 170, large: 220 };
 
 // 取得 sqlite3 Database 物件（你的 connection 可能輸出 { db } 或直接是 db）
 const sqlite = dbConn.db || dbConn;

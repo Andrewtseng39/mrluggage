@@ -6,14 +6,14 @@ module.exports = function init(db) {
       await run(db, `
         CREATE TABLE IF NOT EXISTS orders (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          order_id     TEXT UNIQUE,
-          name         TEXT,
-          phone        TEXT,
-          small_count  INTEGER,
-          large_count  INTEGER,
-          total_count  INTEGER,
+          order_id     TEXT NOT NULL UNIQUE,
+          name         TEXT NOT NULL,
+          phone        TEXT NOT NULL,
+          small_count  INTEGER DEFAULT 0,
+          large_count  INTEGER DEFAULT 0,
+          total_count  INTEGER DEFAULT 0,
           invoice_type TEXT,
-          total_price  INTEGER,
+          total_price  INTEGER NOT NULL,
           created_at   TEXT
         )
       `);

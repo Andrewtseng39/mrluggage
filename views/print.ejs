@@ -4,133 +4,127 @@
   <meta charset="UTF-8">
   <title>訂單印刷單</title>
   <style>
-    /* ---- 票面尺寸 (10cm x 10cm) ---- */
-    @page {
-      size: 100mm 100mm;
-      margin: 0;
-    }
+    @page { size: 100mm 100mm; margin: 0; }
 
     :root {
-      --pad-x: 8mm;     /* 左右內距 */
-      --pad-y: 10mm;    /* 上下基礎內距 */
-      --gap: 6mm;       /* 文字之間間距 */
-      --shift: 15mm;    /* 下移距離 */
+      --pad-x: 8mm;
+      --pad-y: 10mm;
+      --gap-sm: 5mm;
+      --gap-md: 8mm;
     }
 
-    html, body { 
-      height: 100%; 
-      margin: 0; 
-      padding: 0; 
-      background: #fff; 
-      font-family: 'Microsoft JhengHei', 'PingFang TC', 'Helvetica Neue', Arial, sans-serif;
-    }
-
-    /* ---- 單張票面 ---- */
-    .ticket {
-      width: 100mm;
-      height: 100mm;
-      box-sizing: border-box;
-      padding: calc(var(--pad-y) + var(--shift)) var(--pad-x) var(--pad-y) var(--pad-x);
+    html, body {
+      margin: 0;
+      padding: 0;
       background: #fff;
+      font-family: 'Microsoft JhengHei', 'PingFang TC', 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* ---- 基本票面 ---- */
+    .ticket {
+      width: 100mm; height: 100mm;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: var(--gap);
       text-align: center;
+      background: #fff;
       page-break-after: always;
-      position: relative;
+      padding: var(--pad-y) var(--pad-x);
     }
 
-    /* ---- 文字樣式 (針對熱感應紙優化) ---- */
-    .order-id {
-      font-size: 60px;
+    /* ===== 每件標籤（LOGO + 訂單 + 姓名 + 件數） ===== */
+    .label .brand-logo {
+      width: 60mm;     /* ✅ Logo 寬 60mm */
+      height: auto;
+      margin-bottom: var(--gap-md);
+      object-fit: contain;
+    }
+
+    .label .order-id {
+      font-size: 64px;
       font-weight: 900;
+      margin: 0;
+      line-height: 1;
       letter-spacing: 1px;
-      line-height: 0.9;
-      margin: 0;
       color: #000;
-      font-family: 'Arial Black', 'Microsoft JhengHei', Arial, sans-serif;
-      text-shadow: none;
-    }
-    
-    .customer-name {
-      font-size: 32px;
-      font-weight: 700;
-      line-height: 1.1;
-      margin: 0;
-      color: #000;
-      max-width: 80mm;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-    
-    .item-count {
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1.2;
-      margin: 0;
-      color: #000;
-      letter-spacing: 0.5px;
     }
 
-    /* ---- 簽收單優化 (壓縮版面避免換頁) ---- */
-    .sign-sheet {
-      padding: calc(var(--pad-y) + var(--shift) - 8mm) var(--pad-x) calc(var(--pad-y) - 2mm) var(--pad-x);
-      justify-content: flex-start;
+    .label .customer-name {
+      font-size: 30px;
+      font-weight: 700;
+      margin: var(--gap-sm) 0;
+      line-height: 1.15;
+      color: #000;
+      max-width: 84mm;
+      word-break: break-word;
     }
-    
-    .sign-sheet .sign-title {
+
+    .label .item-count {
+      font-size: 22px;
+      font-weight: 700;
+      color: #000;
+      letter-spacing: 0.3px;
+      margin-top: var(--gap-sm);
+    }
+
+    /* ===== 領件單（保留右上角 LOGO） ===== */
+    .sign-sheet {
+      align-items: flex-start;
+      text-align: left;
+      padding: var(--pad-y) var(--pad-x);
+    }
+
+    .sign-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #000;
+      padding-bottom: 3mm;
+      margin-bottom: 6mm;
+    }
+
+    .sign-title {
       font-size: 20px;
       font-weight: 900;
-      margin: 0 0 5mm 0;
+      margin: 0;
       letter-spacing: 1px;
-      color: #000;
-      border-bottom: 1px solid #000;
-      padding-bottom: 1mm;
-      width: 100%;
-    }
-    
-    .sign-sheet .sign-rows {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 22mm 1fr;
-      row-gap: 2.5mm;
-      column-gap: 3mm;
-      text-align: left;
-      font-size: 12px;
-      line-height: 1.2;
-      margin-bottom: 5mm;
-    }
-    
-    .sign-sheet .sign-label { 
-      font-weight: 700; 
-      color: #000;
-      white-space: nowrap;
-    }
-    
-    .sign-sheet .sign-value { 
-      font-weight: 600; 
-      color: #000;
-      word-break: break-all;
-      overflow-wrap: break-word;
     }
 
-    .sign-sheet .signature-box {
+    .brand-logo-small {
+      width: 22mm;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .sign-rows {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 24mm 1fr;
+      row-gap: 3mm;
+      column-gap: 4mm;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .sign-label { font-weight: 700; }
+    .sign-value { font-weight: 600; }
+
+    .signature-box {
       width: 100%;
       border: 1px solid #000;
       border-radius: 2mm;
       padding: 3mm;
-      box-sizing: border-box;
-      flex: 1;
       min-height: 12mm;
       display: flex;
-      align-items: flex-end;
       justify-content: flex-end;
-      background: #fff;
+      align-items: flex-end;
+      margin-top: 6mm;
     }
-    
-    .sign-sheet .signature-hint {
+
+    .signature-hint {
       font-size: 9px;
       color: #666;
       font-weight: 500;
@@ -138,39 +132,13 @@
 
     @media print {
       .print-button { display: none !important; }
-      
-      * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      
-      .ticket {
-        background: #fff !important;
-        page-break-before: auto;
-        page-break-after: always;
-        page-break-inside: avoid;
-        border: none !important;
-        box-shadow: none !important;
-      }
-      
-      .sign-sheet {
-        padding: calc(var(--pad-y) + var(--shift) - 5mm) var(--pad-x) var(--pad-y) var(--pad-x) !important;
-      }
-      
-      /* 確保文字清晰 */
-      .order-id, .customer-name, .item-count, 
-      .sign-title, .sign-label, .sign-value {
-        color: #000 !important;
-        text-shadow: none !important;
-      }
-      
-      .signature-box {
-        border: 2px solid #000 !important;
-        background: #fff !important;
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .brand-logo, .brand-logo-small {
+        filter: grayscale(1) contrast(120%);
+        image-rendering: -webkit-optimize-contrast;
       }
     }
 
-    /* ---- 螢幕操作按鈕 ---- */
     .print-button {
       position: fixed;
       top: 20px;
@@ -183,53 +151,43 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      z-index: 1000;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: background-color 0.2s;
-    }
-    
-    .print-button:hover { 
-      background: #218838; 
+      z-index: 1000;
     }
 
-    /* ---- 響應式調整 ---- */
-    @media screen and (max-width: 480px) {
-      .print-button {
-        top: 10px;
-        right: 10px;
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-    }
+    .print-button:hover { background: #218838; }
   </style>
 </head>
 <body>
-  <!-- 快速列印按鈕 -->
   <button class="print-button" onclick="window.print()">🖨️ 列印標籤</button>
 
   <%
     const small = parseInt(order.small_count || 0, 10);
     const large = parseInt(order.large_count || 0, 10);
-    const totalCount = small + large;
-    const count = totalCount;
+    const totalCount = (small + large) || 0;
+    const hyphenId = (order.order_id || '').toString().replace(/^([A-Z]+)(\d+)/, '$1-$2');
   %>
 
-  <!-- 每件一張標籤 -->
+  <!-- A. 每件標籤（含 60mm Logo，訂單編號自動加連字號） -->
   <% for (let i = 1; i <= totalCount; i++) { %>
-    <div class="ticket">
-      <div class="order-id"><%= order.order_id %></div>
-      <div class="customer-name"><%= order.name %></div>
-      <div class="item-count">第 <%= i %> 件　共 <%= totalCount %> 件</div>
+    <div class="ticket label">
+      <img class="brand-logo" src="https://www.mrluggagetw.com/img/logo.svg" alt="Mr. Luggage">
+      <h1 class="order-id"><%= hyphenId %></h1>
+      <p class="customer-name"><%= order.name %></p>
+      <p class="item-count">第 <%= i %> 件　共 <%= totalCount %> 件</p>
     </div>
   <% } %>
 
-  <!-- 簽收單（每筆訂單最後一張） -->
+  <!-- B. 領件單（同樣顯示加連字號的訂單編號） -->
   <div class="ticket sign-sheet">
-    <div class="sign-title">領件單</div>
+    <div class="sign-header">
+      <div class="sign-title">領件單</div>
+      <img class="brand-logo-small" src="https://www.mrluggagetw.com/img/logo.svg" alt="Mr. Luggage">
+    </div>
 
     <div class="sign-rows">
       <div class="sign-label">訂單編號</div>
-      <div class="sign-value"><%= order.order_id %></div>
+      <div class="sign-value"><%= hyphenId %></div>
 
       <div class="sign-label">姓名</div>
       <div class="sign-value"><%= order.name %></div>
@@ -237,17 +195,14 @@
       <div class="sign-label">領件位置</div>
       <div class="sign-value"><%= order.location_name || '-' %></div>
 
+      <%
+        const parts = [];
+        if (large > 0) parts.push(`大${large}件`);
+        if (small > 0) parts.push(`小${small}件`);
+      %>
       <div class="sign-label">件數</div>
       <div class="sign-value">
-        <%= count %> 件
-        <% 
-          const parts = [];
-          if (large > 0) parts.push(`大${large}件`);
-          if (small > 0) parts.push(`小${small}件`);
-        %>
-        <% if (parts.length) { %>
-          （<%= parts.join('、') %>）
-        <% } %>
+        <%= totalCount %> 件 <% if (parts.length) { %>（<%= parts.join('、') %>）<% } %>
       </div>
     </div>
 
@@ -255,67 +210,30 @@
       <span class="signature-hint">簽名 / 日期</span>
     </div>
   </div>
-<script>
-  // === 印表完成後回報後端 ===
-  (function () {
-    const ORDER_ID = "<%= order.order_id %>";
-    const KEY = "printed:" + ORDER_ID;
-
-    // 確保同一頁不重複回報
-    function alreadyReported() {
-      try { return sessionStorage.getItem(KEY) === "1"; } catch (e) { return false; }
-    }
-    function markReported() {
-      try { sessionStorage.setItem(KEY, "1"); } catch (e) {}
-    }
-
-    async function reportPrinted() {
-      if (alreadyReported()) return;
-      try {
-        await fetch("/admin/printed/" + encodeURIComponent(ORDER_ID), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ source: "afterprint" })
-        });
-        markReported();
-        console.log("✅ 已回報列印完成");
-      } catch (e) {
-        console.warn("⚠️ 回報列印失敗", e);
-      }
-    }
-
-    // 列印對話框關閉後觸發
-    window.addEventListener("afterprint", reportPrinted);
-
-    // 備援：偵測 print mode 結束
-    const mq = window.matchMedia("print");
-    if (mq && mq.addEventListener) {
-      mq.addEventListener("change", (e) => {
-        if (!e.matches) reportPrinted();
-      });
-    }
-
-    // 若使用者直接關閉頁面，也嘗試回報
-    window.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") reportPrinted();
-    });
-    window.addEventListener("pagehide", reportPrinted);
-  })();
-</script>
 
   <script>
-    // 快捷鍵列印
-    document.addEventListener('keydown', function(e) {
-      if (e.ctrlKey && (e.key === 'p' || e.key === 'P')) {
-        e.preventDefault();
-        window.print();
-      }
-    });
+    // === 列印完成回報 ===
+    (function () {
+      const ORDER_ID = "<%= order.order_id %>";
+      const KEY = "printed:" + ORDER_ID;
+      function alreadyReported(){ try { return sessionStorage.getItem(KEY) === "1"; } catch(e){ return false; } }
+      function markReported(){ try { sessionStorage.setItem(KEY, "1"); } catch(e){} }
 
-    // 頁面載入完成後提示
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('熱感應紙列印單已載入完成');
-    });
+      async function reportPrinted(){
+        if (alreadyReported()) return;
+        try{
+          await fetch("/admin/printed/" + encodeURIComponent(ORDER_ID), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ source: "afterprint" })
+          });
+          markReported();
+          console.log("✅ 已回報列印完成");
+        }catch(e){ console.warn("⚠️ 回報列印失敗", e); }
+      }
+
+      window.addEventListener("afterprint", reportPrinted);
+    })();
   </script>
 </body>
 </html>

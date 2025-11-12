@@ -3,41 +3,120 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-// ==============================
-// 1) 路徑策略：環境變數優先
-//    - 本機：預設 ./data/concert.sqlite（請把 /data 加到 .gitignore）
-//    - 正式機（Render）：DB_DIR 設為掛載的磁碟路徑，例如 /var/data
-// ==============================
+// ==== 設定資料夾與檔案路徑 ====
 const DB_DIR  = process.env.DB_DIR  || path.resolve(process.cwd(), 'data');
 const DB_FILE = process.env.DB_FILE || 'concert.sqlite';
 const DB_PATH = path.join(DB_DIR, DB_FILE);
 
-// 2) 確保資料夾存在
-fs.mkdirSync(DB_DIR, { recursive: true });
+// 確保資料夾存在
+try {
+  fs.mkdirSync(DB_DIR, { recursive: true });
+} catch (err) {
+  console.error('❌ 無法建立資料夾：', err);
+  process.exit(1);
+}
 
-const db = new sqlite3.Database(DB_PATH, (err) => {
-  if (err) {
-    console.error('❌ 開啟資料庫失敗：', err);
-    return;
-  }
+let db;
+let isReady = false;
+const waitQueue = [];
 
-  console.log(`✅ SQLite 已連線：${DB_PATH}`);
+// 初始化資料庫
+const initPromise = new Promise((resolve, reject) => {
+  db = new sqlite3.Database(DB_PATH, async (err) => {
+    if (err) {
+      console.error('❌ 開啟資料庫失敗：', err);
+      reject(err);
+      return;
+    }
 
-  db.serialize(() => {
-    // 3) PRAGMA 基本設定
-    db.run('PRAGMA journal_mode = WAL;');
-    db.run('PRAGMA foreign_keys = ON;');
-    db.run('PRAGMA busy_timeout = 5000;');
+    console.log(`✅ SQLite 已連線：${DB_PATH}`);
 
-    // 4) 列出實際開啟的 DB（用來確認真的在持久化磁碟上）
-    db.each('PRAGMA database_list;', (i, r) => {
-      console.log('[DB] database_list:', r);
-    });
+    try {
+      // === PRAGMA 優化設定 ===
+      await new Promise((res, rej) => {
+        db.serialize(() => {
+          db.exec(`
+            PRAGMA journal_mode = WAL;
+            PRAGMA synchronous = NORMAL;
+            PRAGMA foreign_keys = ON;
+            PRAGMA busy_timeout = 8000;
+            PRAGMA wal_autocheckpoint = 1000;
+            PRAGMA temp_store = MEMORY;
+            PRAGMA cache_size = -20000;
+          `, (e) => {
+            if (e) rej(e);
+            else res();
+          });
+        });
+      });
+
+      // 顯示連線資訊（開發模式）
+      if (process.env.NODE_ENV === 'development') {
+        db.each('PRAGMA database_list;', (err, row) => {
+          if (!err) console.log('[DB] database_list:', row);
+        });
+      }
+
+      // === 執行初始化 ===
+      const init = require('./init');
+      await init(db);
+
+      isReady = true;
+      console.log('✅ 資料庫初始化完成');
+
+      // 通知等待的請求
+      waitQueue.forEach(cb => cb());
+      waitQueue.length = 0;
+
+      resolve(db);
+    } catch (initErr) {
+      console.error('❌ 資料庫初始化失敗：', initErr);
+      reject(initErr);
+    }
   });
-
-  // 5) 初始化（注意 init.js 內不要有 DROP/DELETE/FORCE SYNC）
-  const init = require('./init');
-  init(db);
 });
 
-module.exports = db;
+// 優雅關閉
+function closeDatabase() {
+  if (db) {
+    db.close((err) => {
+      if (err) console.error('❌ 關閉 DB 失敗:', err);
+      else console.log('✅ DB 已關閉');
+      process.exit(err ? 1 : 0);
+    });
+  } else {
+    process.exit(0);
+  }
+}
+
+process.on('SIGINT', closeDatabase);
+process.on('SIGTERM', closeDatabase);
+
+// 導出包裝過的 db，確保初始化完成才能使用
+module.exports = new Proxy(() => {}, {
+  get(target, prop) {
+    if (prop === 'ready') {
+      return initPromise;
+    }
+    if (prop === 'isReady') {
+      return isReady;
+    }
+    if (!db) {
+      throw new Error('資料庫尚未初始化');
+    }
+    const value = db[prop];
+    if (typeof value === 'function') {
+      return value.bind(db);
+    }
+    return value;
+  },
+  has(target, prop) {
+    return db ? prop in db : false;
+  },
+  ownKeys(target) {
+    return db ? Reflect.ownKeys(db) : [];
+  },
+  getOwnPropertyDescriptor(target, prop) {
+    return db ? Object.getOwnPropertyDescriptor(db, prop) : undefined;
+  }
+});

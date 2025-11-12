@@ -19,7 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ session middleware 必須放在路由之前
+// session middleware
 app.use(session({
   store: new SQLiteStore({
     db: 'sessions.sqlite',
@@ -32,8 +32,22 @@ app.use(session({
   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
 }));
 
-// ✅ 路由放在 session 之後
-// 印完才記錄列印（需登入）
+// ✅ 新增:資料庫準備檢查 middleware
+app.use((req, res, next) => {
+  if (!db.isReady) {
+    // 如果資料庫還沒準備好,等待它
+    db.ready
+      .then(() => next())
+      .catch(err => {
+        console.error('資料庫初始化失敗:', err);
+        res.status(503).send('系統正在啟動中,請稍後再試');
+      });
+  } else {
+    next();
+  }
+});
+
+// 路由設定
 app.post('/admin/printed/:order_id', ensureLogin, (req, res) => {
   const { order_id } = req.params;
   const who = (req.session?.admin?.email) || 'unknown';
@@ -59,7 +73,6 @@ app.post('/admin/printed/:order_id', ensureLogin, (req, res) => {
 const { exportAcpay } = require('./routes/admin-export-acpay');
 app.get('/admin/export_acpay', ensureLogin, exportAcpay);
 
-// 路由設定
 const customerRoutes = require('./routes/customer');
 const adminRoutes = require('./routes/admin');
 app.use('/', customerRoutes);
@@ -77,9 +90,18 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`伺服器運行在 http://localhost:${PORT}`);
-  console.log(`管理後台:http://localhost:${PORT}/admin`);
-});
+
+// ✅ 關鍵改動:等資料庫準備好才啟動伺服器
+db.ready
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`伺服器運行在 http://localhost:${PORT}`);
+      console.log(`管理後台: http://localhost:${PORT}/admin`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ 啟動失敗:', err);
+    process.exit(1);
+  });
 
 module.exports = app;

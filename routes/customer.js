@@ -27,17 +27,14 @@ function nowTaiwan() {
 // 依寄件地 prefixes 產生流水號（字母 + 3位數，平均分配）
 const crypto = require('crypto');
 
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
 // 3 位數 000–999
 function rand3() {
   return String(crypto.randomInt(0, 1000)).padStart(3, '0');
 }
 
 /**
- * 從 DB 中查目前各字母使用次數，挑「用最少的那幾個」再隨機選一個
+ * 從 DB 中查目前各字母使用次數，
+ * 挑「用最少的那幾個」裡面 ➜ 照 letters 的順序選第一個（不再亂數）
  * letters: ['A','B','C', ...]
  * cb(err, letter)
  */
@@ -69,11 +66,9 @@ function pickBalancedLetter(letters, cb) {
       if (c < min) min = c;
     });
 
-    // 把所有「次數 = 最少」的字母挑出來
-    const candidates = letters.filter((l) => counts.get(l) === min);
+    // ✅ 不再隨機：在 letters 順序裡找「第一個」符合最少次數的字母
+    const chosen = letters.find((l) => counts.get(l) === min) || letters[0];
 
-    // 在最少的那幾個裡面隨機選一個
-    const chosen = pickRandom(candidates);
     cb(null, chosen);
   });
 }

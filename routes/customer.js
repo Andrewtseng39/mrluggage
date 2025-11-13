@@ -22,30 +22,98 @@ function nowTaiwan() {
     .slice(0, 19);
 }
 
-// 依寄件地 prefixes 產生流水號（字母 + 3位數）
+// ==== 訂單編號產生：字母 + 3 位數，並平均分配字母 ====
+
+// 依寄件地 prefixes 產生流水號（字母 + 3位數，平均分配）
 const crypto = require('crypto');
+
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
+// 3 位數 000–999
 function rand3() {
-  return String(crypto.randomInt(0, 1000)).padStart(3, '0'); // 000–999
+  return String(crypto.randomInt(0, 1000)).padStart(3, '0');
 }
-function generateOrderIdFromPrefixes(prefixesStr) {
+
+/**
+ * 從 DB 中查目前各字母使用次數，挑「用最少的那幾個」再隨機選一個
+ * letters: ['A','B','C', ...]
+ * cb(err, letter)
+ */
+function pickBalancedLetter(letters, cb) {
+  const placeholders = letters.map(() => '?').join(',');
+  const sql = `
+    SELECT substr(order_id, 1, 1) AS prefix, COUNT(*) AS cnt
+    FROM orders
+    WHERE substr(order_id, 1, 1) IN (${placeholders})
+    GROUP BY prefix
+  `;
+
+  db.all(sql, letters, (err, rows) => {
+    if (err) return cb(err);
+
+    // 先把所有字母預設為 0
+    const counts = new Map();
+    letters.forEach((l) => counts.set(l, 0));
+
+    // 把 DB 查出來的覆蓋進去
+    rows.forEach((r) => {
+      counts.set(r.prefix, r.cnt);
+    });
+
+    // 找出目前最少的使用次數
+    let min = Infinity;
+    letters.forEach((l) => {
+      const c = counts.get(l);
+      if (c < min) min = c;
+    });
+
+    // 把所有「次數 = 最少」的字母挑出來
+    const candidates = letters.filter((l) => counts.get(l) === min);
+
+    // 在最少的那幾個裡面隨機選一個
+    const chosen = pickRandom(candidates);
+    cb(null, chosen);
+  });
+}
+
+/**
+ * 產生字母 + 3 位數的訂單編號，並確保不重複
+ * prefixesStr 例如: "A,B,C,D,E,F"
+ * cb(err, orderId)
+ */
+function genUniqueOrderIdWithPrefixes(prefixesStr, cb, tries = 0) {
   const letters = String(prefixesStr || '')
     .split(',')
-    .map(s => s.trim().toUpperCase())
+    .map((s) => s.trim().toUpperCase())
     .filter(Boolean);
-  if (!letters.length) throw new Error('此寄件地尚未設定字母開頭');
-  const letter = pickRandom(letters);
-  return letter + rand3(); // 例如 A157
-}
-function genUniqueOrderIdWithPrefixes(prefixesStr, cb, tries = 0) {
-  const candidate = generateOrderIdFromPrefixes(prefixesStr);
-  db.get(`SELECT 1 FROM orders WHERE order_id = ?`, [candidate], (err, row) => {
+
+  if (!letters.length) {
+    return cb(new Error('此寄件地尚未設定字母開頭'));
+  }
+
+  // 先挑「目前用得最少」的字母
+  pickBalancedLetter(letters, (err, letter) => {
     if (err) return cb(err);
-    if (!row) return cb(null, candidate);
-    if (tries > 20) return cb(new Error('訂單編號產生失敗（碰撞過多）'));
-    genUniqueOrderIdWithPrefixes(prefixesStr, cb, tries + 1);
+
+    const candidate = letter + rand3(); // 例如 A157
+
+    db.get(
+      `SELECT 1 FROM orders WHERE order_id = ?`,
+      [candidate],
+      (err2, row) => {
+        if (err2) return cb(err2);
+        if (!row) return cb(null, candidate); // 沒撞號 → OK
+
+        // 撞號就重試，多給一點空間（3 位其實很安全）
+        if (tries > 50) {
+          return cb(new Error('訂單編號產生失敗（碰撞過多）'));
+        }
+
+        genUniqueOrderIdWithPrefixes(prefixesStr, cb, tries + 1);
+      }
+    );
   });
 }
 
@@ -73,7 +141,7 @@ router.post('/submit', (req, res) => {
     invoice,
     carrier,
     agree,
-    location_id
+    location_id,
   } = req.body;
 
   // 基本驗證
@@ -84,7 +152,8 @@ router.post('/submit', (req, res) => {
   const emailSafe = String(email || '').trim();
   if (!emailSafe) return res.status(400).send('Email 為必填欄位');
   const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-  if (!emailRe.test(emailSafe)) return res.status(400).send('Email 格式不正確');
+  if (!emailRe.test(emailSafe))
+    return res.status(400).send('Email 格式不正確');
 
   const smallCount = parseInt(small_count, 10) || 0;
   const largeCount = parseInt(large_count, 10) || 0;
@@ -99,12 +168,15 @@ router.post('/submit', (req, res) => {
   if (!invoice) return res.status(400).send('請選擇發票方式');
 
   // 載具處理
-  const raw = typeof carrier === 'string' ? carrier.normalize('NFKC').trim() : '';
+  const raw =
+    typeof carrier === 'string' ? carrier.normalize('NFKC').trim() : '';
   const carrierNumber = invoice === '載具' && raw ? raw.toUpperCase() : null;
   if (invoice === '載具' && carrierNumber && !validateCarrierNumber(carrierNumber)) {
     return res
       .status(400)
-      .send('載具號碼格式錯誤，請輸入正確的手機條碼（例：/ABC12.+ 或 /A1B-2C3）。');
+      .send(
+        '載具號碼格式錯誤，請輸入正確的手機條碼（例：/ABC12.+ 或 /A1B-2C3）。'
+      );
   }
 
   const total = smallCount * 170 + largeCount * 220;
@@ -118,7 +190,7 @@ router.post('/submit', (req, res) => {
       if (err) return res.status(500).send('讀取寄件地失敗：' + err.message);
       if (!loc) return res.status(400).send('寄件地無效或未啟用');
 
-      // 2) 產出不重複 order_id
+      // 2) 產出不重複 order_id（字母 + 3 位數，且平均分配字母）
       genUniqueOrderIdWithPrefixes(loc.prefixes, (genErr, orderNo) => {
         if (genErr) {
           console.error('產生訂單編號錯誤：', genErr);
@@ -147,7 +219,7 @@ router.post('/submit', (req, res) => {
             carrierNumber,
             createdAt,
             loc.id,
-            loc.name
+            loc.name,
           ],
           function (e2) {
             if (e2) {
@@ -183,7 +255,7 @@ router.get('/success/:orderId', (req, res) => {
       total: row.total_price,
       invoice: row.invoice_type,
       carrierNumber: row.carrier_number || '無',
-      locationName: row.location_name || '-' // 成功頁顯示寄件地
+      locationName: row.location_name || '-', // 成功頁顯示寄件地
     });
   });
 });

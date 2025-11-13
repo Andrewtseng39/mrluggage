@@ -1,6 +1,7 @@
 // routes/admin.js
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
@@ -14,20 +15,27 @@ router.get('/login', (req, res) => {
   res.render('login', { error: null });
 });
 
-// 處理登入
-router.post('/login', (req, res) => {
+// 處理登入 (✅ 已修正：使用 bcrypt 驗證)
+router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  db.get(`SELECT * FROM admins WHERE username = ? AND password = ?`, [username, password], (err, admin) => {
-    if (err) {
-      return res.render('login', { error: '登入錯誤，請稍後再試。' });
-    }
-    if (admin) {
+  
+  try {
+    db.get(`SELECT * FROM admins WHERE username = ?`, [username], async (err, admin) => {
+      if (err) {
+        return res.render('login', { error: '登入錯誤，請稍後再試。' });
+      }
+      
+      if (!admin || !(await bcrypt.compare(password, admin.password))) {
+        return res.render('login', { error: '帳號或密碼錯誤' });
+      }
+      
       req.session.admin = admin;
       res.redirect('/admin');
-    } else {
-      res.render('login', { error: '帳號或密碼錯誤' });
-    }
-  });
+    });
+  } catch (error) {
+    console.error('登入錯誤:', error);
+    res.render('login', { error: '登入錯誤，請稍後再試。' });
+  }
 });
 
 // 登出
@@ -317,17 +325,25 @@ router.get('/admins', (req, res) => {
   });
 });
 
-// 新增管理員
-router.post('/admins/add', (req, res) => {
+// 新增管理員 (✅ 已修正：密碼使用 bcrypt 加密)
+router.post('/admins/add', async (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
 
   const { username, password } = req.body;
   if (!username || !password) return res.send('帳號與密碼不得為空');
 
-  db.run(`INSERT INTO admins (username, password) VALUES (?, ?)`, [username, password], function (err) {
-    if (err) return res.send('新增失敗：' + err.message);
-    res.redirect('/admin/admins');
-  });
+  try {
+    // 加密密碼
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    db.run(`INSERT INTO admins (username, password) VALUES (?, ?)`, [username, hashedPassword], function (err) {
+      if (err) return res.send('新增失敗：' + err.message);
+      res.redirect('/admin/admins');
+    });
+  } catch (error) {
+    console.error('新增管理員錯誤:', error);
+    res.send('新增失敗：' + error.message);
+  }
 });
 
 // 刪除管理員

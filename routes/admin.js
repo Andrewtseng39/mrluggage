@@ -357,6 +357,78 @@ router.post('/admins/delete/:id', (req, res) => {
   });
 });
 
+// 顯示修改密碼頁面
+router.get('/change-password/:id', (req, res) => {
+  if (!req.session.admin) return res.redirect('/admin/login');
+  
+  const id = req.params.id;
+  db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+    if (err || !admin) return res.send('找不到該管理員');
+    res.render('change-password', { admin, error: null });
+  });
+});
+
+// 處理修改密碼
+router.post('/change-password/:id', async (req, res) => {
+  if (!req.session.admin) return res.redirect('/admin/login');
+  
+  const id = req.params.id;
+  const { new_password, confirm_password } = req.body;
+  
+  // 驗證
+  if (!new_password || !confirm_password) {
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+      return res.render('change-password', { 
+        admin, 
+        error: '新密碼與確認密碼不得為空' 
+      });
+    });
+    return;
+  }
+  
+  if (new_password !== confirm_password) {
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+      return res.render('change-password', { 
+        admin, 
+        error: '兩次輸入的密碼不一致' 
+      });
+    });
+    return;
+  }
+  
+  if (new_password.length < 6) {
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+      return res.render('change-password', { 
+        admin, 
+        error: '密碼長度至少需要 6 個字元' 
+      });
+    });
+    return;
+  }
+  
+  try {
+    // 加密新密碼
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+    
+    db.run(
+      `UPDATE admins SET password = ? WHERE id = ?`, 
+      [hashedPassword, id], 
+      function (err) {
+        if (err) return res.send('更新失敗：' + err.message);
+        res.redirect('/admin/admins?success=password_changed');
+      }
+    );
+  } catch (error) {
+    console.error('修改密碼錯誤:', error);
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+      return res.render('change-password', { 
+        admin, 
+        error: '修改失敗：' + error.message 
+      });
+    });
+  }
+});
+
 // ================= 寄件地管理 ================= //
 
 // 列表

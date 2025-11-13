@@ -163,6 +163,16 @@
       box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
     }
     
+    /* 🔐 修改密碼按鈕 */
+    .btn-password {
+      background: #007bff;
+    }
+    
+    .btn-password:hover {
+      background: #0056b3;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+    
     /* 新增管理員區域 */
     .add-admin-section {
       background: #f8f9fa;
@@ -227,6 +237,29 @@
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 16px;
+    }
+    
+    /* 成功提示 */
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #28a745;
+      font-size: 14px;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     /* 響應式設計 */
@@ -323,22 +356,36 @@
       font-weight: 500;
       color: #495057;
     }
+    
+    /* 按鈕組 */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h2>管理員管理</h2>
+      <h2>🔧 管理員管理</h2>
     </div>
     
     <div class="content">
       <!-- 返回按鈕 -->
       <a href="/admin" class="back-btn">← 返回訂單管理</a>
       
+      <!-- 成功提示 -->
+      <% if (typeof success !== 'undefined' && success === 'password_changed') { %>
+        <div class="success-message">
+          ✅ 密碼修改成功!
+        </div>
+      <% } %>
+      
       <!-- 管理員列表區域 -->
       <div class="admin-list-section">
         <h3 class="section-title">
-           管理員列表
+          👥 管理員列表
         </h3>
         
         <div class="admin-count">
@@ -365,9 +412,17 @@
                       <span class="username"><%= admin.username %></span>
                     </td>
                     <td>
-                      <form action="/admin/admins/delete/<%= admin.id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除管理員「<%= admin.username %>」嗎？此操作無法復原！')">
-                        <button type="submit" class="btn btn-danger">刪除</button>
-                      </form>
+                      <div class="btn-group">
+                        <!-- 🔐 修改密碼按鈕 -->
+                        <a href="/admin/change-password/<%= admin.id %>" class="btn btn-password">
+                          🔐 修改密碼
+                        </a>
+                        
+                        <!-- 刪除按鈕 -->
+                        <form action="/admin/admins/delete/<%= admin.id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除管理員「<%= admin.username %>」嗎？此操作無法復原！')">
+                          <button type="submit" class="btn btn-danger">🗑️ 刪除</button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 <% }); %>
@@ -376,7 +431,7 @@
           </div>
         <% } else { %>
           <div class="empty-state">
-            <div class="empty-state-icon"></div>
+            <div class="empty-state-icon">👥</div>
             <p>目前沒有任何管理員</p>
           </div>
         <% } %>
@@ -385,7 +440,7 @@
       <!-- 新增管理員區域 -->
       <div class="add-admin-section">
         <h3 class="section-title">
-           新增管理員
+          ➕ 新增管理員
         </h3>
         
         <form action="/admin/admins/add" method="POST">
@@ -397,16 +452,29 @@
             
             <div class="form-group">
               <label class="form-label" for="password">密碼</label>
-              <input type="password" id="password" name="password" class="form-input" placeholder="請輸入密碼" required>
+              <input type="password" id="password" name="password" class="form-input" placeholder="請輸入密碼(至少6字元)" required minlength="6">
             </div>
             
             <div class="form-group">
-              <button type="submit" class="btn btn-success">新增管理員</button>
+              <button type="submit" class="btn btn-success">✅ 新增管理員</button>
             </div>
           </div>
         </form>
       </div>
     </div>
   </div>
+  
+  <!-- 自動隱藏成功訊息 -->
+  <script>
+    // 如果有成功訊息，3秒後自動淡出
+    const successMsg = document.querySelector('.success-message');
+    if (successMsg) {
+      setTimeout(() => {
+        successMsg.style.transition = 'opacity 0.5s ease-out';
+        successMsg.style.opacity = '0';
+        setTimeout(() => successMsg.remove(), 500);
+      }, 3000);
+    }
+  </script>
 </body>
 </html>

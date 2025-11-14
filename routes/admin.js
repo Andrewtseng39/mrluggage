@@ -54,6 +54,7 @@ router.get('/', (req, res) => {
   const to   = (req.query.to   || tzToday).trim();
   const archived = (req.query.archived === '1') ? 1 : 0;
   const keyword = (req.query.keyword || '').trim();
+  const orderId = (req.query.orderId || '').trim();       // ✅ 新增：專門給訂單編號用
   const filter = req.query.filter || '';
   const locationId = req.query.location_id ? parseInt(req.query.location_id, 10) : null;
 
@@ -63,12 +64,30 @@ router.get('/', (req, res) => {
   where.push('is_archived = ?'); params.push(archived);
   if (from) { where.push("substr(created_at,1,10) >= ?"); params.push(from); }
   if (to)   { where.push("substr(created_at,1,10) <= ?"); params.push(to); }
-  if (filter === 'invoice') { where.push(`invoice_type = ?`); params.push('現場開立'); }
-  else if (filter === 'digital') { where.push(`invoice_type = ?`); params.push('載具'); }
-  if (locationId) { where.push('location_id = ?'); params.push(locationId); }
+
+  if (filter === 'invoice') {
+    where.push(`invoice_type = ?`);
+    params.push('現場開立');
+  } else if (filter === 'digital') {
+    where.push(`invoice_type = ?`);
+    params.push('載具');
+  }
+
+  if (locationId) {
+    where.push('location_id = ?');
+    params.push(locationId);
+  }
+
+  // 🔍 關鍵字只查姓名 / 電話 / Email
   if (keyword) {
-    where.push(`(name LIKE ? OR phone LIKE ? OR order_id LIKE ? OR email LIKE ?)`);
-    params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    where.push(`(name LIKE ? OR phone LIKE ? OR email LIKE ?)`);
+    params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+  }
+
+  // 🔍 專門搜尋訂單編號
+  if (orderId) {
+    where.push(`order_id LIKE ?`);
+    params.push(`%${orderId}%`);
   }
 
   const whereSql = where.join(' AND ');
@@ -149,6 +168,7 @@ router.get('/', (req, res) => {
           totalAmount,
           totalCount,
           keyword,
+          orderId,                    // ✅ 傳給 EJS，對應你新增的欄位
           filter,
           from,
           to,
@@ -171,6 +191,7 @@ router.get('/export', (req, res) => {
   const to   = (req.query.to   || tzToday).trim();
   const archived = (req.query.archived === '1') ? 1 : 0;
   const keyword = (req.query.keyword || '').trim();
+  const orderId = (req.query.orderId || '').trim();       // ✅ 匯出也支援訂單編號
   const filter = req.query.filter || '';
   const locationId = req.query.location_id ? parseInt(req.query.location_id, 10) : null;
 
@@ -180,12 +201,30 @@ router.get('/export', (req, res) => {
   where.push('is_archived = ?'); params.push(archived);
   if (from) { where.push("substr(created_at,1,10) >= ?"); params.push(from); }
   if (to)   { where.push("substr(created_at,1,10) <= ?"); params.push(to); }
-  if (filter === 'invoice') { where.push(`invoice_type = ?`); params.push('現場開立'); }
-  else if (filter === 'digital') { where.push(`invoice_type = ?`); params.push('載具'); }
-  if (locationId) { where.push('location_id = ?'); params.push(locationId); }
+
+  if (filter === 'invoice') {
+    where.push(`invoice_type = ?`);
+    params.push('現場開立');
+  } else if (filter === 'digital') {
+    where.push(`invoice_type = ?`);
+    params.push('載具');
+  }
+
+  if (locationId) {
+    where.push('location_id = ?');
+    params.push(locationId);
+  }
+
+  // 🔍 關鍵字只查姓名 / 電話 / Email
   if (keyword) {
-    where.push(`(name LIKE ? OR phone LIKE ? OR order_id LIKE ? OR email LIKE ?)`);
-    params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    where.push(`(name LIKE ? OR phone LIKE ? OR email LIKE ?)`);
+    params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+  }
+
+  // 🔍 匯出時也可以只針對訂單編號
+  if (orderId) {
+    where.push(`order_id LIKE ?`);
+    params.push(`%${orderId}%`);
   }
 
   const sql = `

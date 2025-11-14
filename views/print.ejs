@@ -69,6 +69,12 @@
       margin-top: var(--gap-sm);
     }
 
+    /* ✅ 讓 (大?件、小?件) 字小一點 */
+    .label .item-detail {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
     /* ===== 領件單（保留右上角 LOGO） ===== */
     .sign-sheet {
       align-items: flex-start;
@@ -112,22 +118,53 @@
     .sign-label { font-weight: 700; }
     .sign-value { font-weight: 600; }
 
-    .signature-box {
+    /* ===== 簽名 + 總金額，一人一半 ===== */
+    .signature-wrapper {
       width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;   /* 左右各一半 */
+      gap: 4mm;
+      margin-top: 6mm;
+    }
+
+    /* 左側簽名格 */
+    .signature-box {
       border: 1px solid #000;
       border-radius: 2mm;
       padding: 3mm;
-      min-height: 12mm;
+      min-height: 20mm;
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start;
       align-items: flex-end;
-      margin-top: 6mm;
     }
 
     .signature-hint {
       font-size: 9px;
       color: #666;
       font-weight: 500;
+    }
+
+    /* 右側金額格 */
+    .amount-box {
+      border: 1px solid #000;
+      border-radius: 2mm;
+      padding: 3mm;
+      min-height: 20mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .amount-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .amount-value {
+      font-size: 20px;
+      font-weight: 900;
+      margin-top: 2mm;
     }
 
     @media print {
@@ -166,6 +203,11 @@
     const large = parseInt(order.large_count || 0, 10);
     const totalCount = (small + large) || 0;
     const hyphenId = (order.order_id || '').toString().replace(/^([A-Z]+)(\d+)/, '$1-$2');
+
+    // 👉 給「每件標籤」用的小件/大件文字，0 的就不顯示
+    const labelParts = [];
+    if (large > 0) labelParts.push(`大${large}件`);
+    if (small > 0) labelParts.push(`小${small}件`);
   %>
 
   <!-- A. 每件標籤（含 60mm Logo，訂單編號自動加連字號） -->
@@ -174,7 +216,12 @@
       <img class="brand-logo" src="https://www.mrluggagetw.com/img/logo.svg" alt="Mr. Luggage">
       <h1 class="order-id"><%= hyphenId %></h1>
       <p class="customer-name"><%= order.name %></p>
-      <p class="item-count">第 <%= i %> 件　共 <%= totalCount %> 件</p>
+      <p class="item-count">
+        第 <%= i %> 件　共 <%= totalCount %> 件
+        <% if (labelParts.length) { %>
+          <span class="item-detail">（<%= labelParts.join('、') %>）</span>
+        <% } %>
+      </p>
     </div>
   <% } %>
 
@@ -206,8 +253,16 @@
       </div>
     </div>
 
-    <div class="signature-box">
-      <span class="signature-hint">簽名 / 日期</span>
+    <!-- 簽名左邊、總金額右邊 -->
+    <div class="signature-wrapper">
+      <div class="signature-box">
+        <span class="signature-hint">簽名 / 日期</span>
+      </div>
+
+      <div class="amount-box">
+        <div class="amount-label">總金額</div>
+        <div class="amount-value">$<%= order.total_price %></div>
+      </div>
     </div>
   </div>
 

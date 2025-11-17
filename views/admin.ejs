@@ -6,64 +6,204 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 16px; background: #f8f9fa; min-height: 100vh; line-height: 1.6; }
-    .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; border: 1px solid #e9ecef; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f8f9fa;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+      overflow: hidden;
+      border: 1px solid #e9ecef;
+    }
 
     .header {
-      background: #ea5514; color: white; padding: 24px; border-bottom: 1px solid #dee2e6;
-      display: flex; align-items: center; justify-content: space-between;
+      background: #ea5514;
+      color: white;
+      padding: 24px;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     h1 { margin: 0; font-size: 1.8rem; font-weight: 600; }
     .header-actions { display: flex; gap: 8px; align-items: center; }
 
     .content { padding: 24px; }
 
-    .search-form { background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 24px; border: 1px solid #e9ecef; }
-    .search-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-    .search-input, .search-select, .date-input {
-      padding: 10px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; background: #fff;
+    .search-form {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+      margin-bottom: 24px;
+      border: 1px solid #e9ecef;
+    }
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .search-input,
+    .search-select,
+    .date-input {
+      padding: 10px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
+      background: #fff;
     }
     .search-input { width: 240px; }
-    /* 👉 新增：專門給訂單編號用，略小一點 */
+    /* 👉 訂單編號 */
     .order-id-input { width: 180px; }
 
-    .search-select, .date-input { width: 180px; }
-    .search-input:focus, .search-select:focus, .date-input:focus { outline: none; border-color: #ea5514; box-shadow: 0 0 0 2px rgba(234,85,20,.2); }
+    .search-select,
+    .date-input { width: 180px; }
 
-    .filter-buttons { margin: 16px 0 20px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .filter-btn { padding: 8px 16px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; text-decoration: none; color: #333; font-size: 14px; transition: all .2s ease; }
-    .filter-btn.active { background: #ea5514; color: white; border-color: #ea5514; }
+    .search-input:focus,
+    .search-select:focus,
+    .date-input:focus {
+      outline: none;
+      border-color: #ea5514;
+      box-shadow: 0 0 0 2px rgba(234,85,20,.2);
+    }
+
+    .filter-buttons {
+      margin: 16px 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+      transition: all .2s ease;
+    }
+    .filter-btn.active {
+      background: #ea5514;
+      color: white;
+      border-color: #ea5514;
+    }
     .filter-btn:hover { background: #f8f9fa; }
     .filter-btn.active:hover { background: #d64814; }
 
-    .btn { display: inline-block; padding: 10px 16px; background: #ea5514; color: white; border: none; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color .2s ease; margin: 2px; }
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      background: #ea5514;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color .2s ease;
+      margin: 2px;
+    }
     .btn:hover { background: #d64814; }
-    .btn-success { background: #28a745; } .btn-success:hover { background: #218838; }
-    .btn-danger { background: #dc3545; } .btn-danger:hover { background: #c82333; }
+    .btn-success { background: #28a745; }
+    .btn-success:hover { background: #218838; }
+    .btn-danger { background: #dc3545; }
+    .btn-danger:hover { background: #c82333; }
     .btn-small { padding: 6px 10px; font-size: 12px; }
 
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; margin: 24px 0; }
-    .stat-card { background: white; border: 1px solid #e9ecef; padding: 20px; border-radius: 6px; text-align: center; border-left: 4px solid #ea5514; }
-    .stat-value { font-size: 1.6rem; font-weight: 600; margin: 8px 0; color: #ea5514; }
-    .stat-label { font-size: .9rem; color: #6c757d; font-weight: 500; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .stat-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      padding: 20px;
+      border-radius: 6px;
+      text-align: center;
+      border-left: 4px solid #ea5514;
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 8px 0;
+      color: #ea5514;
+    }
+    .stat-label {
+      font-size: .9rem;
+      color: #6c757d;
+      font-weight: 500;
+    }
 
-    .table-container { overflow-x: auto; border-radius: 6px; border: 1px solid #e9ecef; }
-    table { width: 100%; border-collapse: collapse; background: white; min-width: 1100px; }
-    th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #e9ecef; font-size: 14px; }
-    th { background: #ea5514; color: white; font-weight: 600; position: sticky; top: 0; z-index: 10; }
+    .table-container {
+      overflow-x: auto;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      min-width: 1100px;
+    }
+    th, td {
+      padding: 12px 8px;
+      text-align: center;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 14px;
+    }
+    th {
+      background: #ea5514;
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
     tbody tr:hover { background-color: #f8f9fa; }
     tbody tr:nth-child(even) { background-color: #fafafa; }
 
-    .invoice-required { background-color: #fff3cd !important; border-left: 4px solid #ffc107; }
+    .invoice-required {
+      background-color: #fff3cd !important;
+      border-left: 4px solid #ffc107;
+    }
     .invoice-required:hover { background-color: #ffeaa7 !important; }
 
-    .invoice-badge, .invoice-normal, .invoice-digital { color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; }
-    .invoice-badge { background:#dc3545; animation: pulse 2s infinite; }
+    .invoice-badge,
+    .invoice-normal,
+    .invoice-digital {
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .invoice-badge {
+      background:#dc3545;
+      animation: pulse 2s infinite;
+    }
     .invoice-normal { background:#28a745; }
     .invoice-digital { background:#17a2b8; }
-    @keyframes pulse { 0%{opacity:1} 50%{opacity:.7} 100%{opacity:1} }
+    @keyframes pulse {
+      0%{opacity:1}
+      50%{opacity:.7}
+      100%{opacity:1}
+    }
 
-    .badge-printed{
+    .badge-printed {
       display:inline-block;
       background:#6c757d;
       color:#fff;
@@ -73,18 +213,161 @@
       font-weight:600;
     }
 
-    .carrier-number { font-family: monospace; background:#e9ecef; padding:2px 6px; border-radius:3px; font-size:12px; }
-    .action-group { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; }
+    .carrier-number {
+      font-family: monospace;
+      background:#e9ecef;
+      padding:2px 6px;
+      border-radius:3px;
+      font-size:12px;
+    }
+    .action-group {
+      display:flex;
+      flex-wrap:wrap;
+      gap:4px;
+      justify-content:center;
+    }
     .delete-form { display:inline; }
 
-    .admin-link { display:inline-block; color:#ea5514; text-decoration:none; font-weight:500; padding: 8px 16px; border:1px solid #ea5514; border-radius:4px; transition: all .2s ease; }
-    .admin-link:hover { background:#ea5514; color:#fff; }
+    .admin-link {
+      display:inline-block;
+      color:#ea5514;
+      text-decoration:none;
+      font-weight:500;
+      padding: 8px 16px;
+      border:1px solid #ea5514;
+      border-radius:4px;
+      transition: all .2s ease;
+    }
+    .admin-link:hover {
+      background:#ea5514;
+      color:#fff;
+    }
+
+    /* 重複預約區塊樣式 & 無重複提示 */
+    .duplicate-alert {
+      background: linear-gradient(135deg, #fff5f5 0%, #ffe8e6 100%);
+      border-left: 5px solid #dc3545;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 3px 10px rgba(220,53,69,0.15);
+    }
+    .duplicate-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .duplicate-title-section { display: flex; align-items: center; }
+    .duplicate-title {
+      font-size: 18px;
+      color: #b71c1c;
+      display: block;
+    }
+    .duplicate-subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+      display: block;
+    }
+    .duplicate-toggle-btn {
+      background: white;
+      border: 2px solid #dc3545;
+      color: #dc3545;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+    .duplicate-toggle-btn:hover {
+      background: #dc3545;
+      color: white;
+    }
+    .duplicates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .duplicate-card {
+      background: white;
+      border: 1px solid #ffcdd2;
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .duplicate-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220,53,69,0.2);
+    }
+    .duplicate-card-content { flex: 1; min-width: 0; }
+    .duplicate-card-label {
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .duplicate-card-value {
+      font-weight: 600;
+      color: #d32f2f;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .duplicate-card-count {
+      background: #dc3545;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .duplicate-tip {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #ffcdd2;
+      font-size: 13px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .no-duplicate-alert {
+      background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
+      border-left: 5px solid #28a745;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(40,167,69,0.1);
+    }
+    .no-duplicate-text {
+      color: #1b5e20;
+      font-weight: 500;
+      font-size: 15px;
+    }
 
     @media (max-width: 768px) {
       body { padding: 8px; }
       h1 { font-size: 1.5rem; }
       .header, .content { padding: 16px; }
-      .search-input, .search-select, .date-input, .order-id-input { width: 100%; }
+      .search-input,
+      .search-select,
+      .date-input,
+      .order-id-input { width: 100%; }
       .btn { width: 100%; margin: 4px 0; }
       .filter-buttons { flex-direction: column; }
       .filter-btn { width: 100%; }
@@ -94,10 +377,20 @@
       .action-group { flex-direction: column; }
       .action-group .btn { width: 100%; margin: 2px 0; }
       table { min-width: 900px; }
-      .header-actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
+      .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
     }
+
     @media (max-width: 480px) {
-      .container { border-radius: 0; border-left: none; border-right: none; }
+      .container {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
       h1 { font-size: 1.3rem; }
       .stat-value { font-size: 1.2rem; }
       th, td { padding: 6px 3px; font-size: 11px; }
@@ -108,7 +401,9 @@
   <div class="container">
     <div class="header">
       <h1>
-        <img src="https://www.mrluggagetw.com/img/foot_logo.svg" alt="Mr. Luggage Logo" style="height:70px; vertical-align:middle; margin-right:10px;">
+        <img src="https://www.mrluggagetw.com/img/foot_logo.svg"
+             alt="Mr. Luggage Logo"
+             style="height:70px; vertical-align:middle; margin-right:10px;">
       </h1>
       <div class="header-actions">
         <a href="/admin/locations" class="admin-link" style="border-color:#fff;color:#fff">寄件地管理</a>
@@ -125,23 +420,21 @@
         <form method="GET" action="/admin">
           <div class="search-row">
 
-            <!-- 👉 新增：專門查訂單編號 -->
+            <!-- 👉 訂單編號 -->
             <input
               type="text"
               name="orderId"
               placeholder="訂單編號"
               value="<%= typeof orderId !== 'undefined' ? orderId : '' %>"
               class="search-input order-id-input">
-              
-            <!-- 原本的關鍵字：姓名 / 電話 / 編號 -->
+
+            <!-- 關鍵字：姓名 / 電話 / Email -->
             <input
               type="text"
               name="keyword"
-              placeholder="搜尋姓名 / 電話"
+              placeholder="搜尋姓名 / 電話 / Email"
               value="<%= keyword %>"
               class="search-input">
-
-        
 
             <input type="date" name="from" value="<%= from %>" class="date-input" title="起日">
             <input type="date" name="to"   value="<%= to %>"   class="date-input" title="迄日">
@@ -149,9 +442,13 @@
             <select name="location_id" class="search-select" title="寄件地">
               <option value="">全部寄件地</option>
               <% (locations || []).forEach(l => { %>
-                <option value="<%= l.id %>" <%= String(selectedLocationId||'')===String(l.id) ? 'selected' : '' %>><%= l.name %></option>
+                <option value="<%= l.id %>"
+                        <%= String(selectedLocationId||'')===String(l.id) ? 'selected' : '' %>>
+                  <%= l.name %>
+                </option>
               <% }) %>
             </select>
+
             <button type="submit" class="btn btn-success">搜尋</button>
           </div>
         </form>
@@ -160,19 +457,36 @@
       <!-- 篩選快捷 -->
       <div class="filter-buttons">
         <a
-          href="/admin?<%= 'from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
+          href="/admin?<%= 'from=' + encodeURIComponent(from || '') +
+                        '&to=' + encodeURIComponent(to || '') +
+                        '&keyword=' + encodeURIComponent(keyword || '') +
+                        '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') +
+                        '&archived=' + encodeURIComponent(archived || '') +
+                        '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
           class="filter-btn <%= !filter ? 'active' : '' %>">全部訂單</a>
 
         <a
-          href="/admin?<%= 'filter=invoice' + '&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
+          href="/admin?<%= 'filter=invoice' +
+                        '&from=' + encodeURIComponent(from || '') +
+                        '&to=' + encodeURIComponent(to || '') +
+                        '&keyword=' + encodeURIComponent(keyword || '') +
+                        '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') +
+                        '&archived=' + encodeURIComponent(archived || '') +
+                        '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
           class="filter-btn <%= filter === 'invoice' ? 'active' : '' %>">現場開立</a>
 
         <a
-          href="/admin?<%= 'filter=digital' + '&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
+          href="/admin?<%= 'filter=digital' +
+                        '&from=' + encodeURIComponent(from || '') +
+                        '&to=' + encodeURIComponent(to || '') +
+                        '&keyword=' + encodeURIComponent(keyword || '') +
+                        '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') +
+                        '&archived=' + encodeURIComponent(archived || '') +
+                        '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
           class="filter-btn <%= filter === 'digital' ? 'active' : '' %>">載具發票</a>
       </div>
 
-      <!-- 重複預約區塊（原樣保留） -->
+      <!-- 重複預約區塊 -->
       <% if (typeof duplicates !== 'undefined' && duplicates.length > 0) { %>
         <div class="duplicate-alert">
           <div class="duplicate-header">
@@ -180,11 +494,11 @@
               <div>
                 <strong class="duplicate-title">請注意偵測到重複預約</strong>
                 <span class="duplicate-subtitle">
-                  區間：<%= from %> ~ <%= to %> 
+                  區間：<%= from %> ~ <%= to %>
                 </span>
               </div>
             </div>
-            
+
             <% if (duplicates.length > 3) { %>
             <button onclick="toggleDuplicates()" id="toggleBtn" class="duplicate-toggle-btn">
               展開全部
@@ -193,10 +507,15 @@
           </div>
 
           <div id="duplicatesContainer" class="duplicates-grid">
-            <% duplicates.forEach(function(d, index) { 
+            <% duplicates.forEach(function(d, index) {
               var q = encodeURIComponent(d.value || '');
-              var link = '/admin?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + q + '&archived=' + archived;
-              var fieldName = d.field === 'name' ? '姓名' : (d.field === 'phone' ? '電話' : 'Email');
+              var link = '/admin?from=' + encodeURIComponent(from || '') +
+                         '&to=' + encodeURIComponent(to || '') +
+                         '&keyword=' + q +
+                         '&archived=' + encodeURIComponent(archived || '');
+              var fieldName = d.field === 'name'
+                ? '姓名'
+                : (d.field === 'phone' ? '電話' : 'Email');
               var isHidden = duplicates.length > 3 && index >= 3;
               var hiddenClass = isHidden ? 'duplicate-hidden' : '';
               var displayStyle = isHidden ? 'style="display:none"' : '';
@@ -215,146 +534,31 @@
             <span>點擊卡片可直接查看該組重複訂單</span>
           </div>
         </div>
-
-        <style>
-          .duplicate-alert {
-            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e6 100%);
-            border-left: 5px solid #dc3545;
-            border-radius: 10px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 3px 10px rgba(220,53,69,0.15);
-          }
-          .duplicate-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
-          }
-          .duplicate-title-section { display: flex; align-items: center; }
-          .duplicate-title { font-size: 18px; color: #b71c1c; display: block; }
-          .duplicate-subtitle { font-size: 13px; color: #666; margin-top: 4px; display: block; }
-          .duplicate-toggle-btn {
-            background: white;
-            border: 2px solid #dc3545;
-            color: #dc3545;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s ease;
-          }
-          .duplicate-toggle-btn:hover { background: #dc3545; color: white; }
-          .duplicates-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-          }
-          .duplicate-card {
-            background: white;
-            border: 1px solid #ffcdd2;
-            border-radius: 8px;
-            padding: 14px 16px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-          }
-          .duplicate-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220,53,69,0.2);
-          }
-          .duplicate-card-content { flex: 1; min-width: 0; }
-          .duplicate-card-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-          .duplicate-card-value {
-            font-weight: 600;
-            color: #d32f2f;
-            font-size: 14px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-          .duplicate-card-count {
-            background: #dc3545;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 13px;
-            flex-shrink: 0;
-          }
-          .duplicate-tip {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #ffcdd2;
-            font-size: 13px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-        </style>
-
-        <script>
-          (function() {
-            var isExpanded = false;
-            window.toggleDuplicates = function() {
-              var hiddenItems = document.querySelectorAll('.duplicate-hidden');
-              var btn = document.getElementById('toggleBtn');
-              isExpanded = !isExpanded;
-              hiddenItems.forEach(function(item) {
-                item.style.display = isExpanded ? 'flex' : 'none';
-              });
-              if (btn) {
-                btn.textContent = isExpanded ? '收合' : '展開全部 (還有 ' + hiddenItems.length + ' 組)';
-              }
-            };
-            document.addEventListener('DOMContentLoaded', function() {
-              var btn = document.getElementById('toggleBtn');
-              var hiddenCount = document.querySelectorAll('.duplicate-hidden').length;
-              if (btn && hiddenCount > 0) {
-                btn.textContent = '展開全部 (還有 ' + hiddenCount + ' 組)';
-              }
-            });
-          })();
-        </script>
       <% } else { %>
         <div class="no-duplicate-alert">
           <span class="no-duplicate-text">目前無重複預約</span>
         </div>
-
-        <style>
-          .no-duplicate-alert {
-            background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
-            border-left: 5px solid #28a745;
-            border-radius: 10px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 6px rgba(40,167,69,0.1);
-          }
-          .no-duplicate-text {
-            color: #1b5e20;
-            font-weight: 500;
-            font-size: 15px;
-          }
-        </style>
       <% } %>
 
       <!-- 匯出 -->
       <p>
         <a
-          href="/admin/export?<%= 'from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') + '&filter=' + encodeURIComponent(filter || '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
+          href="/admin/export?<%= 'from=' + encodeURIComponent(from || '') +
+                                 '&to=' + encodeURIComponent(to || '') +
+                                 '&keyword=' + encodeURIComponent(keyword || '') +
+                                 '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') +
+                                 '&filter=' + encodeURIComponent(filter || '') +
+                                 '&archived=' + encodeURIComponent(archived || '') +
+                                 '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
           class="btn btn-success">匯出 Excel（依目前篩選）</a>
-      
+
         <a
-          href="/admin/export_acpay?<%= 'from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&keyword=' + encodeURIComponent(keyword || '') + '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') + '&archived=' + encodeURIComponent(archived) + '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
+          href="/admin/export_acpay?<%= 'from=' + encodeURIComponent(from || '') +
+                                       '&to=' + encodeURIComponent(to || '') +
+                                       '&keyword=' + encodeURIComponent(keyword || '') +
+                                       '&orderId=' + encodeURIComponent(typeof orderId !== 'undefined' ? (orderId || '') : '') +
+                                       '&archived=' + encodeURIComponent(archived || '') +
+                                       '&location_id=' + encodeURIComponent(selectedLocationId || '') %>"
           class="btn btn-success">匯出載具訂單</a>
       </p>
 
@@ -368,7 +572,7 @@
       <div class="stats">
         <div class="stat-card">
           <div class="stat-value"><%= totalCount %></div>
-          <div class="stat-label">總件數（目前篩選）</div>
+          <div class="stat-label">總件數（目前篩選，未列印優先顯示）</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">$<%= totalAmount %></div>
@@ -445,8 +649,28 @@
                       <a href="/admin/print/<%= order.order_id %>" class="btn btn-small" target="_blank">列印</a>
                     <% } %>
 
-                    <a href="/admin/edit/<%= order.order_id %>" class="btn btn-success btn-small">編輯</a>
-                    <form action="/admin/delete/<%= order.order_id %>" method="POST" class="delete-form" onsubmit="return confirm('確定要刪除這筆訂單嗎？');">
+                    <!-- 編輯：帶目前篩選條件進去 -->
+                    <a
+                      href="/admin/edit/<%= order.order_id %>?from=<%= encodeURIComponent(from || '') %>&to=<%= encodeURIComponent(to || '') %>&keyword=<%= encodeURIComponent(keyword || '') %>&orderId=<%= encodeURIComponent(typeof orderId !== 'undefined' ? orderId : '') %>&filter=<%= encodeURIComponent(filter || '') %>&archived=<%= encodeURIComponent(archived || '') %>&location_id=<%= encodeURIComponent(selectedLocationId || '') %>"
+                      class="btn btn-success btn-small">
+                      編輯
+                    </a>
+
+                    <!-- 刪除：用 hidden 把篩選條件帶給後端 -->
+                    <form
+                      action="/admin/delete/<%= order.order_id %>"
+                      method="POST"
+                      class="delete-form"
+                      onsubmit="return confirm('確定要刪除這筆訂單嗎？');">
+
+                      <input type="hidden" name="from"          value="<%= from || '' %>">
+                      <input type="hidden" name="to"            value="<%= to || '' %>">
+                      <input type="hidden" name="keyword"       value="<%= keyword || '' %>">
+                      <input type="hidden" name="orderIdSearch" value="<%= typeof orderId !== 'undefined' ? orderId : '' %>">
+                      <input type="hidden" name="filter"        value="<%= filter || '' %>">
+                      <input type="hidden" name="archived"      value="<%= archived || '' %>">
+                      <input type="hidden" name="location_id"   value="<%= selectedLocationId || '' %>">
+
                       <button type="submit" class="btn btn-danger btn-small">刪除</button>
                     </form>
                   </div>
@@ -458,5 +682,31 @@
       </div>
     </div>
   </div>
+
+  <script>
+    (function() {
+      var isExpanded = false;
+      window.toggleDuplicates = function() {
+        var hiddenItems = document.querySelectorAll('.duplicate-hidden');
+        var btn = document.getElementById('toggleBtn');
+        isExpanded = !isExpanded;
+        hiddenItems.forEach(function(item) {
+          item.style.display = isExpanded ? 'flex' : 'none';
+        });
+        if (btn) {
+          btn.textContent = isExpanded
+            ? '收合'
+            : '展開全部 (還有 ' + hiddenItems.length + ' 組)';
+        }
+      };
+      document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('toggleBtn');
+        var hiddenCount = document.querySelectorAll('.duplicate-hidden').length;
+        if (btn && hiddenCount > 0) {
+          btn.textContent = '展開全部 (還有 ' + hiddenCount + ' 組)';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -1,4 +1,3 @@
-// routes/admin.js
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
@@ -9,6 +8,30 @@ const os = require('os');
 
 // ✅ 改用共用連線
 const db = require('../db/connection');
+
+/**
+ * 小工具：組回 /admin 的 query string，讓刪除、編輯完都能保留篩選條件
+ */
+function buildAdminQueryString({
+  from = '',
+  to = '',
+  keyword = '',
+  orderId = '',
+  filter = '',
+  archived = '',
+  location_id = ''
+} = {}) {
+  const sp = new URLSearchParams({
+    from: from || '',
+    to: to || '',
+    keyword: keyword || '',
+    orderId: orderId || '',
+    filter: filter || '',
+    archived: archived || '',
+    location_id: location_id || ''
+  });
+  return sp.toString();
+}
 
 // 顯示登入頁
 router.get('/login', (req, res) => {
@@ -80,7 +103,7 @@ router.get('/', (req, res) => {
 
   // 🔍 關鍵字只查姓名 / 電話 / Email
   if (keyword) {
-    where.push(`(name LIKE ? OR phone LIKE ? OR email LIKE ?)`);
+    where.push(`(name LIKE ? OR phone LIKE ? OR email LIKE ?)`); 
     params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
   }
 
@@ -92,14 +115,16 @@ router.get('/', (req, res) => {
 
   const whereSql = where.join(' AND ');
 
-  // 訂單列表
+  // 訂單列表（✅ 未列印排最前面，其它照建立時間新到舊）
   const listSql = `
-    SELECT *,
-           (COALESCE(small_count,0) + COALESCE(large_count,0)) AS total_count 
-    FROM orders 
-    WHERE ${whereSql}
-    ORDER BY created_at DESC
-    LIMIT 1000
+  SELECT *,
+         (COALESCE(small_count,0) + COALESCE(large_count,0)) AS total_count 
+  FROM orders 
+  WHERE ${whereSql}
+  ORDER BY
+    CASE WHEN COALESCE(print_count, 0) = 0 THEN 0 ELSE 1 END ASC,
+    created_at DESC
+  LIMIT 1000
   `;
 
   db.all(listSql, params, (err, rows) => {
@@ -217,7 +242,7 @@ router.get('/export', (req, res) => {
 
   // 🔍 關鍵字只查姓名 / 電話 / Email
   if (keyword) {
-    where.push(`(name LIKE ? OR phone LIKE ? OR email LIKE ?)`);
+    where.push(`(name LIKE ? OR phone LIKE ? OR email LIKE ?)`); 
     params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
   }
 
@@ -287,23 +312,61 @@ router.get('/print/:order_id', (req, res) => {
   });
 });
 
-// 顯示編輯頁
+// 顯示編輯頁（✅ 帶入目前的篩選條件）
 router.get('/edit/:order_id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
 
   const orderId = req.params.order_id;
+
+  // 從 query 把目前的篩選條件帶進來，等等丟給 EJS
+  const {
+    from = '',
+    to = '',
+    keyword = '',
+    orderId: orderIdSearch = '',
+    filter = '',
+    archived = '',
+    location_id = ''
+  } = req.query;
+
   db.get(`SELECT * FROM orders WHERE order_id = ?`, [orderId], (err, order) => {
     if (err || !order) return res.send('找不到該筆訂單');
-    res.render('edit', { order });
+    res.render('edit', { 
+      order,
+      from,
+      to,
+      keyword,
+      orderIdSearch,
+      filter,
+      archived,
+      location_id
+    });
   });
 });
 
-// 提交編輯（✅ 已加入 email 寫回與驗證）
+// 提交編輯（✅ 編輯後保留原本的篩選條件）
 router.post('/edit/:order_id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
 
   const orderId = req.params.order_id;
-  const { name, phone, email, small_count, large_count, invoice_type, carrier_number } = req.body;
+  const { 
+    name, 
+    phone, 
+    email, 
+    small_count, 
+    large_count, 
+    invoice_type, 
+    carrier_number,
+
+    // 這幾個是從表單 hidden 帶回來的篩選條件
+    from = '',
+    to = '',
+    keyword = '',
+    orderIdSearch = '',
+    filter = '',
+    archived = '',
+    location_id = ''
+  } = req.body;
 
   // 基本驗證
   if (!name || !phone) return res.send('姓名與電話為必填');
@@ -338,19 +401,52 @@ router.post('/edit/:order_id', (req, res) => {
     [name, phone, emailSafe, small, large, total, invoice_type, carrierNum, orderId],
     function (err) {
       if (err) return res.send('更新失敗：' + err.message);
-      res.redirect('/admin');
+
+      // ✅ 編輯完一樣回到原本篩選條件
+      const qs = buildAdminQueryString({
+        from,
+        to,
+        keyword,
+        orderId: orderIdSearch,
+        filter,
+        archived,
+        location_id
+      });
+      res.redirect('/admin?' + qs);
     }
   );
 });
 
-// 刪除訂單
+// 刪除訂單（✅ 刪完後保留原本的篩選條件）
 router.post('/delete/:order_id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
 
   const orderId = req.params.order_id;
+
+  // 從表單拿回目前的篩選條件
+  const {
+    from = '',
+    to = '',
+    keyword = '',
+    orderIdSearch = '',
+    filter = '',
+    archived = '',
+    location_id = ''
+  } = req.body;
+
   db.run(`DELETE FROM orders WHERE order_id = ?`, [orderId], function (err) {
     if (err) return res.send('刪除失敗：' + err.message);
-    res.redirect('/admin');
+
+    const qs = buildAdminQueryString({
+      from,
+      to,
+      keyword,
+      orderId: orderIdSearch,
+      filter,
+      archived,
+      location_id
+    });
+    res.redirect('/admin?' + qs);
   });
 });
 
@@ -390,7 +486,7 @@ router.post('/admins/delete/:id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
 
   const id = req.params.id;
-  db.run(`DELETE FROM admins WHERE id = ?`, [id], function (err) {
+  db.run(`DELETE FROM admins WHERE id = ?`, (err) => {
     if (err) return res.send('刪除失敗：' + err.message);
     res.redirect('/admin/admins');
   });
@@ -452,7 +548,7 @@ router.post('/change-password/:id', async (req, res) => {
     db.run(
       `UPDATE admins SET password = ? WHERE id = ?`, 
       [hashedPassword, id], 
-      function (err) {
+      (err) => {
         if (err) return res.send('更新失敗：' + err.message);
         res.redirect('/admin/admins?success=password_changed');
       }
@@ -487,7 +583,7 @@ router.post('/locations/add', (req, res) => {
   db.run(
     `INSERT INTO locations (name, prefixes, is_active) VALUES (?, ?, 1)`,
     [name.trim(), prefixes.trim()],
-    function (err) {
+    (err) => {
       if (err) return res.send('新增失敗：' + err.message);
       res.redirect('/admin/locations');
     }
@@ -501,7 +597,7 @@ router.post('/locations/toggle/:id', (req, res) => {
   db.get(`SELECT is_active FROM locations WHERE id = ?`, [id], (err, row) => {
     if (err || !row) return res.send('找不到此寄件地');
     const next = row.is_active ? 0 : 1;
-    db.run(`UPDATE locations SET is_active = ? WHERE id = ?`, [next, id], function (e2) {
+    db.run(`UPDATE locations SET is_active = ? WHERE id = ?`, [next, id], (e2) => {
       if (e2) return res.send('更新失敗：' + e2.message);
       res.redirect('/admin/locations');
     });
@@ -515,7 +611,7 @@ router.post('/locations/delete/:id', (req, res) => {
   db.get(`SELECT COUNT(1) AS cnt FROM orders WHERE location_id = ?`, [id], (err, row) => {
     if (err) return res.send('檢查失敗：' + err.message);
     if (row && row.cnt > 0) return res.send('已有訂單使用此寄件地，請改為停用');
-    db.run(`DELETE FROM locations WHERE id = ?`, [id], function (e2) {
+    db.run(`DELETE FROM locations WHERE id = ?`, (e2) => {
       if (e2) return res.send('刪除失敗：' + e2.message);
       res.redirect('/admin/locations');
     });

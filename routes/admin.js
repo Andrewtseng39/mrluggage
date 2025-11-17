@@ -723,15 +723,28 @@ router.post('/locations/toggle/:id', (req, res) => {
 // 刪除（若已有訂單綁定，僅允許停用）
 router.post('/locations/delete/:id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
-  const id = req.params.id;
-  db.get(`SELECT COUNT(1) AS cnt FROM orders WHERE location_id = ?`, [id], (err, row) => {
-    if (err) return res.send('檢查失敗：' + err.message);
-    if (row && row.cnt > 0) return res.send('已有訂單使用此寄件地，請改為停用');
-    db.run(`DELETE FROM locations WHERE id = ?`, (e2) => {
-      if (e2) return res.send('刪除失敗：' + e2.message);
-      res.redirect('/admin/locations');
-    });
-  });
-});
 
+  const id = req.params.id;
+
+  db.get(
+    `SELECT COUNT(1) AS cnt FROM orders WHERE location_id = ?`,
+    [id],
+    (err, row) => {
+      if (err) return res.send('檢查失敗：' + err.message);
+
+      if (row && row.cnt > 0) {
+        return res.send('已有訂單使用此寄件地，請改為停用');
+      }
+
+      db.run(
+        `DELETE FROM locations WHERE id = ?`,
+        [id],     
+        (e2) => {
+          if (e2) return res.send('刪除失敗：' + e2.message);
+          res.redirect('/admin/locations');
+        }
+      );
+    }
+  );
+});
 module.exports = router;

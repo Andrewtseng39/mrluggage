@@ -9,6 +9,9 @@ const os = require('os');
 // ✅ 改用共用連線
 const db = require('../db/connection');
 
+// ✅ 批次刪除專用密碼（你可以改成你想要的字串）
+const BULK_DELETE_PASSWORD = 'MR70624227';
+
 /**
  * 小工具：組回 /admin 的 query string，讓刪除、編輯完都能保留篩選條件
  */
@@ -77,7 +80,7 @@ router.get('/', (req, res) => {
   const to   = (req.query.to   || tzToday).trim();
   const archived = (req.query.archived === '1') ? 1 : 0;
   const keyword = (req.query.keyword || '').trim();
-  const orderId = (req.query.orderId || '').trim();       // ✅ 新增：專門給訂單編號用
+  const orderId = (req.query.orderId || '').trim();       // ✅ 專門給訂單編號用
   const filter = req.query.filter || '';
   const locationId = req.query.location_id ? parseInt(req.query.location_id, 10) : null;
 
@@ -117,14 +120,14 @@ router.get('/', (req, res) => {
 
   // 訂單列表（✅ 未列印排最前面，其它照建立時間新到舊）
   const listSql = `
-  SELECT *,
-         (COALESCE(small_count,0) + COALESCE(large_count,0)) AS total_count 
-  FROM orders 
-  WHERE ${whereSql}
-  ORDER BY
-    CASE WHEN COALESCE(print_count, 0) = 0 THEN 0 ELSE 1 END ASC,
-    created_at DESC
-  LIMIT 1000
+    SELECT *,
+           (COALESCE(small_count,0) + COALESCE(large_count,0)) AS total_count 
+    FROM orders 
+    WHERE ${whereSql}
+    ORDER BY
+      CASE WHEN COALESCE(print_count, 0) = 0 THEN 0 ELSE 1 END ASC,
+      created_at DESC
+    LIMIT 1000
   `;
 
   db.all(listSql, params, (err, rows) => {
@@ -293,8 +296,8 @@ router.get('/export', (req, res) => {
     const filepath = path.join(tempDir, filename);
     XLSX.writeFile(workbook, filepath);
 
-    res.download(filepath, filename, (err) => {
-      if (!err) fs.unlinkSync(filepath);
+    res.download(filepath, filename, (err2) => {
+      if (!err2) fs.unlinkSync(filepath);
     });
   });
 });
@@ -399,7 +402,7 @@ router.post('/edit/:order_id', (req, res) => {
          invoice_type = ?, carrier_number = ?
      WHERE order_id = ?`,
     [name, phone, emailSafe, small, large, total, invoice_type, carrierNum, orderId],
-    function (err) {
+    (err) => {
       if (err) return res.send('更新失敗：' + err.message);
 
       // ✅ 編輯完一樣回到原本篩選條件
@@ -417,7 +420,7 @@ router.post('/edit/:order_id', (req, res) => {
   );
 });
 
-// 刪除訂單（✅ 刪完後保留原本的篩選條件）
+// ✅ 單筆刪除（保留原本邏輯，不限日期）
 router.post('/delete/:order_id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
 
@@ -434,8 +437,113 @@ router.post('/delete/:order_id', (req, res) => {
     location_id = ''
   } = req.body;
 
-  db.run(`DELETE FROM orders WHERE order_id = ?`, [orderId], function (err) {
+  db.run(`DELETE FROM orders WHERE order_id = ?`, [orderId], (err) => {
     if (err) return res.send('刪除失敗：' + err.message);
+
+    const qs = buildAdminQueryString({
+      from,
+      to,
+      keyword,
+      orderId: orderIdSearch,
+      filter,
+      archived,
+      location_id
+    });
+    res.redirect('/admin?' + qs);
+  });
+});
+
+// ✅ 批次刪除目前篩選的訂單（需密碼，且只能刪除三天前含以前）
+router.post('/delete-range', (req, res) => {
+  if (!req.session.admin) return res.redirect('/admin/login');
+
+  const {
+    from = '',
+    to = '',
+    keyword = '',
+    orderIdSearch = '',
+    filter = '',
+    archived = '',
+    location_id = '',
+    delete_password = ''
+  } = req.body;
+
+  // 1️⃣ 密碼驗證
+  if (!delete_password || delete_password !== BULK_DELETE_PASSWORD) {
+    return res.send('批次刪除密碼錯誤，未執行刪除。');
+  }
+
+  // 2️⃣ 日期區間檢查
+  if (!from || !to) {
+    return res.send('請先設定要刪除的日期區間（from / to）。');
+  }
+
+  // 取得「台灣時間的今天」，再往前推 3 天
+  const now = new Date(Date.now() + 8*3600*1000);
+  now.setHours(0, 0, 0, 0);
+  const threeDaysAgoDate = new Date(now.getTime() - 3 * 24 * 3600 * 1000);
+  const limitDate = threeDaysAgoDate.toISOString().slice(0, 10); // YYYY-MM-DD
+
+  // 只允許刪「limitDate（含）以前」的訂單
+  if (to > limitDate) {
+    return res.send(`僅允許刪除「${limitDate}（含）」之前的訂單，請調整日期區間後再試。`);
+  }
+
+  // 3️⃣ 組 where 條件（沿用列表邏輯，外加日期限制）
+  const where = ['1=1'];
+  const params = [];
+
+  // archived
+  const archivedFlag = archived === '1' ? 1 : 0;
+  where.push('is_archived = ?');
+  params.push(archivedFlag);
+
+  // 日期
+  if (from) {
+    where.push("substr(created_at,1,10) >= ?");
+    params.push(from);
+  }
+  if (to) {
+    where.push("substr(created_at,1,10) <= ?");
+    params.push(to);
+  }
+
+  // filter：發票類型
+  if (filter === 'invoice') {
+    where.push(`invoice_type = ?`);
+    params.push('現場開立');
+  } else if (filter === 'digital') {
+    where.push(`invoice_type = ?`);
+    params.push('載具');
+  }
+
+  // 寄件地
+  if (location_id) {
+    where.push('location_id = ?');
+    params.push(parseInt(location_id, 10));
+  }
+
+  // 關鍵字：姓名 / 電話 / Email
+  if (keyword) {
+    where.push(`(name LIKE ? OR phone LIKE ? OR email LIKE ?)`); 
+    params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+  }
+
+  // 訂單編號
+  if (orderIdSearch) {
+    where.push(`order_id LIKE ?`);
+    params.push(`%${orderIdSearch}%`);
+  }
+
+  const deleteSql = `
+    DELETE FROM orders
+    WHERE ${where.join(' AND ')}
+  `;
+
+  db.run(deleteSql, params, function(err) {
+    if (err) return res.send('批次刪除失敗：' + err.message);
+
+    console.log(`批次刪除完成，共刪除 ${this.changes || 0} 筆訂單。`);
 
     const qs = buildAdminQueryString({
       from,
@@ -471,7 +579,7 @@ router.post('/admins/add', async (req, res) => {
     // 加密密碼
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    db.run(`INSERT INTO admins (username, password) VALUES (?, ?)`, [username, hashedPassword], function (err) {
+    db.run(`INSERT INTO admins (username, password) VALUES (?, ?)`, [username, hashedPassword], (err) => {
       if (err) return res.send('新增失敗：' + err.message);
       res.redirect('/admin/admins');
     });
@@ -497,7 +605,7 @@ router.get('/change-password/:id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
   
   const id = req.params.id;
-  db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+  db.get(`SELECT id, username FROM admins WHERE id = ?`, (err, admin) => {
     if (err || !admin) return res.send('找不到該管理員');
     res.render('change-password', { admin, error: null });
   });
@@ -512,7 +620,7 @@ router.post('/change-password/:id', async (req, res) => {
   
   // 驗證
   if (!new_password || !confirm_password) {
-    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, (err, admin) => {
       return res.render('change-password', { 
         admin, 
         error: '新密碼與確認密碼不得為空' 
@@ -522,7 +630,7 @@ router.post('/change-password/:id', async (req, res) => {
   }
   
   if (new_password !== confirm_password) {
-    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, (err, admin) => {
       return res.render('change-password', { 
         admin, 
         error: '兩次輸入的密碼不一致' 
@@ -532,7 +640,7 @@ router.post('/change-password/:id', async (req, res) => {
   }
   
   if (new_password.length < 6) {
-    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, (err, admin) => {
       return res.render('change-password', { 
         admin, 
         error: '密碼長度至少需要 6 個字元' 
@@ -555,7 +663,7 @@ router.post('/change-password/:id', async (req, res) => {
     );
   } catch (error) {
     console.error('修改密碼錯誤:', error);
-    db.get(`SELECT id, username FROM admins WHERE id = ?`, [id], (err, admin) => {
+    db.get(`SELECT id, username FROM admins WHERE id = ?`, (err, admin) => {
       return res.render('change-password', { 
         admin, 
         error: '修改失敗：' + error.message 
@@ -594,7 +702,7 @@ router.post('/locations/add', (req, res) => {
 router.post('/locations/toggle/:id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
   const id = req.params.id;
-  db.get(`SELECT is_active FROM locations WHERE id = ?`, [id], (err, row) => {
+  db.get(`SELECT is_active FROM locations WHERE id = ?`, (err, row) => {
     if (err || !row) return res.send('找不到此寄件地');
     const next = row.is_active ? 0 : 1;
     db.run(`UPDATE locations SET is_active = ? WHERE id = ?`, [next, id], (e2) => {

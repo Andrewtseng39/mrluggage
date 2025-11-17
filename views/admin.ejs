@@ -562,6 +562,40 @@
           class="btn btn-success">匯出載具訂單</a>
       </p>
 
+            <!-- 批次刪除目前篩選（需密碼，且僅刪除三天前含以前） -->
+      <form
+        action="/admin/delete-range"
+        method="POST"
+        style="margin: 8px 0 24px 0;"
+        onsubmit="return confirm('⚠️ 確定要批次刪除【目前篩選條件】中，三天前（含）以前的所有訂單嗎？此動作無法復原！');"
+      >
+        <!-- 把目前篩選條件帶給後端 -->
+        <input type="hidden" name="from"          value="<%= from || '' %>">
+        <input type="hidden" name="to"            value="<%= to || '' %>">
+        <input type="hidden" name="keyword"       value="<%= keyword || '' %>">
+        <input type="hidden" name="orderIdSearch" value="<%= typeof orderId !== 'undefined' ? orderId : '' %>">
+        <input type="hidden" name="filter"        value="<%= filter || '' %>">
+        <input type="hidden" name="archived"      value="<%= archived || '' %>">
+        <input type="hidden" name="location_id"   value="<%= selectedLocationId || '' %>">
+
+        <span style="font-size:13px;color:#dc3545;display:inline-block;margin-bottom:4px;">
+          僅會刪除「三天前（含）以前」且符合目前篩選條件的訂單。
+        </span><br>
+
+        <input
+          type="password"
+          name="delete_password"
+          placeholder="輸入批次刪除密碼"
+          required
+          class="search-input"
+          style="width:220px; margin-right:8px;"
+        >
+        <button type="submit" class="btn btn-danger">
+          批次刪除目前篩選訂單
+        </button>
+      </form>
+
+
       <!-- 統計資訊 -->
       <%
         const searchSummaryParts = [];

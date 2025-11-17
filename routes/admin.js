@@ -702,15 +702,23 @@ router.post('/locations/add', (req, res) => {
 router.post('/locations/toggle/:id', (req, res) => {
   if (!req.session.admin) return res.redirect('/admin/login');
   const id = req.params.id;
-  db.get(`SELECT is_active FROM locations WHERE id = ?`, (err, row) => {
+
+  db.get(`SELECT is_active FROM locations WHERE id = ?`, [id], (err, row) => {
     if (err || !row) return res.send('找不到此寄件地');
+
     const next = row.is_active ? 0 : 1;
-    db.run(`UPDATE locations SET is_active = ? WHERE id = ?`, [next, id], (e2) => {
-      if (e2) return res.send('更新失敗：' + e2.message);
-      res.redirect('/admin/locations');
-    });
+
+    db.run(
+      `UPDATE locations SET is_active = ? WHERE id = ?`,
+      [next, id],
+      (e2) => {
+        if (e2) return res.send('更新失敗：' + e2.message);
+        res.redirect('/admin/locations');
+      }
+    );
   });
 });
+
 
 // 刪除（若已有訂單綁定，僅允許停用）
 router.post('/locations/delete/:id', (req, res) => {
